@@ -1,0 +1,2 @@
+# Local backup (nested .git); confuses GitHub Desktop if left untracked
+mugrok.local.bak/
