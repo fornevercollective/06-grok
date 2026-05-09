@@ -1,0 +1,566 @@
+import { useEffect, useState } from 'react';
+import { useAppStore } from './store';
+import PluginManager from './plugins/pluginManager';
+import { collaborationService } from './services/collaboration';
+import { mlService } from './services/mlService';
+import { offlineSyncService } from './services/offlineSync';
+import { performanceMonitor } from './services/performanceMonitor';
+import Footer from './components/Footer';
+import NotebookPane from './components/NotebookPane';
+import DrawLayer from './components/DrawLayer';
+import ShortcutPopup from './components/ShortcutPopup';
+import { initGrokTerminal } from './terminal/grokTerminal';
+import { uvspeedPageUrl } from './lib/uvspeedWebBase';
+import './App.css';
+
+/** Shell markup mirrors notes.html; TS wiring is incremental. Use React onClick for toggles — StrictMode double-mounts effects, so addEventListener ran twice and each click fired toggles twice (no visible change). */
+function App() {
+  const showTerminal = useAppStore((s) => s.showTerminal);
+  const showPad = useAppStore((s) => s.showPad);
+  const showNotes = useAppStore((s) => s.showNotes);
+  const showDraw = useAppStore((s) => s.showDraw);
+  const showLive = useAppStore((s) => s.showLive);
+  const grokipediaActive = useAppStore((s) => s.grokipediaActive);
+  const isCollaborating = useAppStore((s) => s.isCollaborating);
+  const showChat = useAppStore((s) => s.showChat);
+
+  const [liveExpanded, setLiveExpanded] = useState(false);
+  const [showGames, setShowGames] = useState(false);
+  const [activeGameTab, setActiveGameTab] = useState('hub');
+  const [grokipediaUrl, setGrokipediaUrl] = useState('');
+
+  const loadGrokipediaUrl = (url: string) => {
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    let u = trimmed;
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    const frame = document.getElementById('grokipedia-frame') as HTMLIFrameElement;
+    if (frame) {
+      frame.src = u;
+      frame.hidden = false;
+    }
+    const emp = document.getElementById('grokipedia-empty');
+    if (emp) emp.hidden = true;
+    setGrokipediaUrl(u);
+  };
+
+  (window as any).loadGrokipediaFromFooter = (q: string) => {
+    const url = 'https://grokipedia.com/search?q=' + encodeURIComponent(q);
+    loadGrokipediaUrl(url);
+  };
+
+  const [chatHistory, setChatHistory] = useState<
+    { id: string; type: string; message: string }[]
+  >(() => {
+
+    const saved = localStorage.getItem('grokChatHistory');
+
+    return saved ? JSON.parse(saved) : [
+
+      { id: '4874aef059d0', message: 'Can you verify all that was pending in the other session chat?', type: 'chat' },
+
+      { id: 'abc123def456', message: 'grok chat session id 525a77f03459', type: 'chat' },
+
+      { id: 'xyz789ghi012', message: 'from agent story continuation', type: 'chat' },
+
+      { id: 'jkl345mno678', message: 'this was a seconded crash terminal', type: 'chat' },
+
+      { id: 'pqr901stu234', message: 'grok cli was havin chats in the other tab like this before it froze', type: 'chat' },
+
+      { id: 'vwx567yza890', message: 'want to migrate/implament go/chess/neuralink/sports-field into the game button', type: 'chat' },
+
+      { id: 'bcd123efg456', message: 'create a way to view/reference/train/save grok chats like this one Chat ID {4874aef059d0}', type: 'chat' }
+
+    ];
+
+  });
+
+  const togglePad = useAppStore((s) => s.togglePad);
+  const toggleNotes = useAppStore((s) => s.toggleNotes);
+  const toggleDraw = useAppStore((s) => s.toggleDraw);
+  const toggleLive = useAppStore((s) => s.toggleLive);
+  const toggleTerminal = useAppStore((s) => s.toggleTerminal);
+  const toggleChat = useAppStore((s) => s.toggleChat);
+  const setCollaborating = useAppStore((s) => s.setCollaborating);
+
+  useEffect(() => {
+    const pluginManager = new PluginManager({
+      store: useAppStore,
+      registerCommand: (name: string, _handler: Function) => {
+        console.log(`Plugin command registered: ${name}`);
+      },
+      registerHook: () => {},
+      emitHook: () => {},
+      services: {
+        collaboration: collaborationService,
+        ml: mlService,
+        offlineSync: offlineSyncService,
+        performance: performanceMonitor,
+      },
+    });
+    (window as any).pluginManager = pluginManager;
+    return () => {
+      delete (window as any).pluginManager;
+    };
+  }, []);
+
+  useEffect(() => {
+    const w = window as Window & { notesSurfaceAppendFromScratch?: (text: string) => boolean };
+    w.notesSurfaceAppendFromScratch = (text: string) => {
+      const v = String(text ?? '').trim();
+      if (!v) return false;
+      useAppStore.getState().addNotebookCell({
+        id: `cell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        type: 'markdown',
+        content: v,
+      });
+      return true;
+    };
+    return () => {
+      delete w.notesSurfaceAppendFromScratch;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    const tid = window.setTimeout(() => {
+      const inp = document.getElementById('iss-hint-input') as HTMLInputElement | null;
+      if (!inp) return;
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const v = inp.value.trim();
+        if (!v) return;
+        useAppStore.getState().addNotebookCell({
+          id: `cell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+          type: 'markdown',
+          content: v,
+        });
+        inp.value = '';
+      };
+      inp.addEventListener('keydown', onKey);
+      cleanup = () => inp.removeEventListener('keydown', onKey);
+    }, 0);
+    return () => {
+      window.clearTimeout(tid);
+      cleanup?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    const cleanup = initGrokTerminal();
+    return () => {
+      cleanup?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('nt-draw-open', showDraw);
+  }, [showDraw]);
+
+  useEffect(() => {
+    const updateLiveMetrics = () => {
+      const now = Date.now();
+      const timeComboEl = document.getElementById('nt-live-time-combo');
+      const localEl = document.getElementById('nt-live-local');
+      const regionEl = document.getElementById('nt-live-region');
+      const driftEl = document.getElementById('nt-live-drift');
+      const hopsEl = document.getElementById('nt-live-hops');
+      const rttEl = document.getElementById('nt-live-rtt');
+      const gpuEl = document.getElementById('nt-live-gpu');
+      const cpuEl = document.getElementById('nt-live-cpu');
+
+      if (timeComboEl) {
+        const seconds = Math.floor(now / 1000);
+        const ms = now % 1000;
+        timeComboEl.textContent = `${seconds} · ${ms.toString().padStart(3, '0')}`;
+      }
+      if (localEl) {
+        localEl.textContent = new Date(now).toLocaleTimeString('en', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+      if (regionEl) {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+        regionEl.textContent = `${locale} · ${tz}`;
+      }
+      if (driftEl) {
+        const perfNow = performance.now();
+        const perfOrigin = performance.timeOrigin;
+        const drift = now - (perfOrigin + perfNow);
+        driftEl.textContent = `${drift.toFixed(1)}ms`;
+      }
+      if (hopsEl) {
+        hopsEl.textContent = '—'; // Placeholder, requires network analysis
+      }
+      if (rttEl) {
+        // Simple ping simulation
+        rttEl.textContent = `${Math.floor(Math.random() * 50) + 10}ms`;
+      }
+      if (gpuEl) {
+        try {
+          const canvas = document.createElement('canvas');
+          const gl =
+            (canvas.getContext('webgl') ||
+              canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+          if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info') as
+              | { UNMASKED_RENDERER_WEBGL: number }
+              | null;
+            const renderer = debugInfo
+              ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+              : gl.getParameter(gl.RENDERER);
+            gpuEl.textContent = renderer ? String(renderer).split(' ')[0] : '—';
+          } else {
+            gpuEl.textContent = '—';
+          }
+        } catch {
+          gpuEl.textContent = '—';
+        }
+      }
+      if (cpuEl) {
+        cpuEl.textContent = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cores` : '—';
+      }
+    };
+    updateLiveMetrics();
+    const interval = setInterval(updateLiveMetrics, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'e') {
+        setLiveExpanded(prev => !prev);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('grokChatHistory', JSON.stringify(chatHistory));
+  }, [chatHistory]);
+
+  const mainClassName = [
+    'main',
+    !showTerminal && 'term-io-hidden',
+    showNotes && 'notes-panel-open',
+    showDraw && 'nt-draw-active',
+    showLive && 'nt-live-embed-active',
+    grokipediaActive && 'grokipedia-panel-active',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <div className="notes-surface-page dark">
+      <div className="nt-top">
+        <div className="nt-top-left">
+          <button
+            type="button"
+            className="nt-top-btn logo-btn"
+            id="btn-toggle-status"
+            title="Show terminal input"
+            aria-label="Toggle terminal output and prompt"
+            aria-pressed={showTerminal}
+            onClick={() => toggleTerminal()}
+          >
+            <span className="logo-cli" translate="no">
+              <span className="logo-cli-brand">.grok</span>
+              <span className="logo-cli-chev" aria-hidden="true">❯</span>
+              <span className="logo-cli-tail">cli</span>
+            </span>
+          </button>
+          <span className="badge badge-live">LIVE</span>
+          <span className="nt-top-live-strip" aria-label="Clock and host hints" translate="no">
+            <span className="nt-mkv nt-mkv-time">
+              <span
+                className="nt-mk nt-time-combo"
+                id="nt-live-time-combo"
+                title="Unix seconds · epoch ms — sub-second suffix in blue"
+                aria-label="Unix seconds and epoch milliseconds"
+              ></span>
+            </span>
+            <span className="nt-sep">·</span>
+            <span className="nt-mkv">
+              <span className="nt-mk" title="Local date and time (browser locale)">local</span>
+              <span className="nt-mv" id="nt-live-local"></span>
+            </span>
+            {!liveExpanded && (
+              <>
+                <span className="nt-sep">—</span>
+                <span className="nt-sep">·</span>
+                <span className="nt-expand-hint">ctrl+e expand</span>
+              </>
+            )}
+            {liveExpanded && (
+              <>
+                <span className="nt-sep">—</span>
+                <span className="nt-mkv">
+                  <span className="nt-mk">region</span>
+                  <span className="nt-mv" id="nt-live-region"></span>
+                </span>
+                <span className="nt-sep">·</span>
+                <span className="nt-mkv">
+                  <span className="nt-mk">drift</span>
+                  <span className="nt-mv nt-mv-fixed-num" id="nt-live-drift"></span>
+                </span>
+                <span className="nt-sep">·</span>
+                <span className="nt-mkv">
+                  <span className="nt-mk">hops</span>
+                  <span className="nt-mv" id="nt-live-hops"></span>
+                </span>
+                <span className="nt-sep">·</span>
+                <span className="nt-mkv">
+                  <span className="nt-mk">rtt</span>
+                  <span className="nt-mv nt-mv-fixed-num" id="nt-live-rtt"></span>
+                </span>
+                <span className="nt-sep">·</span>
+                <span className="nt-mkv">
+                  <span className="nt-mk">gpu</span>
+                  <span className="nt-mv" id="nt-live-gpu"></span>
+                </span>
+                <span className="nt-sep">·</span>
+                <span className="nt-mkv">
+                  <span className="nt-mk">cpu</span>
+                  <span className="nt-mv" id="nt-live-cpu"></span>
+                </span>
+              </>
+            )}
+          </span>
+        </div>
+        <div className="status" role="status" aria-live="polite">
+          <div className="nt-status-inner">
+            <div className="nt-status-topline">
+              <div className="nt-status-fact">
+                <svg className="grok-mini-mark" width="14" height="14" viewBox="0 0 33 33" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M13.237 21.041l11.082-8.19a.75.75 0 0 1 1.578.379c1.363 3.289.754 7.242-1.957 9.955-2.71 2.714-6.482 3.31-9.93 1.954l-3.765 1.745c5.401 3.697 11.96 2.783 16.059-1.324 3.25-3.255 4.258-7.692 3.316-11.693l.009.008C27.965 7.998 29.666 5.65 33.15.845 33.232.73 33.314.617 33.397.5l-4.586 4.59v-.014L13.234 21.044z"/>
+                  <path d="M10.95 23.031c-3.877-3.707-3.208-9.446.1-12.755 2.446-2.45 6.454-3.449 9.952-1.98l3.758-1.737a12.5 12.5 0 0 0-2.54-1.386c-4.5-1.854-9.887-.931-13.545 2.728-3.518 3.523-4.625 8.94-2.725 13.561 1.42 3.454-.906 5.898-3.25 8.363-.83.874-1.664 1.749-2.335 2.674L10.947 23.034z"/>
+                </svg>
+                <span className="nt-fact-text">
+                  <span className="nt-fact-strong">Fact-checked</span> by Grok <time id="nt-fact-time" dateTime="2026-02-14">2 months ago</time>
+                </span>
+              </div>
+            </div>
+            <div className="nt-status-metrics">
+              <span className="dot" aria-hidden="true"></span>
+              <span id="st-state">ready</span>
+              <span className="sep">│</span>
+              <span>blocks: <span id="nt-sb-count">0</span></span>
+            </div>
+          </div>
+        </div>
+        <div className="nt-top-right">
+          <button
+            type="button"
+            className={`nt-top-btn${showPad ? ' active' : ''}`}
+            id="btn-toggle-pad"
+            title="Hide notebook pad"
+            aria-label="Hide notebook pad"
+            aria-pressed={showPad}
+            onClick={() => togglePad()}
+          >
+            + Pad
+          </button>
+          <button
+            type="button"
+            className={`nt-top-btn${showNotes ? ' active' : ''}`}
+            id="btn-toggle-notes"
+            title="Toggle notes panel"
+            aria-label="Toggle notes panel"
+            aria-pressed={showNotes}
+            onClick={() => toggleNotes()}
+          >
+            +Note
+          </button>
+          <button
+            type="button"
+            className={`nt-top-btn${showGames ? ' active' : ''}`}
+            id="btn-toggle-games"
+            title="Game boards"
+            aria-label="Toggle game boards"
+            aria-pressed={showGames}
+            onClick={() => setShowGames(!showGames)}
+          >
+            +Games
+          </button>
+          <button
+            type="button"
+            className={`nt-top-btn${showDraw ? ' active' : ''}`}
+            id="btn-toggle-draw"
+            title="Drawing tools"
+            aria-label="Toggle drawing tools"
+            aria-pressed={showDraw}
+            onClick={() => toggleDraw()}
+          >
+            + Draw
+          </button>
+          <button
+            type="button"
+            className={`nt-top-btn${showLive ? ' active' : ''}`}
+            id="btn-toggle-live"
+            title="Live hexcast"
+            aria-label="Toggle live hexcast"
+            aria-pressed={showLive}
+            onClick={() => toggleLive()}
+          >
+            +Live
+          </button>
+          <button
+            type="button"
+            className={`nt-top-btn${isCollaborating ? ' active' : ''}`}
+            id="btn-toggle-collab"
+            title="Toggle collaboration"
+            aria-label="Toggle collaboration"
+            aria-pressed={isCollaborating}
+            onClick={() => setCollaborating(!isCollaborating)}
+          >
+            +Collab
+          </button>
+          <button
+            type="button"
+            className={`nt-top-btn${showChat ? ' active' : ''}`}
+            id="btn-toggle-chat"
+            title="Toggle chat"
+            aria-label="Toggle chat"
+            aria-pressed={showChat}
+            onClick={() => toggleChat()}
+          >
+            +Chat
+          </button>
+        </div>
+      </div>
+
+      {showLive && (
+        <div id="nt-live-hexcast" className="nt-live-hexcast" aria-hidden="false">
+          <div className="nt-live-hexcast-rainbow" aria-hidden="true">
+            <span className="hx-r1"></span><span className="hx-r2"></span><span className="hx-r3"></span><span className="hx-r4"></span><span className="hx-r5"></span><span className="hx-r6"></span>
+          </div>
+          <div className="nt-live-hexcast-head">
+            <div className="nt-hx-tabs" role="tablist" aria-label="Live stack (Studio vs uvspeed pages)">
+              <button type="button" className="nt-hx-tab active" role="tab" id="nt-hx-tab-embed" aria-selected="true" aria-controls="nt-hx-panel-embed" data-hx-view="embed">Studio</button>
+              <button type="button" className="nt-hx-tab" role="tab" aria-selected="false" aria-controls="nt-hx-panel-external" data-hx-view="hexcast">hexcast</button>
+            </div>
+          </div>
+          <div className="nt-hx-body">
+            <div id="nt-hx-panel-embed" className="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-hx-tab-embed">
+              {/* Hexcast controls and panels */}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showGames && (
+        <div id="nt-games-hexcast" className="nt-live-hexcast" aria-hidden="false">
+          <div className="nt-live-hexcast-rainbow" aria-hidden="true">
+            <span className="hx-r1"></span><span className="hx-r2"></span><span className="hx-r3"></span><span className="hx-r4"></span><span className="hx-r5"></span><span className="hx-r6"></span>
+          </div>
+          <div className="nt-live-hexcast-head">
+            <div className="nt-hx-tabs" role="tablist" aria-label="Games boards">
+              <button type="button" className={`nt-hx-tab${activeGameTab === 'hub' ? ' active' : ''}`} role="tab" id="nt-games-tab-hub" aria-selected={activeGameTab === 'hub'} aria-controls="nt-games-panel-hub" onClick={() => setActiveGameTab('hub')}>Hub</button>
+              <button type="button" className={`nt-hx-tab${activeGameTab === 'go' ? ' active' : ''}`} role="tab" aria-selected={activeGameTab === 'go'} aria-controls="nt-games-panel-go" onClick={() => setActiveGameTab('go')}>Go</button>
+              <button type="button" className={`nt-hx-tab${activeGameTab === 'chess' ? ' active' : ''}`} role="tab" aria-selected={activeGameTab === 'chess'} aria-controls="nt-games-panel-chess" onClick={() => setActiveGameTab('chess')}>Chess</button>
+              <button type="button" className={`nt-hx-tab${activeGameTab === 'neuralink' ? ' active' : ''}`} role="tab" aria-selected={activeGameTab === 'neuralink'} aria-controls="nt-games-panel-neuralink" onClick={() => setActiveGameTab('neuralink')}>Neuralink</button>
+              <button type="button" className={`nt-hx-tab${activeGameTab === 'sports' ? ' active' : ''}`} role="tab" aria-selected={activeGameTab === 'sports'} aria-controls="nt-games-panel-sports" onClick={() => setActiveGameTab('sports')}>Sports Field</button>
+            </div>
+          </div>
+          <div className="nt-hx-body">
+            <div id="nt-games-panel-hub" className="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-games-tab-hub" hidden={activeGameTab !== 'hub'}>
+              <iframe src={uvspeedPageUrl('games-ugrad-hub.html')} style={{ width: '100%', height: '100%', border: 'none' }} title="Games Hub" />
+            </div>
+            <div id="nt-games-panel-go" className="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-games-tab-go" hidden={activeGameTab !== 'go'}>
+              <iframe src={uvspeedPageUrl('go-ugrad.html')} style={{ width: '100%', height: '100%', border: 'none' }} title="Go Game" />
+            </div>
+            <div id="nt-games-panel-chess" className="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-games-tab-chess" hidden={activeGameTab !== 'chess'}>
+              <iframe src={uvspeedPageUrl('chess-ugrad.html')} style={{ width: '100%', height: '100%', border: 'none' }} title="Chess Game" />
+            </div>
+            <div id="nt-games-panel-neuralink" className="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-games-tab-neuralink" hidden={activeGameTab !== 'neuralink'}>
+              <iframe src={uvspeedPageUrl('glyph.html')} style={{ width: '100%', height: '100%', border: 'none' }} title="Glyph Game" />
+            </div>
+            <div id="nt-games-panel-sports" className="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-games-tab-sports" hidden={activeGameTab !== 'sports'}>
+              <iframe src={uvspeedPageUrl('sports-field-ugrad.html')} style={{ width: '100%', height: '100%', border: 'none' }} title="Sports Field" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showChat && (
+        <div id="nt-chat-hexcast" className="nt-live-hexcast" aria-hidden="false">
+          <div className="nt-live-hexcast-rainbow" aria-hidden="true">
+            <span className="hx-r1"></span><span className="hx-r2"></span><span className="hx-r3"></span><span className="hx-r4"></span><span className="hx-r5"></span><span className="hx-r6"></span>
+          </div>
+          <div className="nt-live-hexcast-head">
+            <h3 style={{margin: 0, fontSize: '14px', color: 'var(--qp-text)'}}>Chat History & Training</h3>
+          </div>
+          <div className="nt-hx-body" style={{padding: '10px', overflowY: 'auto'}}>
+            <div style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
+              <button onClick={() => setChatHistory([])} style={{padding: '5px 10px', background: 'var(--qp-bg-tertiary)', border: '1px solid var(--qp-border)', borderRadius: '4px'}}>Clear History</button>
+              <button onClick={() => {
+                // Train on history using ML engine
+                if (chatHistory.length > 0) {
+                  // Placeholder for training
+                  alert('Training on ' + chatHistory.length + ' chats (placeholder)');
+                }
+              }} style={{padding: '5px 10px', background: 'var(--qp-accent)', color: 'white', border: 'none', borderRadius: '4px'}}>Train on History</button>
+            </div>
+            <div>
+              {chatHistory.length === 0 ? (
+                <p style={{color: 'var(--iss-muted)'}}>No chats saved yet. Send messages in the footer to save.</p>
+              ) : (
+                chatHistory.map((chat, i) => (
+                  <div key={i} style={{marginBottom: '10px', padding: '8px', background: 'var(--iss-chrome)', borderRadius: '4px'}}>
+                    <small style={{color: 'var(--iss-muted)'}}>ID: {chat.id} | Mode: {chat.type}</small>
+                    <p style={{margin: '5px 0', color: 'var(--qp-text)'}}>{chat.message}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={mainClassName} id="main">
+        <div className="term-pane">
+          <div id="term-output"></div>
+          <div className="term-prompt">
+            <span className="tp-label">grok ❯</span>
+            <input id="term-input" type="text" placeholder="type command…" autoComplete="off" spellCheck="false" />
+          </div>
+        </div>
+
+        <div className="grokipedia-pane" id="grokipedia-pane" aria-label="Grokipedia">
+          <div className="gpb-bar" role="toolbar" aria-label="Navigator">
+            <button type="button" className="gpb-btn" id="gpb-back" title="Back">◀</button>
+            <button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh" onClick={() => { const frame = document.getElementById('grokipedia-frame') as HTMLIFrameElement; if (frame             <button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh" onClick={() => { const frame = document.getElementById('grokipedia-frame') as HTMLIFrameElement; if (frame <button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh">⟳</button><button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh">⟳</button> frame.src) frame.src = frame.src; }}>⟳</button>            <button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh" onClick={() => { const frame = document.getElementById('grokipedia-frame') as HTMLIFrameElement; if (frame <button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh">⟳</button><button type="button" className="gpb-btn" id="gpb-refresh" title="Refresh">⟳</button> frame.src) frame.src = frame.src; }}>⟳</button> frame.src) frame.src = frame.src; }}>⟳</button>
+            <input type="text" className="gpb-url" id="gpb-url" spellCheck="false" autoComplete="off" placeholder="https://grokipedia.com/…" value={grokipediaUrl} onChange={(e) => setGrokipediaUrl(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') loadGrokipediaUrl(grokipediaUrl); }} />
+            <button type="button" className="gpb-go" id="gpb-go" title="Go" onClick={() => loadGrokipediaUrl(grokipediaUrl)}>Go</button>
+          </div>
+          <div className="gp-body-stack" id="gp-body-stack">
+            <iframe className="grokipedia-frame" id="grokipedia-frame" title="Grokipedia search" hidden sandbox="allow-scripts allow-popups allow-forms allow-downloads allow-top-navigation-by-user-activation" referrerPolicy="no-referrer-when-downgrade"></iframe>
+            <div className="gp-viewer" id="gp-viewer" hidden aria-live="polite"></div>
+            <div className="grokipedia-empty" id="grokipedia-empty">
+              <span>Select <strong>Grokipedia</strong> in the footer and search — results load here.</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="splitter" id="splitter-notebook" data-target="notebook-pane"></div>
+        <NotebookPane />
+
+        <div className={`notes-drawer${showNotes ? ' open' : ''}`} id="notes-pane">
+          <div className="nt-notes">
+            <textarea className="nt-notes-editor" id="notes-editor" placeholder="Type your notes here..."></textarea>
+            <div className="nt-notes-cards" id="notes-cards"></div>
+          </div>
+        </div>
+
+        {showDraw && <DrawLayer />}
+      </div>
+
+      <Footer />
+      <ShortcutPopup />
+    </div>
+  );
+}
+
+export default App;

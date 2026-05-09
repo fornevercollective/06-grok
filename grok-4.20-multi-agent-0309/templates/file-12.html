@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>GROK › TEAM RAILWAY v15 • DASHBOARD + CLI BREAKOUT</title>
+<style>
+:root {
+  --bg: #000000; --panel: #0a0a0a; --border: #1a1a1a;
+  --accent: #00ff9f; --accent2: #00eaff; --text: #00ddaa;
+  --mono: ui-monospace, "SF Mono", Consolas, monospace;
+}
+body { margin:0; background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; overflow:hidden; }
+header { background:#050505; border-bottom:3px solid var(--accent); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; }
+h2 { color:var(--accent2); margin:0 0 8px 0; font-size:13px; letter-spacing:1px; }
+
+.panel { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:12px; margin:8px; }
+.dashboard-grid { display:grid; grid-template-columns: 260px 1fr 340px; gap:8px; height:calc(100vh - 68px); padding:8px; }
+
+.sidebar { display:flex; flex-direction:column; gap:8px; }
+.main { display:flex; flex-direction:column; gap:8px; }
+.terminal { flex:1; background:#000; border:1px solid #222; padding:12px; overflow:auto; white-space:pre-wrap; font-size:12px; line-height:1.4; }
+
+.client-list { max-height:300px; overflow:auto; }
+.client { padding:4px 8px; background:#111; margin:2px 0; border-left:3px solid #00ff9f; font-size:12px; }
+
+.status-bar { font-size:11px; color:#666; display:flex; gap:16px; }
+.btn { background:#111; color:var(--accent); border:1px solid var(--accent); padding:5px 12px; font-size:11px; cursor:pointer; border-radius:3px; }
+.btn:hover { background:var(--accent); color:#000; }
+.mic-btn.recording { background:#00ff9f; color:#000; animation:pulse 1.2s infinite; }
+@keyframes pulse { 50% { opacity:0.4; } }
+
+.agent-toggle { display:flex; align-items:center; gap:8px; background:#111; padding:6px 10px; margin:3px 0; border-radius:4px; cursor:pointer; }
+.agent-toggle.on { border:2px solid #00ff9f; background:#002211; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GROK › TEAM RAILWAY v15 • DASHBOARD</h1>
+  <div class="status-bar">
+    <span>Server: <input id="server-url" value="ws://localhost:8080" style="background:#111;color:#0f0;border:none;width:220px"></span>
+    <button onclick="connectWebSocket()" class="btn">CONNECT</button>
+    <span id="ws-status">WS: disconnected</span>
+    <span id="client-count">Connected: 1</span>
+  </div>
+</header>
+
+<div class="dashboard-grid">
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="panel">
+      <h2>RAILWAY AGENTS</h2>
+      <div id="agent-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>CONNECTED CLIENTS</h2>
+      <div id="client-list" class="client-list"></div>
+    </div>
+
+    <div class="panel">
+      <h2>STAGING AREA</h2>
+      <div id="staging-area" style="min-height:120px;background:#111;padding:8px;font-size:11px;overflow:auto">— highlight any text to stage —</div>
+      <button onclick="clearStaging()" class="btn" style="width:100%;margin-top:6px">CLEAR STAGING</button>
+    </div>
+  </div>
+
+  <!-- CENTER TERMINAL -->
+  <div class="main">
+    <div class="panel" style="flex:1;display:flex;flex-direction:column">
+      <h2>GROK CLI BREAKOUT • LIVE LOG</h2>
+      <pre id="console-log" class="terminal"></pre>
+    </div>
+
+    <div class="panel">
+      <button onclick="toggleVoice()" id="mic-btn" class="btn mic-btn" style="width:100%;padding:12px;font-size:14px">🎤 ACTIVATE VOICE COMMAND (18 commands)</button>
+    </div>
+  </div>
+
+  <!-- RIGHT DASHBOARD -->
+  <div>
+    <div class="panel">
+      <h2>RAILWAY STATUS</h2>
+      <div id="railway-status" style="font-size:12px;line-height:1.6"></div>
+    </div>
+
+    <div class="panel">
+      <h2>LAST VOICE INTENT (PyTorch / Rust)</h2>
+      <div id="last-intent" style="background:#111;padding:12px;font-size:14px;color:#ff00cc;min-height:40px"></div>
+    </div>
+
+    <div class="panel">
+      <h2>QUICK ACTIONS</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <button onclick="exportRailway('steno')" class="btn">Export .steno</button>
+        <button onclick="exportRailway('json')" class="btn">Export JSON</button>
+        <button onclick="forceMerge()" class="btn">Force Merge</button>
+        <button onclick="togglePause()" id="pause-btn" class="btn">Pause Railway</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== STATE ======================
+let ws = null;
+let myId = "Dashboard-" + Math.floor(Math.random()*9999);
+let activeAgents = { Oppie: true, Leo: true, Enrico: true, Hans: true };
+let connectedClients = [];
+let lastIntent = "—";
+
+const voiceCommands = [
+  "pause railway","resume railway","force merge","export steno","export json","clear staging",
+  "hop on opp","hop on leo","hop on enrico","hop on hans",
+  "hop off opp","hop off leo","hop off enrico","hop off hans",
+  "increase depth","decrease depth","start transcript","stop transcript"
+];
+
+// ====================== LOG ======================
+function log(msg) {
+  const el = document.getElementById("console-log");
+  const ts = new Date().toLocaleTimeString('en-US',{hour12:false});
+  el.textContent += `${ts} ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// ====================== WEBSOCKET ======================
+function connectWebSocket() {
+  const url = document.getElementById("server-url").value;
+  ws = new WebSocket(url);
+
+  ws.onopen = () => {
+    document.getElementById("ws-status").innerHTML = `<span style="color:#00ff9f">● LIVE</span>`;
+    log("[WS] Dashboard connected to railway hub");
+    ws.send(JSON.stringify({type:"join", client:myId, role:"dashboard"}));
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "state") {
+        activeAgents = msg.state.activeAgents || activeAgents;
+        lastIntent = msg.state.lastIntent || lastIntent;
+        updateDashboard();
+      } else if (msg.type === "clients") {
+        connectedClients = msg.clients || [];
+        updateClientList();
+      }
+    } catch(e) {}
+  };
+
+  ws.onclose = () => {
+    document.getElementById("ws-status").innerHTML = `<span style="color:#f66">● DISCONNECTED</span>`;
+    setTimeout(connectWebSocket, 3000);
+  };
+}
+
+// ====================== DASHBOARD UPDATES ======================
+function updateDashboard() {
+  let html = `<strong>Depth:</strong> ${depth || 4}<br>`;
+  html += `<strong>Paused:</strong> ${isPaused ? "YES" : "NO"}<br>`;
+  html += `<strong>Last Intent (PyTorch/Rust):</strong> ${lastIntent}<br><br>`;
+  html += `<strong>Agents on Railway:</strong><br>`;
+  Object.keys(activeAgents).forEach(a => {
+    html += `• ${a}: ${activeAgents[a] ? "ON" : "OFF"}<br>`;
+  });
+  document.getElementById("railway-status").innerHTML = html;
+}
+
+function updateClientList() {
+  const el = document.getElementById("client-list");
+  let html = "";
+  connectedClients.forEach(c => {
+    html += `<div class="client">● ${c} ${c===myId ? '(this dashboard)' : ''}</div>`;
+  });
+  el.innerHTML = html || "<div style='color:#555'>No other clients</div>";
+  document.getElementById("client-count").textContent = `Connected: ${connectedClients.length + 1}`;
+}
+
+function toggleAgent(name) {
+  activeAgents[name] = !activeAgents[name];
+  if (ws) ws.send(JSON.stringify({type:"toggleAgent", name, value:activeAgents[name]}));
+  updateDashboard();
+}
+
+function renderAgents() {
+  const el = document.getElementById("agent-list");
+  let html = "";
+  Object.keys(activeAgents).forEach(name => {
+    const on = activeAgents[name];
+    html += `<div onclick="toggleAgent('${name}')" class="agent-toggle ${on?'on':''}">
+      <span style="color:#00ff9f">●</span> ${name} <span style="margin-left:auto;font-size:10px;color:#666">${on?'ON RAIL':'SIDING'}</span>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ====================== VOICE + STAGING + EXPORT ======================
+function toggleVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return log("[VOICE] Not supported in this browser");
+  
+  const rec = new SpeechRecognition();
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.onresult = (e) => {
+    let transcript = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+    const lower = transcript.toLowerCase();
+    for (let cmd of voiceCommands) {
+      if (lower.includes(cmd)) {
+        log(`[VOICE COMMAND] ${cmd}`);
+        if (ws) ws.send(JSON.stringify({type:"voice_command", text:cmd}));
+        return;
+      }
+    }
+  };
+  rec.start();
+  log("[VOICE] Listening — 18 commands active");
+}
+
+function exportRailway(fmt) {
+  if (ws) ws.send(JSON.stringify({type:"export", format:fmt}));
+  log(`[EXPORT] Requested ${fmt.toUpperCase()} export`);
+}
+
+// Boot
+log("Grok Railway v14 Dashboard Loaded — CLI Breakout Mode");
+log("Highlight any text on screen to stage it");
+connectWebSocket();
+renderAgents();
+updateDashboard();
+</script>
+</body>
+</html>

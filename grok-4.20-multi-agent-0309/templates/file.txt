@@ -1,0 +1,34 @@
+<div id="lab-steno-preview" class="lab-steno-wrap" role="region" aria-label="Steno pad preview">
+  <div class="lab-steno-bar">
+    <span class="lab-steno-title">Channel A → steno → Channel B</span>
+    <span class="lab-steno-bar-actions">
+      <button type="button" id="lab-steno-save" class="lab-steno-btn">save .steno</button>
+      <button type="button" id="lab-steno-load" class="lab-steno-btn">load</button>
+      <button type="button" id="lab-steno-demo" class="lab-steno-btn">demo</button>
+    </span>
+  </div>
+  <div class="lab-steno-panes">
+    <div class="lab-steno-pane lab-steno-pane-a">
+      <div class="lab-steno-ph">
+        <span><span class="ch-a">A</span> human-readable code</span>
+        <span id="lab-steno-la-stats" class="lab-steno-mini">—</span>
+      </div>
+      <textarea id="lab-steno-la" class="lab-steno-ta" spellcheck="false" placeholder="Paste or type code — whitespace will carry quantum data"></textarea>
+    </div>
+    <div class="lab-steno-pane lab-steno-pane-b">
+      <div class="lab-steno-ph">
+        <span><span class="ch-b">B</span> decoded metadata</span>
+        <span id="lab-steno-rb-stats" class="lab-steno-mini">—</span>
+      </div>
+      <div id="lab-steno-rb" class="lab-steno-rb"></div>
+    </div>
+  </div>
+  <div class="lab-steno-foot" aria-live="polite">
+    <span id="lab-steno-fl">lines: 0</span>
+    <span id="lab-steno-fb">bits: 0</span>
+    <span id="lab-steno-fu">util: —</span>
+    <span id="lab-steno-fc">capacity: —</span>
+    <span id="lab-steno-fw">waste: —</span>
+  </div>
+</div>
+<input type="file" id="lab-steno-file" accept=".js,.ts,.py,.rs,.go,.html,.css,.json,.md,.txt,.steno" style="display:none" aria-hidden="true">

@@ -1,0 +1,32 @@
+{
+  "manifest_path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/manifest.json",
+  "base_dir": "/Volumes/qbitOS/03.models/nanochat-demo",
+  "defaults": {
+    "ollama_model": "auto",
+    "examples_per_source": 3,
+    "max_source_chars": 3000,
+    "max_source_rows": 8,
+    "temperature": 0.2,
+    "num_predict": 64,
+    "max_response_chars": 260,
+    "val_ratio": 0.1,
+    "seed": 1337
+  },
+  "ollama_model": "granite3.2:latest",
+  "source_count": 221,
+  "total_examples": 286,
+  "train_examples": 261,
+  "val_examples": 25,
+  "docs": 221,
+  "grounded_examples": 286,
+  "train_rows": 261,
+  "val_rows": 25,
+  "outputs": {
+    "raw_dir": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/raw",
+    "normalized_dir": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized",
+    "search_db": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/index/reference.sqlite",
+    "grounded_examples": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/index/grounded_examples.jsonl",
+    "train_jsonl": "/Volumes/qbitOS/03.models/nanochat-demo/training_data/final_train.jsonl",
+    "val_jsonl": "/Volumes/qbitOS/03.models/nanochat-demo/training_data/final_val.jsonl"
+  }
+}

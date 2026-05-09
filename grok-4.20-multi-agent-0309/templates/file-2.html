@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-grok-team="1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grok › Team • Console</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #111111;
+  --border: #222222;
+  --text: #e0e0e0;
+  --accent: #00f5d4;
+  --accent2: #00b8a9;
+  --muted: #666666;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  overflow-x: hidden;
+}
+
+header {
+  background: #0a0a0a;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header h1 { font-size: 1.1rem; margin:0; font-weight: 500; color: var(--accent); }
+
+.git-traffic {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  overflow-x: auto;
+}
+.git-graph {
+  min-width: 920px;
+  height: 92px;
+  position: relative;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1.25rem;
+}
+
+h2 { font-size: 0.95rem; color: var(--accent); margin:0 0 0.75rem; letter-spacing: -.02em; }
+.lede { color: var(--muted); font-size: 0.8rem; margin-bottom: 1rem; }
+
+.console-log {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  padding: 1rem;
+  height: 240px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  color: #00ddaa;
+}
+
+.steno-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.steno-pane {
+  background: var(--panel);
+  padding: 1rem;
+}
+.steno-pane h3 { font-size: 0.75rem; color: #00b8a9; margin:0 0 0.5rem; }
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 50% { opacity: 0.4; } }
+
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a1a;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  margin: 2px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GROK › TEAM CONSOLE</h1>
+  <div style="display:flex;gap:1.5rem;font-size:0.8rem;color:var(--muted)">
+    <div><span class="status-dot"></span> 4 Agents Online</div>
+    <div id="live-users">3 Humans in flow</div>
+  </div>
+</header>
+
+<!-- GIT GRAPH TRAFFIC CONTROL -->
+<div class="git-traffic">
+  <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;font-size:0.75rem;color:var(--muted)">
+    <div><strong>MAIN PRODUCTION CHAIN</strong> — Isomorphic Orchestration Loop</div>
+    <div style="color:var(--accent)">ON/OFF RAMPS ENABLED — Hackathon / Office Mode</div>
+  </div>
+  
+  <svg id="git-graph" class="git-graph" viewBox="0 0 1100 92" xmlns="http://www.w3.org/2000/svg"></svg>
+  
+  <div style="display:flex;gap:0.75rem;margin-top:0.75rem;flex-wrap:wrap">
+    <button onclick="joinRamp('triage')" class="panel" style="padding:0.4rem 1rem;font-size:0.8rem;cursor:pointer">Join Triage Ramp</button>
+    <button onclick="joinRamp('analysis')" class="panel" style="padding:0.4rem 1rem;font-size:0.8rem;cursor:pointer">Join Analysis Ramp</button>
+    <button onclick="joinRamp('contrib')" class="panel" style="padding:0.4rem 1rem;font-size:0.8rem;cursor:pointer">Join Contributor Lane</button>
+    <button onclick="hopOff()" class="panel" style="padding:0.4rem 1rem;font-size:0.8rem;cursor:pointer;background:#330000;color:#ff6666">Hop Off Chain</button>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;padding:0 1.25rem">
+
+  <!-- MAIN ORCHESTRATION -->
+  <div>
+    <div class="panel">
+      <h2>Active Tasks • Isomorphic Flow</h2>
+      <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.8rem">
+        <thead><tr style="color:var(--muted);text-align:left"><th>Ticket</th><th>Objective</th><th>Stage</th><th>Participants</th><th>Status</th></tr></thead>
+        <tbody id="task-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Context Pad • Live Synthesis</h2>
+      <div class="steno-grid">
+        <div class="steno-pane">
+          <h3>Channel A — Incoming Prompt / Raw Data</h3>
+          <textarea id="channel-a" style="width:100%;height:180px;background:#0a0a0a;border:1px solid #222;color:#ccc;font-family:var(--mono);padding:0.75rem;font-size:0.8rem" placeholder="Paste research objective, dataset, or URL list..."></textarea>
+          <button onclick="createTask()" style="margin-top:0.75rem;padding:0.5rem 1rem;background:var(--accent);color:black;border:none;border-radius:4px;cursor:pointer">Send to Orchestration</button>
+        </div>
+        <div class="steno-pane">
+          <h3>Channel B — Team Synthesis &amp; Iterated Output</h3>
+          <div id="channel-b" style="height:180px;overflow:auto;font-family:var(--mono);font-size:0.8rem;color:#00ddaa;background:#0a0a0a;padding:0.75rem;white-space:pre-wrap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE CONSOLE & PRESENCE -->
+  <div>
+    <div class="panel">
+      <h2>Live Console • Agent Feed</h2>
+      <pre id="console-log" class="console-log">2026-04-17 14:32:11.442 [ORCH] Isomorphic orchestration layer active
+2026-04-17 14:32:12.118 [OPP] Poll complete. 2 new tasks enqueued.
+2026-04-17 14:32:13.291 [LEO] Analysis ramp engaged — decomposing query...
+</pre>
+    </div>
+
+    <div class="panel">
+      <h2>Presence • In Flow</h2>
+      <div id="presence" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Orchestration Graph Legend</h2>
+      <div style="font-size:0.75rem;color:var(--muted);line-height:1.6">
+        <strong>Main Chain</strong> — Persistent production loop (never interrupted)<br>
+        <strong>On-Ramps</strong> — Temporary human/agent entry points (Triage, Analysis, Contributor)<br>
+        <strong>Off-Ramp</strong> — Clean exit that merges results back into main chain without disruption
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== STATE ======================
+let usersInFlow = [
+  {id: "Oppie", color: "#00f5d4", role: "Orchestrator"},
+  {id: "Leo", color: "#00b8ff", role: "Analysis"},
+  {id: "Enrico", color: "#ff2e9f", role: "Convert"},
+  {id: "Hans", color: "#a78bfa", role: "Collab"}
+];
+
+let tasks = [];
+const stages = ["Search", "Analysis", "Convert", "Collab", "Iterate", "Loop"];
+
+// ====================== GIT GRAPH RENDERER ======================
+function renderGitGraph(activeRamps = []) {
+  const svg = document.getElementById("git-graph");
+  svg.innerHTML = `
+    <!-- Main trunk -->
+    <path d="M 80 46 L 1020 46" stroke="#00f5d4" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <text x="40" y="52" fill="#00f5d4" font-size="11" font-family="monospace">MAIN</text>
+    
+    <!-- Ramps -->
+    <path d="M 220 46 Q 280 10 340 10" stroke="#00b8ff" stroke-width="3.5" fill="none" stroke-dasharray="2,2"/>
+    <text x="260" y="18" fill="#00b8ff" font-size="10" font-family="monospace">TRIAGE</text>
+    
+    <path d="M 480 46 Q 540 10 610 10" stroke="#ff2e9f" stroke-width="3.5" fill="none" stroke-dasharray="2,2"/>
+    <text x="520" y="18" fill="#ff2e9f" font-size="10" font-family="monospace">ANALYSIS</text>
+    
+    <path d="M 720 46 Q 780 82 860 82" stroke="#a78bfa" stroke-width="3.5" fill="none" stroke-dasharray="2,2"/>
+    <text x="760" y="88" fill="#a78bfa" font-size="10" font-family="monospace">CONTRIB</text>
+    
+    <!-- Merge points -->
+    <circle cx="340" cy="10" r="6" fill="#111" stroke="#00b8ff"/>
+    <circle cx="610" cy="10" r="6" fill="#111" stroke="#ff2e9f"/>
+    <circle cx="860" cy="82" r="6" fill="#111" stroke="#a78bfa"/>
+    <circle cx="1020" cy="46" r="9" fill="#00f5d4"/>
+  `;
+
+  // Add active user dots on ramps
+  activeRamps.forEach((ramp, i) => {
+    const x = ramp === 'triage' ? 300 : ramp === 'analysis' ? 570 : 800;
+    const y = ramp === 'contrib' ? 75 : 18;
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("cx", x);
+    dot.setAttribute("cy", y);
+    dot.setAttribute("r", "5");
+    dot.setAttribute("fill", "#00f5d4");
+    svg.appendChild(dot);
+  });
+}
+
+// ====================== USER & RAMP MANAGEMENT ======================
+let activeRamps = [];
+
+window.joinRamp = function(type) {
+  const name = prompt("Enter your handle (e.g. Sarah, Alex):", "Guest-" + Math.floor(Math.random()*99));
+  if (!name) return;
+  
+  usersInFlow.push({id: name, color: "#22ff88", role: type.toUpperCase() + " Ramp"});
+  activeRamps.push(type);
+  
+  renderGitGraph(activeRamps);
+  renderPresence();
+  
+  log(`[${name.toUpperCase()}] joined ${type} ramp → merged into main chain`);
+};
+
+window.hopOff = function() {
+  if (usersInFlow.length > 4) {
+    const leaver = usersInFlow.pop();
+    activeRamps = activeRamps.filter(r => !r.includes(leaver.role.toLowerCase()));
+    renderGitGraph(activeRamps);
+    renderPresence();
+    log(`[${leaver.id}] hopped off cleanly. Main chain unaffected.`);
+  }
+};
+
+// ====================== TASKS & ORCHESTRATION ======================
+function createTask() {
+  const input = document.getElementById("channel-a").value.trim() || "New research synthesis request";
+  const id = "T-" + String(1000 + Math.floor(Math.random()*8999));
+  
+  const task = {
+    id: id,
+    title: input.substring(0, 48) + (input.length > 48 ? "…" : ""),
+    stage: stages[0],
+    participants: ["Oppie", "Leo"],
+    status: "running"
+  };
+  
+  tasks.unshift(task);
+  renderTasks();
+  
+  // Simulate progression
+  let step = 0;
+  const interval = setInterval(() => {
+    step++;
+    if (step < stages.length) {
+      task.stage = stages[step];
+      if (step === 2) task.participants.push("Enrico");
+      if (step === 4) task.participants.push("Hans");
+      renderTasks();
+    } else {
+      task.status = "completed";
+      renderTasks();
+      clearInterval(interval);
+      log(`[${id}] completed full isomorphic loop`);
+    }
+  }, 1400);
+  
+  document.getElementById("channel-b").textContent += `\n→ ${id} | ${task.title}\n`;
+  log(`New task ${id} entered main chain`);
+}
+
+function renderTasks() {
+  const tbody = document.getElementById("task-tbody");
+  tbody.innerHTML = tasks.map(t => `
+    <tr style="border-bottom:1px solid #222">
+      <td style="color:var(--accent);padding:8px 0"><strong>${t.id}</strong></td>
+      <td style="padding:8px 12px">${t.title}</td>
+      <td style="color:#00ddaa;padding:8px 0">${t.stage}</td>
+      <td style="padding:8px 0">${t.participants.join(", ")}</td>
+      <td style="padding:8px 0"><span style="background:${t.status==='completed'?'#003322':'#002233'};color:${t.status==='completed'?'#00ffaa':'#00ccff'};padding:2px 10px;border-radius:999px;font-size:10px">${t.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ====================== LIVE LOG ======================
+function log(msg) {
+  const logEl = document.getElementById("console-log");
+  const time = new Date().toLocaleTimeString('en-US', {hour12:false, hour:"2-digit", minute:"2-digit", second:"2-digit"});
+  logEl.textContent += `${time} ${msg}\n`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function renderPresence() {
+  const container = document.getElementById("presence");
+  container.innerHTML = usersInFlow.map(u => `
+    <div class="user-pill" style="color:${u.color}">
+      <span style="background:${u.color}22;width:6px;height:6px;border-radius:50%;display:inline-block"></span>
+      ${u.id} <span style="font-size:9px;opacity:0.6">(${u.role})</span>
+    </div>
+  `).join('');
+}
+
+// ====================== BOOT ======================
+renderGitGraph();
+renderPresence();
+log("[SYSTEM] Grok Team Console initialized — isomorphic orchestration active");
+log("[INFO] On/Off ramps enabled. Multiple users can join without disrupting main chain.");
+
+setTimeout(() => {
+  createTask();
+  createTask();
+}, 800);
+</script>
+</body>
+</html>

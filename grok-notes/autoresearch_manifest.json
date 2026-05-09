@@ -1,0 +1,2478 @@
+{
+  "version": 1,
+  "description": "Generated autoresearch source manifest for nanochat.",
+  "aliases": {},
+  "defaults": {
+    "ollama_model": "auto",
+    "examples_per_source": 3,
+    "max_source_chars": 3000,
+    "max_source_rows": 8,
+    "temperature": 0.2,
+    "num_predict": 64,
+    "max_response_chars": 260,
+    "val_ratio": 0.1,
+    "seed": 1337
+  },
+  "metadata": {
+    "seed_files": [
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/autoresearch/README.md",
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/nanoGPT/train.py",
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/nanoGPT/data/openwebtext/prepare.py",
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/minbpe/README.md",
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/llama2.c/tinystories.py",
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/llm.c/dev/data/data_common.py",
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/llm.c/dev/eval/README.md",
+      "/Volumes/qbitOS/00.dev/cursor/pontusab/toolpick/src/tool-index.ts",
+      "/Volumes/qbitOS/00.dev/cursor/pontusab/languine/packages/cli/src/parsers/index.ts",
+      "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/src/lib/agents/server.ts",
+      "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/src/app/api/chat/route.ts"
+    ],
+    "repo_dirs": [
+      "/Volumes/qbitOS/00.dev/cursor/karpathy",
+      "/Volumes/qbitOS/00.dev/cursor/pontusab",
+      "/Volumes/qbitOS/00.dev/cursor/cookbook-main"
+    ],
+    "source_dirs": [
+      "/Volumes/qbitOS/03.models/nanochat-demo",
+      "/Volumes/qbitOS/03.models/training_data",
+      "/Volumes/qbitOS/00.dev/cursor/train",
+      "/Volumes/qbitOS/00.dev/cursor/game"
+    ],
+    "urls_files": [
+      "/Volumes/qbitOS/00.dev/cursor/karpathy/nanochat-master/dev/research_urls.txt"
+    ]
+  },
+  "sources": [
+    {
+      "id": "karpathy-autoresearch-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/autoresearch/README.md",
+      "title": "autoresearch/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-nanogpt-train-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/nanoGPT/train.py",
+      "title": "nanoGPT/train.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-nanogpt-data-openwebtext-prepare-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/nanoGPT/data/openwebtext/prepare.py",
+      "title": "nanoGPT/data/openwebtext/prepare.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-minbpe-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/minbpe/README.md",
+      "title": "minbpe/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-llama2-c-tinystories-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/llama2.c/tinystories.py",
+      "title": "llama2.c/tinystories.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-llm-c-dev-data-data-common-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/llm.c/dev/data/data_common.py",
+      "title": "llm.c/dev/data/data_common.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-llm-c-dev-eval-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/llm.c/dev/eval/README.md",
+      "title": "llm.c/dev/eval/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "pontusab-toolpick-src-tool-index-ts",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/toolpick/src/tool-index.ts",
+      "title": "toolpick/src/tool-index.ts",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-languine-packages-cli-src-parsers-index-ts",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/languine/packages/cli/src/parsers/index.ts",
+      "title": "languine/packages/cli/src/parsers/index.ts",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "cookbook-main-sdk-agent-kanban-src-lib-agents-server-ts",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/src/lib/agents/server.ts",
+      "title": "sdk/agent-kanban/src/lib/agents/server.ts",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-app-builder-src-app-api-chat-route-ts",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/src/app/api/chat/route.ts",
+      "title": "sdk/app-builder/src/app/api/chat/route.ts",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "karpathy-llm101n-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/LLM101n/README.md",
+      "title": "LLM101n/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-matlabwrapper-cmakelists-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/MatlabWrapper/CMakeLists.txt",
+      "title": "MatlabWrapper/CMakeLists.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-matlabwrapper-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/MatlabWrapper/Readme.md",
+      "title": "MatlabWrapper/Readme.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-random-forest-matlab-readme-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/Random-Forest-Matlab/README.txt",
+      "title": "Random-Forest-Matlab/README.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-license-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/LICENSE.md",
+      "title": "arxiv-sanity-preserver/LICENSE.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/README.md",
+      "title": "arxiv-sanity-preserver/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-analyze-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/analyze.py",
+      "title": "arxiv-sanity-preserver/analyze.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-buildsvm-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/buildsvm.py",
+      "title": "arxiv-sanity-preserver/buildsvm.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-download-pdfs-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/download_pdfs.py",
+      "title": "arxiv-sanity-preserver/download_pdfs.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-fetch-papers-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/fetch_papers.py",
+      "title": "arxiv-sanity-preserver/fetch_papers.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-make-cache-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/make_cache.py",
+      "title": "arxiv-sanity-preserver/make_cache.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-parse-pdf-to-text-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/parse_pdf_to_text.py",
+      "title": "arxiv-sanity-preserver/parse_pdf_to_text.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-requirements-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/requirements.txt",
+      "title": "arxiv-sanity-preserver/requirements.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-serve-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/serve.py",
+      "title": "arxiv-sanity-preserver/serve.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-thumb-pdf-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/thumb_pdf.py",
+      "title": "arxiv-sanity-preserver/thumb_pdf.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-twitter-daemon-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/twitter_daemon.py",
+      "title": "arxiv-sanity-preserver/twitter_daemon.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-arxiv-sanity-preserver-utils-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/arxiv-sanity-preserver/utils.py",
+      "title": "arxiv-sanity-preserver/utils.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-autoresearch-prepare-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/autoresearch/prepare.py",
+      "title": "autoresearch/prepare.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-autoresearch-program-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/autoresearch/program.md",
+      "title": "autoresearch/program.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-autoresearch-pyproject-toml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/autoresearch/pyproject.toml",
+      "title": "autoresearch/pyproject.toml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-autoresearch-train-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/autoresearch/train.py",
+      "title": "autoresearch/train.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-build-nanogpt-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/build-nanogpt/README.md",
+      "title": "build-nanogpt/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-build-nanogpt-fineweb-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/build-nanogpt/fineweb.py",
+      "title": "build-nanogpt/fineweb.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-build-nanogpt-hellaswag-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/build-nanogpt/hellaswag.py",
+      "title": "build-nanogpt/hellaswag.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-build-nanogpt-input-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/build-nanogpt/input.txt",
+      "title": "build-nanogpt/input.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-build-nanogpt-train-gpt2-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/build-nanogpt/train_gpt2.py",
+      "title": "build-nanogpt/train_gpt2.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-char-rnn-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/char-rnn/Readme.md",
+      "title": "char-rnn/Readme.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-char-rnn-data-tinyshakespeare-input-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/char-rnn/data/tinyshakespeare/input.txt",
+      "title": "char-rnn/data/tinyshakespeare/input.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-convnetjs-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/convnetjs/Readme.md",
+      "title": "convnetjs/Readme.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-convnetjs-bower-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/convnetjs/bower.json",
+      "title": "convnetjs/bower.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-pre-commit-config-yaml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/.pre-commit-config.yaml",
+      "title": "cpython/.pre-commit-config.yaml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-readthedocs-yml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/.readthedocs.yml",
+      "title": "cpython/.readthedocs.yml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-ruff-toml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/.ruff.toml",
+      "title": "cpython/.ruff.toml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-readme-rst",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/README.rst",
+      "title": "cpython/README.rst",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-android-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Android/README.md",
+      "title": "cpython/Android/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-android-android-env-sh",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Android/android-env.sh",
+      "title": "cpython/Android/android-env.sh",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-android-android-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Android/android.py",
+      "title": "cpython/Android/android.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-android-testbed-app-src-main-c-cmakelists-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Android/testbed/app/src/main/c/CMakeLists.txt",
+      "title": "cpython/Android/testbed/app/src/main/c/CMakeLists.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-ruff-toml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/.ruff.toml",
+      "title": "cpython/Apple/.ruff.toml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-main-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/__main__.py",
+      "title": "cpython/Apple/__main__.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-ios-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/iOS/README.md",
+      "title": "cpython/Apple/iOS/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-testbed-main-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/testbed/__main__.py",
+      "title": "cpython/Apple/testbed/__main__.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-testbed-iostestbed-assets-xcassets-contents-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/testbed/iOSTestbed/Assets.xcassets/Contents.json",
+      "title": "cpython/Apple/testbed/iOSTestbed/Assets.xcassets/Contents.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-testbed-iostestbed-assets-xcassets-accentcolor-colorset-contents-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/testbed/iOSTestbed/Assets.xcassets/AccentColor.colorset/Contents.json",
+      "title": "cpython/Apple/testbed/iOSTestbed/Assets.xcassets/AccentColor.colorset/Contents.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-apple-testbed-iostestbed-assets-xcassets-appicon-appiconset-contents-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Apple/testbed/iOSTestbed/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "title": "cpython/Apple/testbed/iOSTestbed/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-doc-ruff-toml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Doc/.ruff.toml",
+      "title": "cpython/Doc/.ruff.toml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "karpathy-cpython-doc-readme-rst",
+      "kind": "file",
+      "packs": [
+        "autoresearch-karpathy"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/karpathy/cpython/Doc/README.rst",
+      "title": "cpython/Doc/README.rst",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from karpathy."
+    },
+    {
+      "id": "pontusab-hyper-changelog-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/CHANGELOG.md",
+      "title": "hyper/CHANGELOG.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/README.md",
+      "title": "hyper/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-biome-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/biome.json",
+      "title": "hyper/biome.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-bunfig-toml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/bunfig.toml",
+      "title": "hyper/bunfig.toml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-lefthook-yml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/lefthook.yml",
+      "title": "hyper/lefthook.yml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/package.json",
+      "title": "hyper/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-renovate-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/renovate.json",
+      "title": "hyper/renovate.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-tsconfig-base-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/tsconfig.base.json",
+      "title": "hyper/tsconfig.base.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-tsconfig-fallback-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/tsconfig.fallback.json",
+      "title": "hyper/tsconfig.fallback.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/tsconfig.json",
+      "title": "hyper/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-apps-examples-ai-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/apps/examples/ai/package.json",
+      "title": "hyper/apps/examples/ai/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-apps-examples-ai-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/apps/examples/ai/tsconfig.json",
+      "title": "hyper/apps/examples/ai/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-apps-examples-todo-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/apps/examples/todo/package.json",
+      "title": "hyper/apps/examples/todo/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-apps-examples-todo-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/apps/examples/todo/tsconfig.json",
+      "title": "hyper/apps/examples/todo/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-apps-hello-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/apps/hello/package.json",
+      "title": "hyper/apps/hello/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-apps-hello-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/apps/hello/tsconfig.json",
+      "title": "hyper/apps/hello/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-getting-started-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/getting-started.md",
+      "title": "hyper/docs/getting-started.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-testing-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/testing.md",
+      "title": "hyper/docs/testing.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-adr-0001-roadmap-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/adr/0001-roadmap.md",
+      "title": "hyper/docs/adr/0001-roadmap.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-adr-0002-tsgo-bugs-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/adr/0002-tsgo-bugs.md",
+      "title": "hyper/docs/adr/0002-tsgo-bugs.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-archive-design-v0-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/archive/design-v0.md",
+      "title": "hyper/docs/archive/design-v0.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-bun-sql-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/bun-sql.md",
+      "title": "hyper/docs/recipes/bun-sql.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-drizzle-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/drizzle.md",
+      "title": "hyper/docs/recipes/drizzle.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-jwt-auth-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/jwt-auth.md",
+      "title": "hyper/docs/recipes/jwt-auth.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-observability-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/observability.md",
+      "title": "hyper/docs/recipes/observability.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-orm-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/orm.md",
+      "title": "hyper/docs/recipes/orm.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-prisma-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/prisma.md",
+      "title": "hyper/docs/recipes/prisma.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-session-auth-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/session-auth.md",
+      "title": "hyper/docs/recipes/session-auth.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-recipes-trpc-bridge-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/recipes/trpc-bridge.md",
+      "title": "hyper/docs/recipes/trpc-bridge.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-docs-security-defaults-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/docs/security/defaults.md",
+      "title": "hyper/docs/security/defaults.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-auth-jwt-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/auth-jwt/README.md",
+      "title": "hyper/packages/auth-jwt/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-auth-jwt-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/auth-jwt/package.json",
+      "title": "hyper/packages/auth-jwt/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-auth-jwt-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/auth-jwt/tsconfig.json",
+      "title": "hyper/packages/auth-jwt/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-cache-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/cache/README.md",
+      "title": "hyper/packages/cache/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-cache-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/cache/package.json",
+      "title": "hyper/packages/cache/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-cache-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/cache/tsconfig.json",
+      "title": "hyper/packages/cache/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-cli-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/cli/README.md",
+      "title": "hyper/packages/cli/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-cli-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/cli/package.json",
+      "title": "hyper/packages/cli/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-cli-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/cli/tsconfig.json",
+      "title": "hyper/packages/cli/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-client-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/client/README.md",
+      "title": "hyper/packages/client/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-client-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/client/package.json",
+      "title": "hyper/packages/client/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-client-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/client/tsconfig.json",
+      "title": "hyper/packages/client/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-compress-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/compress/README.md",
+      "title": "hyper/packages/compress/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-compress-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/compress/package.json",
+      "title": "hyper/packages/compress/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-compress-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/compress/tsconfig.json",
+      "title": "hyper/packages/compress/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-core-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/core/README.md",
+      "title": "hyper/packages/core/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-core-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/core/package.json",
+      "title": "hyper/packages/core/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "pontusab-hyper-packages-core-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-pontusab"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/pontusab/hyper/packages/core/tsconfig.json",
+      "title": "hyper/packages/core/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from pontusab."
+    },
+    {
+      "id": "cookbook-main-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/README.md",
+      "title": "README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-agent-kanban-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/README.md",
+      "title": "sdk/agent-kanban/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-agent-kanban-components-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/components.json",
+      "title": "sdk/agent-kanban/components.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-agent-kanban-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/package.json",
+      "title": "sdk/agent-kanban/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-agent-kanban-pnpm-workspace-yaml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/pnpm-workspace.yaml",
+      "title": "sdk/agent-kanban/pnpm-workspace.yaml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-agent-kanban-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/agent-kanban/tsconfig.json",
+      "title": "sdk/agent-kanban/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-app-builder-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/README.md",
+      "title": "sdk/app-builder/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-app-builder-components-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/components.json",
+      "title": "sdk/app-builder/components.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-app-builder-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/package.json",
+      "title": "sdk/app-builder/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-app-builder-pnpm-workspace-yaml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/pnpm-workspace.yaml",
+      "title": "sdk/app-builder/pnpm-workspace.yaml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-app-builder-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/app-builder/tsconfig.json",
+      "title": "sdk/app-builder/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-coding-agent-cli-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/coding-agent-cli/README.md",
+      "title": "sdk/coding-agent-cli/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-coding-agent-cli-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/coding-agent-cli/package.json",
+      "title": "sdk/coding-agent-cli/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-coding-agent-cli-pnpm-workspace-yaml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/coding-agent-cli/pnpm-workspace.yaml",
+      "title": "sdk/coding-agent-cli/pnpm-workspace.yaml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-coding-agent-cli-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/coding-agent-cli/tsconfig.json",
+      "title": "sdk/coding-agent-cli/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-quickstart-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/quickstart/README.md",
+      "title": "sdk/quickstart/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-quickstart-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/quickstart/package.json",
+      "title": "sdk/quickstart/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-quickstart-pnpm-workspace-yaml",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/quickstart/pnpm-workspace.yaml",
+      "title": "sdk/quickstart/pnpm-workspace.yaml",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "cookbook-main-sdk-quickstart-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-cookbook-main"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/cookbook-main/sdk/quickstart/tsconfig.json",
+      "title": "sdk/quickstart/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from cookbook-main."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/manifest.json",
+      "title": "autoresearch/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-codestral-22b-v0-1-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/codestral-22b-v0.1/manifest.json",
+      "title": "autoresearch/clean-ollama-library/codestral-22b-v0.1/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-granite-4-h-tiny-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/granite-4-h-tiny/manifest.json",
+      "title": "autoresearch/clean-ollama-library/granite-4-h-tiny/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-ministral-3-14b-reasoning-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/ministral-3-14b-reasoning/manifest.json",
+      "title": "autoresearch/clean-ollama-library/ministral-3-14b-reasoning/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-ministral-3-3b-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/ministral-3-3b/manifest.json",
+      "title": "autoresearch/clean-ollama-library/ministral-3-3b/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-mistral-nemo-instruct-2407-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/mistral-nemo-instruct-2407/manifest.json",
+      "title": "autoresearch/clean-ollama-library/mistral-nemo-instruct-2407/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-nemotron-3-nano-4b-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/nemotron-3-nano-4b/manifest.json",
+      "title": "autoresearch/clean-ollama-library/nemotron-3-nano-4b/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-olmocr-2-7b-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/olmocr-2-7b/manifest.json",
+      "title": "autoresearch/clean-ollama-library/olmocr-2-7b/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-phi-4-reasoning-plus-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/phi-4-reasoning-plus/manifest.json",
+      "title": "autoresearch/clean-ollama-library/phi-4-reasoning-plus/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-autoresearch-clean-ollama-library-qwen3-5-9b-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/autoresearch/clean-ollama-library/qwen3.5-9b/manifest.json",
+      "title": "autoresearch/clean-ollama-library/qwen3.5-9b/manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-base-checkpoints-localdemo-meta-000002-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/base_checkpoints/localdemo/meta_000002.json",
+      "title": "base_checkpoints/localdemo/meta_000002.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-chatsft-checkpoints-localdemo-meta-000000-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/chatsft_checkpoints/localdemo/meta_000000.json",
+      "title": "chatsft_checkpoints/localdemo/meta_000000.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-chatsft-checkpoints-localdemo-meta-000001-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/chatsft_checkpoints/localdemo/meta_000001.json",
+      "title": "chatsft_checkpoints/localdemo/meta_000001.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-chatsft-checkpoints-localdemo-meta-000002-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/chatsft_checkpoints/localdemo/meta_000002.json",
+      "title": "chatsft_checkpoints/localdemo/meta_000002.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-index-build-manifest-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/index/build-manifest.json",
+      "title": "corpus/index/build-manifest.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-index-grounded-examples-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/index/grounded_examples.jsonl",
+      "title": "corpus/index/grounded_examples.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-index-source-manifest-lock-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/index/source-manifest.lock.json",
+      "title": "corpus/index/source-manifest.lock.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-autoresearch-prepare-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/autoresearch-prepare.txt",
+      "title": "corpus/normalized/autoresearch-prepare.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-autoresearch-readme-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/autoresearch-readme.txt",
+      "title": "corpus/normalized/autoresearch-readme.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-claude-pytorch-treehugger-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/claude-pytorch-treehugger.txt",
+      "title": "corpus/normalized/claude-pytorch-treehugger.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-readme-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-readme-md.txt",
+      "title": "corpus/normalized/cookbook-main-readme-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-components-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-components-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-components-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-package-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-package-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-package-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-pnpm-lock-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-pnpm-lock-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-pnpm-lock-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-pnpm-workspace-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-pnpm-workspace-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-pnpm-workspace-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-readme-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-readme-md.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-readme-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-src-lib-agents-server-ts-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-src-lib-agents-server-ts.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-src-lib-agents-server-ts.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-agent-kanban-tsconfig-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-agent-kanban-tsconfig-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-agent-kanban-tsconfig-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-components-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-components-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-components-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-package-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-package-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-package-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-pnpm-lock-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-pnpm-lock-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-pnpm-lock-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-pnpm-workspace-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-pnpm-workspace-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-pnpm-workspace-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-readme-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-readme-md.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-readme-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-src-app-api-chat-route-ts-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-src-app-api-chat-route-ts.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-src-app-api-chat-route-ts.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-app-builder-tsconfig-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-app-builder-tsconfig-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-app-builder-tsconfig-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-coding-agent-cli-package-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-coding-agent-cli-package-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-coding-agent-cli-package-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-coding-agent-cli-pnpm-lock-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-coding-agent-cli-pnpm-lock-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-coding-agent-cli-pnpm-lock-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-coding-agent-cli-pnpm-workspace-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-coding-agent-cli-pnpm-workspace-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-coding-agent-cli-pnpm-workspace-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-coding-agent-cli-readme-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-coding-agent-cli-readme-md.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-coding-agent-cli-readme-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-coding-agent-cli-tsconfig-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-coding-agent-cli-tsconfig-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-coding-agent-cli-tsconfig-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-quickstart-package-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-quickstart-package-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-quickstart-package-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-quickstart-pnpm-lock-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-quickstart-pnpm-lock-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-quickstart-pnpm-lock-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-quickstart-pnpm-workspace-yaml-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-quickstart-pnpm-workspace-yaml.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-quickstart-pnpm-workspace-yaml.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-quickstart-readme-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-quickstart-readme-md.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-quickstart-readme-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-cookbook-main-sdk-quickstart-tsconfig-json-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/cookbook-main-sdk-quickstart-tsconfig-json.txt",
+      "title": "corpus/normalized/cookbook-main-sdk-quickstart-tsconfig-json.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-deepwiki-nanochat-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/deepwiki-nanochat.txt",
+      "title": "corpus/normalized/deepwiki-nanochat.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-game-agents-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/game-agents-md.txt",
+      "title": "corpus/normalized/game-agents-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "nanochat-demo-corpus-normalized-game-claude-md-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-nanochat-demo"
+      ],
+      "path": "/Volumes/qbitOS/03.models/nanochat-demo/corpus/normalized/game-claude-md.txt",
+      "title": "corpus/normalized/game-claude-md.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from nanochat-demo."
+    },
+    {
+      "id": "training-data-convnetjs-distill-20260430-013541-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/convnetjs_distill_20260430_013541.jsonl",
+      "title": "convnetjs_distill_20260430_013541.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-imdb-distill-smoketest-20260430-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/imdb_distill_smoketest_20260430.jsonl",
+      "title": "imdb_distill_smoketest_20260430.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-kbatch-grounded-test-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/kbatch_grounded_test.jsonl",
+      "title": "kbatch_grounded_test.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-local-research-smoketest-20260430-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/local_research_smoketest_20260430.jsonl",
+      "title": "local_research_smoketest_20260430.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-tech-world-grounded-20260430-014730-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/tech_world_grounded_20260430_014730.jsonl",
+      "title": "tech_world_grounded_20260430_014730.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-tech-world-grounded-test-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/tech_world_grounded_test.jsonl",
+      "title": "tech_world_grounded_test.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260401-001830-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260401_001830.jsonl",
+      "title": "ugrad_distill_20260401_001830.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-012944-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_012944.jsonl",
+      "title": "ugrad_distill_20260430_012944.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-014053-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_014053.jsonl",
+      "title": "ugrad_distill_20260430_014053.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-015042-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_015042.jsonl",
+      "title": "ugrad_distill_20260430_015042.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-020533-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_020533.jsonl",
+      "title": "ugrad_distill_20260430_020533.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-020603-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_020603.jsonl",
+      "title": "ugrad_distill_20260430_020603.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-021202-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_021202.jsonl",
+      "title": "ugrad_distill_20260430_021202.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-023117-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_023117.jsonl",
+      "title": "ugrad_distill_20260430_023117.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-025516-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_025516.jsonl",
+      "title": "ugrad_distill_20260430_025516.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-025939-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_025939.jsonl",
+      "title": "ugrad_distill_20260430_025939.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-030218-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_030218.jsonl",
+      "title": "ugrad_distill_20260430_030218.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-20260430-041022-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_20260430_041022.jsonl",
+      "title": "ugrad_distill_20260430_041022.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "training-data-ugrad-distill-bridge-test-jsonl",
+      "kind": "file",
+      "packs": [
+        "autoresearch-training-data"
+      ],
+      "path": "/Volumes/qbitOS/03.models/training_data/ugrad_distill_bridge_test.jsonl",
+      "title": "ugrad_distill_bridge_test.jsonl",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from training_data."
+    },
+    {
+      "id": "train-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/package.json",
+      "title": "package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-server-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/server.py",
+      "title": "server.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/README.md",
+      "title": "train/README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-copilot-cli-continuation-log-2026-04-30-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/copilot-cli-continuation-log-2026-04-30.txt",
+      "title": "train/copilot-cli-continuation-log-2026-04-30.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-copilot-cli-continuation-log-2026-05-01-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/copilot-cli-continuation-log-2026-05-01.txt",
+      "title": "train/copilot-cli-continuation-log-2026-05-01.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/package.json",
+      "title": "train/package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/tsconfig.json",
+      "title": "train/tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-public-data-catalog-meta-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/public/data/catalog-meta.json",
+      "title": "train/public/data/catalog-meta.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-scripts-build-catalog-data-py",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/scripts/build_catalog_data.py",
+      "title": "train/scripts/build_catalog_data.py",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "train-train-src-generated-catalog-meta-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-train"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/train/train/src/generated/catalog-meta.json",
+      "title": "train/src/generated/catalog-meta.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from train."
+    },
+    {
+      "id": "game-agents-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/AGENTS.md",
+      "title": "AGENTS.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "game-claude-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/CLAUDE.md",
+      "title": "CLAUDE.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "game-readme-md",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/README.md",
+      "title": "README.md",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "game-copilot-cli-continuation-log-2026-05-01-txt",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/copilot-cli-continuation-log-2026-05-01.txt",
+      "title": "copilot-cli-continuation-log-2026-05-01.txt",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "game-package-lock-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/package-lock.json",
+      "title": "package-lock.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "game-package-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/package.json",
+      "title": "package.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "game-tsconfig-json",
+      "kind": "file",
+      "packs": [
+        "autoresearch-game"
+      ],
+      "path": "/Volumes/qbitOS/00.dev/cursor/game/tsconfig.json",
+      "title": "tsconfig.json",
+      "license": "repository-local",
+      "notes": "Autoresearch discovered source from game."
+    },
+    {
+      "id": "url-nanochat",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://deepwiki.com/karpathy/nanochat",
+      "title": "nanochat",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-discussions",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://github.com/karpathy/nanochat/discussions",
+      "title": "discussions",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-transformers",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://github.com/karpathy/transformers",
+      "title": "transformers",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-transformers-2",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://github.com/huggingface/transformers",
+      "title": "transformers",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-ai",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://leerob.com/ai",
+      "title": "ai",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-dx",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://leerob.com/dx",
+      "title": "dx",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-agents",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://leerob.com/agents",
+      "title": "agents",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-pixo",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://github.com/leerob/pixo",
+      "title": "pixo",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-pixo-leerob-com",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://pixo.leerob.com",
+      "title": "pixo.leerob.com",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-2001319077042696623",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://x.com/leerob/status/2001319077042696623",
+      "title": "2001319077042696623",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-1929727742821413331",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://x.com/leerob/status/1929727742821413331",
+      "title": "1929727742821413331",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    },
+    {
+      "id": "url-sequoiacap-com",
+      "kind": "url",
+      "packs": [
+        "autoresearch-urls"
+      ],
+      "uri": "https://sequoiacap.com",
+      "title": "sequoiacap.com",
+      "license": "external-reference",
+      "notes": "Autoresearch URL source."
+    }
+  ]
+}

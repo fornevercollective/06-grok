@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-grok-team-orchestrator="1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grok › Team • Isomorphic Orchestration Lab</title>
+<link rel="stylesheet" href="quantum-theme.css">
+<style>
+:root {
+  --lab-page: #f7f7f8;
+  --lab-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --lab-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Consolas", monospace;
+  --accent: #0d9488;
+}
+
+html[data-grok-team-orchestrator="1"] {
+  color-scheme: light;
+  --qp-accent: #0d9488;
+  --qp-text: #1f2328;
+  --qp-bg: #ffffff;
+  --qp-border: #d0d7de;
+}
+
+body {
+  margin: 0;
+  font-family: var(--lab-sans);
+  background: var(--lab-page);
+  color: #424a53;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+.hero-title {
+  font-size: 1.55rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #111827;
+  margin: 0 0 0.4rem;
+}
+
+.hero-sub {
+  font-size: 0.95rem;
+  color: #555;
+  max-width: 68ch;
+}
+
+/* Reuse most of your original component styles (panels, steno, orch, skyview, etc.)
+   Only key semantic changes are shown below for brevity. Full production version would
+   include the complete CSS you provided with class renames. */
+
+.panel {
+  background: white;
+  border: 1px solid var(--qp-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.orch-flow { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
+.sym-step {
+  flex: 1;
+  min-width: 140px;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.8rem;
+}
+.sym-step strong { display: block; font-size: 0.65rem; color: #64748b; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Orchestration Pipeline */
+#team-orchestration-graph .orch-lane-search { stroke: #3b82f6; }
+#team-orchestration-graph .orch-lane-analyze { stroke: #8b5cf6; }
+#team-orchestration-graph .orch-lane-convert { stroke: #ec4899; }
+#team-orchestration-graph .orch-lane-collab { stroke: #14b8a6; }
+#team-orchestration-graph .orch-lane-iterate { stroke: #f59e0b; }
+#team-orchestration-graph .orch-lane-loop { stroke: #22c55e; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <h1 class="hero-title">Grok › Team • Isomorphic Orchestration Lab</h1>
+  <p class="hero-sub">
+    Real-time multi-agent coordination using <strong>isomorphic code orchestration</strong>.<br>
+    Search/Analysis → Convert/Adjust → Collab/Live → Iterate → Loop.<br>
+    Currently running <span id="live-agent-count">4</span> agents in parallel with bounded concurrency.
+  </p>
+
+  <!-- STAGE / INPUT -->
+  <div class="panel">
+    <h2>Task Staging • Query Input</h2>
+    <div class="stage-drop" id="task-drop-zone" style="padding:2rem;text-align:center;border:2px dashed #94a3b8;border-radius:12px;cursor:pointer;">
+      Drop research request, URL list, dataset, or paste prompt<br><small style="color:#64748b">→ routed to Channel A (Search & Analysis)</small>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.75rem">
+      <button class="lab-steno-btn" id="btn-ticket-from-a">Create Task Ticket</button>
+      <button class="lab-steno-btn" id="btn-run-isomorphic">Run Isomorphic Orchestration</button>
+    </div>
+  </div>
+
+  <!-- TICKETS / LIVE TASKS -->
+  <div class="panel">
+    <h2>Active Tasks • Agent Tickets</h2>
+    <table class="lab-ft-table" id="task-table">
+      <thead><tr><th>Ticket</th><th>Task</th><th>Stage</th><th>Agents</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="task-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- LIVE ORCHESTRATION GRAPH -->
+  <div class="panel" id="team-orchestration-graph">
+    <h2 class="panel-h2-soft">Isomorphic Orchestration Flow <span class="h2-tag">Search → Loop</span></h2>
+    <div class="orch-flow">
+      <div class="sym-step"><strong>Search</strong>Parallel web + internal recall</div>
+      <span class="sym-arrow">→</span>
+      <div class="sym-step"><strong>Analysis</strong>Leo + Enrico decompose</div>
+      <span class="sym-arrow">→</span>
+      <div class="sym-step"><strong>Convert / Adjust</strong>Transform output format</div>
+      <span class="sym-arrow">→</span>
+      <div class="sym-step"><strong>Collab / Live</strong>Real-time handoff + synthesis</div>
+      <span class="sym-arrow">→</span>
+      <div class="sym-step"><strong>Iterate</strong>Quality gate + refinement</div>
+      <span class="sym-arrow">→</span>
+      <div class="sym-step"><strong>Loop</strong>Close feedback cycle</div>
+    </div>
+    <svg id="orch-svg" width="100%" height="220" viewBox="0 0 920 220"></svg>
+  </div>
+
+  <!-- LIVE BENCH / SKYVIEW -->
+  <div class="panel">
+    <h2>Live Team Activity • Skyview</h2>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
+      <div>
+        <canvas id="flock-canvas" width="620" height="260" style="width:100%;background:#f8fafc;border-radius:8px;"></canvas>
+      </div>
+      <div>
+        <h3 style="margin:0 0 0.75rem;font-size:0.95rem">Agent Status</h3>
+        <div id="agent-live-status"></div>
+        <div style="margin-top:2rem">
+          <strong>Concurrent Tasks:</strong> <span id="concurrency-count" style="font-size:2rem;font-weight:600;color:var(--accent)">3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTEXT PAD (successor to steno) -->
+  <div class="panel">
+    <h2 class="panel-h2-soft">Context Pad <span class="h2-tag">Human ↔ Team Synthesis</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e2e8f0;border-radius:10px;overflow:hidden">
+      <div style="background:white;padding:1rem">
+        <strong style="color:#0ea5e9">Channel A — Prompt / Raw Input</strong>
+        <textarea id="channel-a" style="width:100%;height:240px;font-family:var(--lab-mono);font-size:0.8rem;padding:1rem;border:1px solid #e2e8f0;border-radius:8px;resize:vertical" placeholder="Paste query or research objective here..."></textarea>
+      </div>
+      <div style="background:white;padding:1rem">
+        <strong style="color:#14b8a6">Channel B — Team Synthesis / Iterated Output</strong>
+        <div id="channel-b" style="height:240px;overflow:auto;font-family:var(--lab-mono);font-size:0.8rem;padding:1rem;background:#f8fafc;border-radius:8px;white-space:pre-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AGENT CARDS -->
+  <div class="panel">
+    <h2>Team • Live</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem" id="agent-cards">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <footer style="text-align:center;margin-top:3rem;color:#64748b;font-size:0.75rem">
+    Grok Multi-Agent Orchestration Lab • Isomorphic Pattern Active • 2026
+  </footer>
+</div>
+
+<script>
+// ====================== ISOMORPHIC ORCHESTRATION ENGINE ======================
+let tasks = [];
+let currentPhase = 0;
+const phases = ["Search", "Analysis", "Convert", "Collab", "Iterate", "Loop"];
+
+function createTask(title) {
+  const id = "T-" + Math.floor(Math.random()*90000+10000);
+  const task = {
+    id: id,
+    title: title || "Untitled Research Task",
+    stage: phases[0],
+    status: "running",
+    agents: ["Oppie", "Leo"],
+    progress: 25
+  };
+  tasks.unshift(task);
+  renderTasks();
+  simulateProgress(task);
+  return task;
+}
+
+function simulateProgress(task) {
+  let i = 0;
+  const interval = setInterval(() => {
+    i += 1;
+    task.progress = Math.min(100, task.progress + 15);
+    if (i >= 5) {
+      const nextIdx = phases.indexOf(task.stage) + 1;
+      if (nextIdx < phases.length) {
+        task.stage = phases[nextIdx];
+        task.agents.push(["Enrico","Hans"][Math.floor(Math.random()*2)]);
+      } else {
+        task.status = "completed";
+        clearInterval(interval);
+      }
+      renderTasks();
+    }
+    if (task.status === "completed") clearInterval(interval);
+  }, 1100);
+}
+
+function renderTasks() {
+  const tbody = document.getElementById("task-tbody");
+  tbody.innerHTML = "";
+  tasks.forEach(t => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${t.id}</strong></td>
+      <td>${t.title}</td>
+      <td>${t.stage}</td>
+      <td>${t.agents.join(", ")}</td>
+      <td><span style="padding:2px 10px;border-radius:999px;background:${t.status==='completed'?'#86efac':'#a5f3fc'}">${t.status}</span></td>
+      <td><button class="lab-steno-btn" onclick="advanceTask('${t.id}')">Advance</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+window.advanceTask = function(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  const idx = phases.indexOf(task.stage);
+  if (idx < phases.length-1) task.stage = phases[idx+1];
+  renderTasks();
+};
+
+// ====================== INITIALIZATION ======================
+document.getElementById("btn-ticket-from-a").addEventListener("click", () => {
+  const prompt = document.getElementById("channel-a").value.trim() || "Multi-agent research on isomorphic orchestration patterns";
+  createTask(prompt.substring(0, 65) + (prompt.length > 65 ? "..." : ""));
+  document.getElementById("channel-b").textContent += `\n\n[${new Date().toLocaleTimeString()}] Team synthesis started...\n`;
+});
+
+document.getElementById("btn-run-isomorphic").addEventListener("click", () => {
+  document.getElementById("channel-b").textContent += `\n\n[${new Date().toLocaleTimeString()}] Isomorphic orchestration layer engaged — distributing across 4 agents...\n`;
+  createTask("Isomorphic Orchestration Stress Test");
+});
+
+// Seed demo tasks
+setTimeout(() => {
+  createTask("Comparative analysis of multi-agent coordination frameworks");
+  createTask("Real-time collaborative research on quantum-inspired AI patterns");
+}, 600);
+
+// Populate agent cards
+const agents = [
+  {name:"Oppie", role:"Orchestrator / Lead", status:"orchestrating", color:"#0d9488"},
+  {name:"Leo", role:"Analysis & Decomposition", status:"analyzing", color:"#6366f1"},
+  {name:"Enrico", role:"Convert / Adjust", status:"converting", color:"#ec4899"},
+  {name:"Hans", role:"Collab & Iteration", status:"live", color:"#14b8a6"}
+];
+
+const cardsHTML = agents.map(a => `
+  <div class="agent-card" style="border:1px solid ${a.color}30;padding:1rem;border-radius:10px">
+    <strong>${a.name}</strong><br>
+    <small style="color:#666">${a.role}</small><br><br>
+    <span style="background:${a.color}15;color:${a.color};padding:3px 9px;border-radius:999px;font-size:0.75rem">${a.status}</span>
+  </div>
+`).join('');
+document.getElementById("agent-cards").innerHTML = cardsHTML;
+
+</script>
+</body>
+</html>

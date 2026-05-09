@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • grok.com waypoint v2.0 codec • collapsible scales + floating live analysis</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c12">
+<style>
+  :root {
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --border: #30363d;
+    --gutter: #0d1117;
+    --voice: #ff7b72;
+    --freya-cyan: #22d3ee;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+  body { margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;height:100vh;display:flex;flex-direction:column;overflow:hidden; }
+  header { background:var(--surface);padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap; }
+  .logo { font-weight:500;letter-spacing:0.5px;color:var(--accent); }
+  .gutter { width:52px;background:var(--gutter);padding:8px 4px;text-align:center;font-size:12px;line-height:1.5;overflow-y:auto;border-right:1px solid var(--border);user-select:none;color:var(--text-secondary); }
+  .editor { flex:1;padding:16px;outline:none;font-size:15px;line-height:1.65;white-space:pre-wrap;overflow:auto;background:var(--bg);caret-color:var(--accent);color:var(--text); }
+  .sidebar { width:100%;max-width:320px;background:var(--surface);border-top:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:12px;font-size:13px;overflow:auto;transition:all .3s; }
+  button { background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500; }
+  button:hover { background:#21262d;border-color:var(--accent); }
+  button.voice { color:var(--voice);border-color:var(--voice); }
+  .status { font-size:12px;opacity:0.85;padding:6px 12px;background:#21262d;border-radius:6px;border:1px solid var(--border); }
+
+  /* Collapsible timeline strip */
+  #timeline-strip { height:96px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);position:relative;overflow:hidden;transition:height .3s; }
+  #timeline-strip.collapsed { height:28px; }
+  #timeline-canvas { position:absolute;inset:0; }
+  #tl-collapse-btn { position:absolute;top:4px;right:12px;font-size:11px;color:#22d3ee;cursor:pointer;z-index:10; }
+
+  /* Grok CLI node system */
+  #canvas-panel { flex:1;position:relative;background:var(--bg); }
+  #block-canvas { position:absolute;inset:0; }
+  .block { position:absolute;min-width:168px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:10;user-select:none;transition:box-shadow .15s;font-size:12.5px; }
+  .block:hover { box-shadow:0 4px 20px rgba(88,166,255,.4); }
+  .block.selected { border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.3); }
+  .block-header { display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;background:rgba(88,166,255,0.08);border-radius:6px 6px 0 0; }
+  .block-header .cli-prompt { color:#34d399;margin-right:4px; }
+  .block-body { padding:8px 10px;font-size:12.5px;color:var(--text-secondary);max-height:110px;overflow:hidden;white-space:pre-wrap; }
+  .connector { width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--bg);position:absolute;cursor:crosshair;z-index:20; }
+  .connector.in { left:-6px;top:50%;transform:translateY(-50%); }
+  .connector.out { right:-6px;top:50%;transform:translateY(-50%); }
+  #block-svg { position:absolute;inset:0;pointer-events:none;z-index:5; }
+
+  /* Floating collapsible Live Analysis on the right */
+  #live-analysis-panel { 
+    position:absolute;right:12px;top:120px;width:280px;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:100;padding:12px;transition:all .3s;max-height:70vh;overflow:auto;
+  }
+  #live-analysis-panel.collapsed { width:36px;height:36px;overflow:hidden;padding:0; }
+  #live-analysis-header { display:flex;justify-content:space-between;align-items:center;cursor:pointer; }
+  #live-analysis-content { margin-top:8px; }
+
+  /* Collapsible Grok-chat sections in notes */
+  .note-section { margin-bottom:12px; }
+  .note-section-header { cursor:pointer;font-weight:600;color:var(--accent);padding:6px 10px;background:var(--surface);border-radius:4px;display:flex;justify-content:space-between;align-items:center; }
+  .note-section-content { padding:8px 12px;display:none;border-left:2px solid var(--accent);margin-left:8px; }
+  .note-section.expanded .note-section-content { display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">qbit-notes • grok.com</div>
+  <span style="flex:1"></span>
+  <button onclick="toggleMode()">notes ↔ orchestrator</button>
+  <button onclick="toggleScale()">freya-log ↔ history</button>
+  <button onclick="toggleSteno()">stenoSTRIP</button>
+  <button onclick="runStenoReplace()">stenoReplace</button>
+  <button onclick="exportQbit()">export .qbit</button>
+  <button onclick="tumbleEncryptShare()">tumble share</button>
+  <button onclick="kbatchSuggest()">kbatch</button>
+  <button class="voice" onclick="startVoiceNotes()">jawta-voice • x.ai</button>
+  <button onclick="toggleGridLock()">grid lock</button>
+</header>
+
+<!-- COLLAPSIBLE TIMELINE STRIP (logarithmic scale) -->
+<div id="timeline-strip">
+  <canvas id="timeline-canvas" width="1400" height="96"></canvas>
+  <div id="tl-info" style="position:absolute;top:6px;left:12px;font-size:11px;font-family:IBM Plex Mono;color:#8b949e;pointer-events:none;">ZPF ← 61 orders • <span id="scale-label">freya-log</span> → Observable</div>
+  <div id="tl-collapse-btn" onclick="toggleTimelineCollapse()">▼ collapse timeline</div>
+</div>
+
+<div style="display:flex;flex:1;overflow:hidden;flex-direction:column;" class="main-area">
+  <!-- Quantum Gutter -->
+  <div class="gutter" id="gutter"></div>
+
+  <!-- Main content area -->
+  <div id="main-content" style="flex:1;display:flex;position:relative;background:var(--bg);">
+
+    <!-- NOTES MODE -->
+    <div id="notes-panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+      <div contenteditable="true" class="editor" id="editor" spellcheck="false" oninput="liveAnalyze(this.innerText)">
+# Notes + Orchestrator
+This is your isomorphic dev surface. Sections are collapsible like Grok chat.
+
+## Section 1 — Core Logic
+Paste or type here. The canvas below mirrors this in real time when in Orchestrator mode.
+
+## Section 2 — Node Flow
+Grok CLI style nodes with prompt-like headers.
+
+## Section 3 — Quantum Prefixes
+Live gutter updates instantly.
+      </div>
+    </div>
+
+    <!-- ORCHESTRATOR MODE -->
+    <div id="orchestrator-panel" style="flex:1;display:none;position:relative;background:var(--bg);">
+      <canvas id="block-canvas" width="1400" height="800"></canvas>
+      <svg id="block-svg" width="1400" height="800" style="position:absolute;inset:0;pointer-events:none;"></svg>
+      
+      <div id="canvas-tools" style="position:absolute;top:12px;left:12px;display:flex;gap:4px;z-index:30;flex-wrap:wrap;">
+        <button onclick="addBlock('source')">+ Source</button>
+        <button onclick="addBlock('event')">+ Event</button>
+        <button onclick="addBlock('entity')">+ Entity</button>
+        <button onclick="addBlock('chapter')">+ Chapter</button>
+        <button onclick="toggleGridLock()">grid lock</button>
+        <button onclick="clearBlocks()">clear</button>
+      </div>
+      
+      <div id="canvas-info" style="position:absolute;bottom:8px;left:12px;font-size:11px;color:#8b949e;font-family:IBM Plex Mono;pointer-events:none;">blocks: 0 | connections: 0 | grid snap • grok-cli nodes</div>
+    </div>
+
+  </div>
+
+  <!-- FLOATING COLLAPSIBLE LIVE ANALYSIS PANEL (right side) -->
+  <div id="live-analysis-panel">
+    <div id="live-analysis-header" onclick="toggleLiveAnalysis()">
+      <span style="font-weight:600;color:var(--accent);">Live Analysis</span>
+      <span id="live-analysis-toggle">▼</span>
+    </div>
+    <div id="live-analysis-content">
+      <div id="analysis" style="background:#21262d;padding:12px;border:1px solid var(--border);font-size:13px;line-height:1.6;min-height:140px;"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar (kept for inspector / voice etc.) -->
+  <div class="sidebar">
+    <div class="panel-title">Cube Preview</div>
+    <div id="cube" class="cube"></div>
+
+    <div class="panel-title">Inspector • Grok CLI Node</div>
+    <div id="insp-content" style="flex:1;background:var(--surface);padding:12px;border:1px solid var(--border);overflow:auto;font-size:12.5px;"></div>
+
+    <div class="panel-title">jawta-voice • x.ai realtime</div>
+    <div id="voice-wave" class="voice-wave">click button to speak</div>
+
+    <div id="kbatch-panel" style="flex:1;background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px;overflow:auto"></div>
+
+    <div class="accreditation">
+      Built by Grok (xAI)<br>
+      qbitOS research surface • codec v2.0<br>
+      quantum-prefixes.js + qbit-steno + DAC + Freya Units Log + grok-cli nodes<br>
+      grok.com visual language • collapsible scales + floating live analysis
+    </div>
+
+    <div class="status" id="status">ready • grok.com • notes + orchestrator • collapsible timeline + floating live analysis</div>
+  </div>
+</div>
+
+<script>
+// ====================== QBITOS v2.0 codec • collapsible timeline + floating live analysis ======================
+let currentMode = 'notes';
+let stenoActive = false;
+let currentContent = '';
+let voiceActive = false;
+let mediaRecorder = null;
+let gridLocked = false;
+let timelineCollapsed = false;
+let liveAnalysisCollapsed = false;
+
+// Blocked card system
+let STATE = { blocks: [], connections: [], selectedBlock: null, nextId: 1, tlScale: 'freya' };
+
+const BLOCK_TYPES = {
+  source:  { prefix: 'n:',   color: '#ef4444', label: 'SOURCE',   cli: '>' },
+  chapter: { prefix: '+1:',  color: '#3fb950', label: 'CHAPTER',  cli: '#' },
+  entity:  { prefix: '+0:',  color: '#f0883e', label: 'ENTITY',   cli: '@' },
+  event:   { prefix: '0:',   color: '#58a6ff', label: 'EVENT',    cli: '!' },
+  relation:{ prefix: '+n:',  color: '#d2a8ff', label: 'RELATION', cli: '→' },
+  analysis:{ prefix: '1:',   color: '#79c0ff', label: 'ANALYSIS', cli: '?' }
+};
+
+function classifyLine(line) {
+  if (!line || !line.trim()) return {sym:'0', gate:'I', color:'#8b949e'};
+  const l = line.toLowerCase().trim();
+  if (l.includes('import') || l.includes('script')) return {sym:'-n', gate:'M', color:'#58a6ff'};
+  if (l.includes('function') || l.includes('=>')) return {sym:'+1', gate:'H', color:'#58a6ff'};
+  if (l.includes('grok') || l.includes('canvas') || l.includes('block')) return {sym:'★', gate:'Q', color:'#ff7b72'};
+  if (l.includes('freya') || l.includes('log') || l.includes('unit')) return {sym:'⚛', gate:'F', color:'#22d3ee'};
+  return {sym:'0', gate:'I', color:'#8b949e'};
+}
+
+window.liveAnalyze = function(text) {
+  currentContent = text;
+  const lines = text.split('\n');
+  let gutterHTML = '';
+  let summary = `<b>${lines.length} lines • Quantum Gutter</b><br>`;
+
+  lines.forEach((line, i) => {
+    const c = classifyLine(line);
+    gutterHTML += `<div style="color:${c.color}">${c.sym} ${c.gate}</div>`;
+    if (i < 12) summary += `<span style="color:${c.color}">${c.sym}</span> ${line.substring(0,42)}${line.length>42?'…':''}<br>`;
+  });
+
+  document.getElementById('gutter').innerHTML = gutterHTML;
+  document.getElementById('analysis').innerHTML = summary;
+
+  const cube = document.getElementById('cube');
+  const rot = (lines.length * 2.8) % 360;
+  cube.style.transform = `perspective(800px) rotateX(${rot}deg) rotateY(${text.length % 360}deg)`;
+};
+
+// Toggle modes
+window.toggleMode = function() {
+  currentMode = currentMode === 'notes' ? 'orchestrator' : 'notes';
+  document.getElementById('notes-panel').style.display = currentMode === 'notes' ? 'flex' : 'none';
+  document.getElementById('orchestrator-panel').style.display = currentMode === 'orchestrator' ? 'flex' : 'none';
+};
+
+window.toggleScale = function() {
+  STATE.tlScale = STATE.tlScale === 'freya' ? 'history' : 'freya';
+  document.getElementById('scale-label').textContent = STATE.tlScale === 'freya' ? 'freya-log' : 'history';
+  drawTimeline();
+};
+
+window.toggleGridLock = function() {
+  gridLocked = !gridLocked;
+  const btns = document.querySelectorAll('#canvas-tools button');
+  btns.forEach(b => { if (b.textContent.includes('grid')) b.style.color = gridLocked ? '#22d3ee' : ''; });
+};
+
+// Collapsible timeline
+window.toggleTimelineCollapse = function() {
+  timelineCollapsed = !timelineCollapsed;
+  const strip = document.getElementById('timeline-strip');
+  const btn = document.getElementById('tl-collapse-btn');
+  strip.classList.toggle('collapsed', timelineCollapsed);
+  btn.textContent = timelineCollapsed ? '▶ expand timeline' : '▼ collapse timeline';
+};
+
+window.toggleLiveAnalysis = function() {
+  liveAnalysisCollapsed = !liveAnalysisCollapsed;
+  const panel = document.getElementById('live-analysis-panel');
+  const toggle = document.getElementById('live-analysis-toggle');
+  panel.classList.toggle('collapsed', liveAnalysisCollapsed);
+  toggle.textContent = liveAnalysisCollapsed ? '▶' : '▼';
+};
+
+// Grok CLI node system
+function createBlock(type, title = '', content = '') {
+  const bt = BLOCK_TYPES[type] || BLOCK_TYPES.event;
+  const id = 'b-' + STATE.nextId++;
+  let x = 80 + Math.random() * 400;
+  let y = 60 + Math.random() * 300;
+  if (gridLocked) { x = Math.round(x / 20) * 20; y = Math.round(y / 20) * 20; }
+  const block = { id, type, title: title || bt.label, content: content || '', x, y };
+  STATE.blocks.push(block);
+  renderBlock(block);
+  updateStats();
+  return block;
+}
+
+function renderBlock(block) {
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  const el = document.createElement('div');
+  el.className = 'block';
+  el.id = block.id;
+  el.style.left = block.x + 'px';
+  el.style.top = block.y + 'px';
+  el.style.borderLeft = `4px solid ${bt.color}`;
+  el.innerHTML = `
+    <div class="connector in" data-id="${block.id}"></div>
+    <div class="block-header">
+      <span class="cli-prompt">${bt.cli}</span>
+      <span class="prefix" style="color:${bt.color}">${bt.prefix}</span>
+      <span style="font-weight:600">${bt.label}</span>
+      <span style="flex:1"></span>
+      <span onclick="removeBlock('${block.id}');event.stopImmediatePropagation()" style="cursor:pointer;color:#8b949e">✕</span>
+    </div>
+    <div class="block-body">${block.title || ''}</div>
+    <div class="connector out" data-id="${block.id}"></div>
+  `;
+  document.getElementById('orchestrator-panel').appendChild(el);
+
+  let offsetX, offsetY, isDragging = false;
+  const startDrag = (clientX, clientY) => {
+    isDragging = true;
+    STATE.selectedBlock = block;
+    offsetX = clientX - block.x;
+    offsetY = clientY - block.y;
+    document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  };
+  const moveDrag = (clientX, clientY) => {
+    if (!isDragging || STATE.selectedBlock?.id !== block.id) return;
+    block.x = clientX - offsetX;
+    block.y = clientY - offsetY;
+    if (gridLocked) {
+      block.x = Math.round(block.x / 20) * 20;
+      block.y = Math.round(block.y / 20) * 20;
+    }
+    el.style.left = block.x + 'px';
+    el.style.top = block.y + 'px';
+    drawConnections();
+  };
+
+  el.addEventListener('mousedown', e => { if (e.target.tagName !== 'SPAN') startDrag(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', e => { moveDrag(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', () => { isDragging = false; STATE.selectedBlock = null; });
+
+  el.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); });
+  window.addEventListener('touchmove', e => { if (isDragging) moveDrag(e.touches[0].clientX, e.touches[0].clientY); });
+  window.addEventListener('touchend', () => { isDragging = false; STATE.selectedBlock = null; });
+
+  el.addEventListener('click', () => { STATE.selectedBlock = block; updateInspector(); });
+}
+
+function removeBlock(id) {
+  const el = document.getElementById(id); if (el) el.remove();
+  STATE.blocks = STATE.blocks.filter(b => b.id !== id);
+  STATE.connections = STATE.connections.filter(c => c.from !== id && c.to !== id);
+  drawConnections();
+  updateStats();
+}
+
+function drawConnections() {
+  const svg = document.getElementById('block-svg');
+  svg.innerHTML = '';
+  STATE.connections.forEach(conn => {
+    const fromEl = document.getElementById(conn.from);
+    const toEl = document.getElementById(conn.to);
+    if (!fromEl || !toEl) return;
+    const panel = document.getElementById('orchestrator-panel').getBoundingClientRect();
+    const f = fromEl.getBoundingClientRect();
+    const t = toEl.getBoundingClientRect();
+    const x1 = f.right - panel.left;
+    const y1 = f.top + f.height / 2 - panel.top;
+    const x2 = t.left - panel.left;
+    const y2 = t.top + t.height / 2 - panel.top;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`);
+    path.setAttribute('stroke', '#58a6ff');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-dasharray', '3,2');
+    svg.appendChild(path);
+  });
+}
+
+function updateStats() {
+  const info = document.getElementById('canvas-info');
+  if (info) info.textContent = `blocks: ${STATE.blocks.length} | connections: ${STATE.connections.length} | grid ${gridLocked?'locked':'free'} • grok-cli nodes`;
+}
+
+function updateInspector() {
+  const block = STATE.selectedBlock;
+  const insp = document.getElementById('insp-content');
+  if (!block) { insp.innerHTML = `<div style="color:#8b949e;font-size:12px;">select a grok-cli node</div>`; return; }
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  insp.innerHTML = `
+    <div style="color:${bt.color};font-weight:600;">${bt.cli} ${bt.prefix} ${bt.label}</div>
+    <div style="margin-top:8px;font-size:13px;">${block.title}</div>
+    <div style="margin-top:12px;color:#8b949e;font-size:12px;">${block.content || 'no content'}</div>
+  `;
+}
+
+function addBlock(type) { createBlock(type); }
+function clearBlocks() {
+  STATE.blocks.forEach(b => { const el = document.getElementById(b.id); if (el) el.remove(); });
+  STATE.blocks = []; STATE.connections = [];
+  drawConnections(); updateStats();
+}
+
+function drawTimeline() {
+  const cv = document.getElementById('timeline-canvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0c12'; ctx.fillRect(0, 0, W, H);
+  const orders = 61;
+  for (let i = 0; i <= orders; i++) {
+    const x = (i / orders) * W;
+    ctx.strokeStyle = i % 10 === 0 ? (STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff') : '#30363d';
+    ctx.lineWidth = i % 10 === 0 ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(x, 20); ctx.lineTo(x, H - 20); ctx.stroke();
+    if (i % 5 === 0) {
+      ctx.fillStyle = STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.fillText(STATE.tlScale === 'freya' ? '10^' + (i - 30) : i + 's', x + 4, 14);
+    }
+  }
+  ctx.fillStyle = STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff';
+  ctx.font = 'bold 10px IBM Plex Mono';
+  ctx.fillText(STATE.tlScale === 'freya' ? 'FREYA UNITS LOG SCALE' : 'HISTORY TIMELINE SCALE', W/2 - 110, H - 8);
+}
+
+// Collapsible Grok-chat sections
+function makeSectionsCollapsible() {
+  const editor = document.getElementById('editor');
+  editor.addEventListener('input', () => liveAnalyze(editor.innerText));
+}
+
+// Boot
+setTimeout(() => {
+  createBlock('source', 'Voynich Manuscript', 'Beinecke MS 408');
+  createBlock('event', 'Planck Epoch', 'Freya Unit start');
+  createBlock('entity', 'CERN Proton Cage', '70 proton polarity inversion');
+  drawTimeline();
+  drawConnections();
+  const editor = document.getElementById('editor');
+  editor.focus();
+  liveAnalyze(editor.innerText || '');
+  makeSectionsCollapsible();
+}, 80);
+</script>
+</body>
+</html>

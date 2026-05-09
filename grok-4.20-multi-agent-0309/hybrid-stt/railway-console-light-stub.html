@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<!-- Grok Railway v15 — Full Dashboard with IronRaw + Real Rust Backend -->
+<html lang="en" data-theme="light" data-railway-console="1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grok Railway · Console v15</title>
+<style>
+:root {
+  color-scheme: light;
+  --lab-page: #f7f7f8;
+  --lab-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --lab-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Consolas", monospace;
+  --lab-card-shadow: 0 1px 3px rgba(15,23,42,0.08);
+  --qp-bg: #ffffff;
+  --qp-bg-secondary: #f6f8fa;
+  --qp-border: #d0d7de;
+  --qp-text: #1f2328;
+  --qp-text-secondary: #424a53;
+  --qp-text-muted: #656d76;
+  --qp-accent: #0969da;
+  --qp-accent-subtle: rgba(9,105,218,0.08);
+  --nav-w-expanded: 220px;
+  --nav-w-collapsed: 56px;
+  --insp-w-expanded: 300px;
+  --insp-w-collapsed: 0px;
+}
+
+html[data-railway-console="1"] { height:100%; background:var(--lab-page); }
+* { box-sizing:border-box; }
+
+body {
+  margin:0; height:100%; overflow:hidden; font-family:var(--lab-sans); font-size:14px;
+  line-height:1.5; color:var(--qp-text); background:var(--lab-page);
+}
+body.nav-collapsed { --nav-w:var(--nav-w-collapsed); }
+body.inspector-collapsed { --insp-w:var(--insp-w-collapsed); }
+
+.app-shell {
+  display:grid;
+  grid-template-columns:var(--nav-w) var(--insp-w) minmax(0,1fr);
+  height:100%;
+}
+
+.nav-rail {
+  background:var(--qp-bg); border-right:1px solid var(--qp-border); display:flex; flex-direction:column;
+  transition:width .25s ease;
+}
+.nav-toggle { align-self:flex-end; margin:8px; width:36px; height:32px; border:1px solid var(--qp-border);
+  border-radius:6px; background:var(--qp-bg-secondary); cursor:pointer; font-size:18px; }
+.nav-brand { padding:12px 16px; font-weight:600; font-size:15px; letter-spacing:-0.02em; }
+body.nav-collapsed .nav-brand { display:none; }
+
+.nav-items { flex:1; padding:0 8px; overflow-y:auto; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; border:none;
+  background:transparent; font:inherit; color:var(--qp-text); cursor:pointer; width:100%;
+}
+.nav-item:hover { background:var(--qp-bg-secondary); }
+.nav-item.active { background:var(--qp-accent-subtle); color:var(--qp-accent); font-weight:500; }
+body.nav-collapsed .nav-item { justify-content:center; padding:10px 0; }
+body.nav-collapsed .nav-label { display:none; }
+
+.main-stack { position:relative; display:flex; flex-direction:column; min-height:0; overflow:hidden; background:var(--lab-page); }
+.topbar {
+  flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; padding:10px 16px;
+  background:var(--qp-bg); border-bottom:1px solid var(--qp-border); gap:12px; flex-wrap:wrap;
+}
+.topbar-title { font-size:15px; font-weight:500; letter-spacing:-0.02em; }
+.topbar-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+.workspace-main { flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.workspace { flex:1; padding:12px 16px; overflow:auto; display:flex; flex-direction:column; gap:12px; }
+
+.cohesive-grid {
+  display:grid; grid-template-columns:minmax(280px,460px) 1fr; gap:12px; flex:1; min-height:0;
+}
+@media (max-width:960px) { .cohesive-grid { grid-template-columns:1fr; } }
+
+.panel-card {
+  background:var(--qp-bg); border:1px solid var(--qp-border); border-radius:12px; box-shadow:var(--lab-card-shadow);
+  display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;
+}
+.pc-head {
+  padding:10px 14px; border-bottom:1px solid var(--qp-border); font-size:11px; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.06em; color:var(--qp-text-muted); flex-shrink:0;
+}
+.pc-body { flex:1; min-height:0; overflow:auto; padding:12px; }
+
+.terminal {
+  font-family:var(--lab-mono); font-size:12.5px; line-height:1.5; background:#f6f8fa; border:1px solid var(--qp-border);
+  border-radius:8px; padding:12px; white-space:pre-wrap; flex:1; min-height:140px; overflow:auto;
+}
+
+.staging-mount {
+  flex:1; background:var(--qp-bg-secondary); border:1px solid var(--qp-border); border-radius:8px;
+  padding:12px; font-size:13px; overflow:auto; min-height:120px;
+}
+.staging-item {
+  padding:8px 10px; margin:6px 0; background:var(--qp-bg); border:1px solid var(--qp-border);
+  border-radius:6px; cursor:pointer; font-size:12.5px;
+}
+
+.graph-ribbon { flex:0 0 auto; padding:8px 16px; }
+.rail-graph-svg { width:100%; height:180px; background:var(--qp-bg-secondary); border-radius:8px; border:1px solid var(--qp-border); }
+
+.insp-edge-tab {
+  position:absolute; left:0; top:180px; z-index:50; width:32px; height:110px; background:var(--qp-bg);
+  border:1px solid var(--qp-border); border-left:none; border-radius:0 8px 8px 0; display:flex;
+  align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:var(--qp-accent);
+  box-shadow:2px 0 8px rgba(0,0,0,0.1);
+}
+body.inspector-collapsed .insp-edge-tab { display:flex; }
+.inspector { transition:width .25s ease; overflow:hidden; }
+body.inspector-collapsed .inspector { width:0; padding:0; border:none; visibility:hidden; }
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Nav Rail -->
+  <aside class="nav-rail">
+    <button class="nav-toggle" onclick="toggleNav()">‹</button>
+    <div class="nav-brand">Grok Railway v15</div>
+    <nav class="nav-items">
+      <button class="nav-item active" onclick="setView('overview')">Overview</button>
+      <button class="nav-item" onclick="setView('terminal')">Terminal</button>
+      <button class="nav-item" onclick="setView('tickets')">Tickets</button>
+      <button class="nav-item" onclick="setView('staging')">Staging</button>
+    </nav>
+  </aside>
+
+  <!-- Inspector -->
+  <aside class="inspector" id="inspector">
+    <div class="pc-head">Railway Data</div>
+    <div style="padding:12px">
+      <div id="railway-status"></div>
+      <div id="agent-list" style="margin-top:16px"></div>
+      <div id="client-list" style="margin-top:16px"></div>
+      <div style="margin-top:20px">
+        <strong>Last Intent</strong>
+        <div id="last-intent" style="background:#f6f8fa;padding:10px;border-radius:6px;margin-top:6px">—</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-stack">
+    <button class="insp-edge-tab" onclick="toggleInspector()" id="insp-edge-tab" style="display:none">›</button>
+
+    <header class="topbar">
+      <div class="topbar-title">Grok Railway Console</div>
+      <div class="topbar-actions">
+        <input id="server-url" value="ws://127.0.0.1:8080/ws" style="width:240px">
+        <button class="btn" onclick="connectWebSocket()">Connect</button>
+        <span id="ws-status">● disconnected</span>
+        <span id="client-count">Clients: 1</span>
+      </div>
+    </header>
+
+    <div class="graph-ribbon">
+      <div class="panel-card">
+        <div class="pc-head">Merge Graph · Live Railway</div>
+        <div id="rail-graph-host" class="rail-graph-svg"></div>
+      </div>
+    </div>
+
+    <div class="workspace-main">
+      <main class="workspace">
+        <!-- Overview -->
+        <div id="view-overview" class="view active cohesive-grid">
+          <div class="panel-card">
+            <div class="pc-head">IronRaw Terminal</div>
+            <pre id="terminal-output" class="terminal">Waiting for connection...</pre>
+          </div>
+          <div class="panel-card">
+            <div class="pc-head">Staging Area</div>
+            <div id="staging-area" class="staging-mount">Highlight any text on this page to stage it.</div>
+            <button class="btn" onclick="clearStaging()" style="margin:8px;width:calc(100% - 16px)">Clear Staging</button>
+          </div>
+        </div>
+
+        <!-- Other views omitted for brevity but available on request -->
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== STATE & WS ======================
+let ws = null;
+let activeAgents = { Oppie:true, Leo:true, Enrico:true, Hans:true };
+let lastIntent = "—";
+let isPaused = false;
+let stagingBuffer = [];
+
+function log(msg) {
+  const ts = new Date().toLocaleTimeString('en-US',{hour12:false});
+  const line = `${ts} ${msg}\n`;
+  const term = document.getElementById("terminal-output");
+  if (term) term.textContent += line;
+  term.scrollTop = term.scrollHeight;
+}
+
+function connectWebSocket() {
+  const url = document.getElementById("server-url").value;
+  ws = new WebSocket(url);
+
+  ws.onopen = () => {
+    document.getElementById("ws-status").innerHTML = '<span style="color:#1a7f37">● LIVE</span>';
+    log("Connected to Rust Railway server");
+    ws.send(JSON.stringify({type:"join", client:"Dashboard", role:"dashboard"}));
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "state") {
+        if (msg.state.activeAgents) activeAgents = msg.state.activeAgents;
+        if (msg.state.lastIntent) lastIntent = msg.state.lastIntent;
+        isPaused = msg.state.isPaused || false;
+        updateDashboard();
+      } else if (msg.type === "log") {
+        log(msg.text);
+      }
+    } catch(err){}
+  };
+
+  ws.onclose = () => {
+    document.getElementById("ws-status").innerHTML = '<span style="color:#cf222e">● OFF</span>';
+    setTimeout(connectWebSocket, 3000);
+  };
+}
+
+function updateDashboard() {
+  let html = `Depth: ${4}<br>Paused: ${isPaused?"YES":"NO"}<br>Last Intent: ${lastIntent}<br><br>Agents:<br>`;
+  Object.keys(activeAgents).forEach(a => {
+    html += `• ${a}: ${activeAgents[a]?"ON RAIL":"OFF"}<br>`;
+  });
+  const statusEl = document.getElementById("railway-status");
+  if (statusEl) statusEl.innerHTML = html;
+}
+
+window.toggleVoice = function() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return log("SpeechRecognition not supported");
+  const rec = new SpeechRecognition();
+  rec.continuous = true;
+  rec.onresult = (e) => {
+    let t = "";
+    for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+    log("Voice: " + t);
+    if (ws) ws.send(JSON.stringify({type:"voice_command", text:t}));
+  };
+  rec.start();
+  document.getElementById("mic-btn").classList.add("recording");
+};
+
+document.addEventListener("mouseup", () => {
+  const text = window.getSelection().toString().trim();
+  if (text.length > 10) {
+    stagingBuffer.unshift(text);
+    if (stagingBuffer.length > 6) stagingBuffer.pop();
+    renderStaging();
+    log("Staged: " + text.substring(0,60) + "...");
+  }
+});
+
+function renderStaging() {
+  const el = document.getElementById("staging-area");
+  el.innerHTML = stagingBuffer.map((t,i) => 
+    `<div class="staging-item" onclick="useStaged(${i})">${t}</div>`
+  ).join("");
+}
+
+window.useStaged = function(i) {
+  log("[STAGED → TERMINAL] " + stagingBuffer[i]);
+  stagingBuffer.splice(i,1);
+  renderStaging();
+};
+
+window.clearStaging = function() {
+  stagingBuffer = [];
+  renderStaging();
+};
+
+window.toggleAgent = function(name) {
+  activeAgents[name] = !activeAgents[name];
+  if (ws) ws.send(JSON.stringify({type:"toggleAgent", name:name, value:activeAgents[name]}));
+  updateDashboard();
+};
+
+function connectWebSocket() { /* already defined above */ }
+
+// Boot
+log("Grok Railway v15 Dashboard ready");
+connectWebSocket();
+updateDashboard();
+renderStaging();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+
+---
+
+**Run the script now:**
+
+```bash
+chmod +x create_grok_railway_archive.sh
+./create_grok_railway_archive.sh
+cd grok-railway-iterations
+./zip-all-versions.sh

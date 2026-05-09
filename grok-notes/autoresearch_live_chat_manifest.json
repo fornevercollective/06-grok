@@ -1,0 +1,11 @@
+{
+  "raw_records_path": "/Volumes/qbitOS/03.models/nanochat-demo/training_data/autoresearch_live_chat_records.jsonl",
+  "train_jsonl": "/Volumes/qbitOS/03.models/nanochat-demo/training_data/autoresearch_live_chat_train.jsonl",
+  "val_jsonl": "/Volumes/qbitOS/03.models/nanochat-demo/training_data/autoresearch_live_chat_val.jsonl",
+  "raw_records": 3,
+  "unique_conversations": 3,
+  "train_rows": 2,
+  "val_rows": 1,
+  "seed": 1337,
+  "val_ratio": 0.1
+}

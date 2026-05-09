@@ -1,0 +1,4300 @@
+<!-- Grok Notes - cleaned for Grok Studio and Grokipedia -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-uvspeed-web="file:///Users/tref/dev/projects/uvspeed/web/">
+<head>
+<script>
+try {
+  if (window.parent !== window) document.documentElement.classList.add('qp-embed-chrome');
+  if (new URLSearchParams(location.search).get('hide_contrails') === '1') {
+    document.documentElement.classList.add('nt-hide-contrails');
+  }
+} catch (e) {}
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#121212">
+<meta name="color-scheme" content="dark">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<title>Grok Notes — Updated Interface</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png">
+<link rel="stylesheet" href="quantum-theme.css">
+<link rel="stylesheet" href="notes-surface.css">
+<style>
+/* Grok CLI + quantum-theme: single source via --qp-* (quantum-theme.css) */
+:root {
+  --radius: 6px;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --grok-gold: #c9a84c;
+  --grok-purple: #a78bfa;
+  --grok-cyan: #22d3ee;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{
+  height:100%;
+  height:100dvh;
+  background:#121212;
+}
+/* Page-wide palette = .iron-search-staff-hint ( #121212 · #666 · #fff · 11px system UI ) */
+body.notes-surface-page{
+  --iss-hint-bg:#121212;
+  --iss-input-bg:#1e1e1e;
+  --iss-chrome:#0a0a0a;
+  --iss-line:#2a2a2a;
+  --iss-muted:#666666;
+  --iss-text-strong:#ffffff;
+  --iss-blue:#4a9eff;
+  --qp-bg:#121212;
+  --qp-bg-secondary:#1e1e1e;
+  --qp-bg-tertiary:#0a0a0a;
+  --qp-bg-hover:#2a2a2a;
+  --qp-canvas-bg:#121212;
+  --qp-card:#1e1e1e;
+  --qp-code-bg:#0a0a0a;
+  --qp-input-bg:#121212;
+  --qp-border:#2a2a2a;
+  --qp-border-muted:#2a2a2a;
+  --qp-card-border:#2a2a2a;
+  --qp-text:#ffffff;
+  --qp-text-secondary:#c4c4c4;
+  --qp-text-muted:#666666;
+  --qp-accent:#4a9eff;
+  --qp-accent-subtle:rgba(74,158,255,0.18);
+  --qp-accent-hover:#79c0ff;
+  --qp-scrollbar:#2a2a2a;
+  --qp-scrollbar-track:#121212;
+  --qp-shadow:rgba(0,0,0,0.35);
+  --qp-shadow-lg:rgba(0,0,0,0.55);
+  min-height:100%;
+  min-height:100dvh;
+  max-height:100dvh;
+  overflow:hidden;
+  touch-action:manipulation;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:11px;
+  line-height:1.35;
+  display:flex;
+  flex-direction:column;
+  background:var(--iss-hint-bg);
+  color:var(--qp-text);
+  padding-top:env(safe-area-inset-top);
+  -webkit-font-smoothing:antialiased;
+}
+body.notes-surface-page #term-output,
+body.notes-surface-page .term-prompt,
+body.notes-surface-page .term-prompt #term-input,
+body.notes-surface-page .nt-notes-editor,
+body.notes-surface-page .nt-note-card,
+body.notes-surface-page code,
+body.notes-surface-page .nt-rd-cell-toolbar button{
+  font-family:var(--font-mono);
+}
+body.notes-surface-page #term-output{
+  font-size:12px;
+  line-height:1.6;
+}
+
+.nt-top{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  gap:8px 12px;
+  padding:6px 16px;padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right));
+  background:var(--iss-hint-bg);border-bottom:1px solid var(--iss-line);
+  flex-shrink:0;min-height:44px;box-shadow:none;
+  font-size:11px;line-height:1.35;
+  color:var(--iss-muted);
+}
+.nt-top-left{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0;justify-self:start}
+.nt-top-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;justify-self:end}
+/* Brand control: same strip as + Pad / +Note; toggles terminal I/O (#term-output + .term-prompt), not .status */
+/* CLI-style: .grok > cli (blue brand · white suffix; mono) */
+.nt-top .logo-btn{
+  font-size:12px;font-weight:600;letter-spacing:0;font-family:var(--font-mono);
+  max-width:100%;color:var(--iss-text-strong);
+}
+.nt-top .logo-cli{display:inline-flex;align-items:baseline;gap:0.2em;white-space:nowrap;line-height:1.2}
+/* Clicks always hit the button (some hosts mis-target nested spans). */
+.nt-top .logo-btn .logo-cli,.nt-top .logo-btn .logo-cli *{pointer-events:none}
+/* Same blue as #iss-engine-brand (footer: --iss-blue → --qp-accent inside .iron-search-staff) */
+.nt-top .logo-cli-brand{color:var(--qp-accent);font-weight:500;letter-spacing:.02em}
+.nt-top .logo-cli-chev{color:#fff;font-weight:600}
+.nt-top .logo-cli-tail{color:#fff;font-weight:600}
+.nt-top .logo-btn.active .logo-cli-brand{color:var(--qp-accent)}
+.nt-top .badge{font-size:10px;padding:2px 8px;border-radius:12px;font-weight:600;letter-spacing:.5px;background:var(--qp-bg-tertiary);color:var(--qp-text-secondary)}
+.badge-live{background:var(--qp-success);color:#fff;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* LIVE-adjacent: unix · epoch · local · region · drift · … (titles on .nt-mk only — avoids tooltip flutter) */
+.nt-top-live-strip{
+  display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px 8px;
+  font-family:var(--font-mono);
+  font-size:9px;line-height:1.35;
+  color:var(--iss-muted);
+  max-width:min(100%,70vw);
+  letter-spacing:.01em;
+}
+.nt-top-live-strip .nt-mkv{display:inline-flex;align-items:baseline;gap:3px;white-space:nowrap}
+.nt-top-live-strip .nt-mkv.nt-mkv-time{gap:4px;align-items:baseline}
+.nt-top-live-strip .nt-mkv-time .nt-mk{color:var(--qp-text-muted);font-weight:500}
+.nt-top-live-strip .nt-time-sep-mid{color:var(--qp-text-muted);font-weight:500;opacity:.85;padding:0 1px}
+.nt-top-live-strip .nt-time-num{color:var(--qp-text);font-weight:600;font-variant-numeric:tabular-nums}
+.nt-top-live-strip .nt-time-num-epoch-tail{color:var(--iss-blue);font-weight:600;font-variant-numeric:tabular-nums}
+.nt-top-live-strip .nt-mv.nt-time-combo{
+  display:inline-flex;align-items:baseline;flex-wrap:wrap;gap:0;max-width:none;
+  font-weight:600;font-variant-numeric:tabular-nums;
+}
+.nt-top-live-strip .nt-mk{color:var(--qp-text-muted);font-weight:500;text-transform:lowercase}
+.nt-top-live-strip .nt-mv{
+  color:var(--qp-text);font-weight:600;max-width:14em;overflow:hidden;text-overflow:ellipsis;
+  font-variant-numeric:tabular-nums;
+}
+.nt-top-live-strip .nt-mv.nt-mv-fixed-num{min-width:5.5ch;display:inline-block;text-align:right}
+.nt-top-live-strip .nt-sep{opacity:.4;color:var(--iss-line);padding:0 1px;user-select:none}
+.nt-top .status{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  min-width:0;max-width:min(720px,96vw);
+  padding:2px 4px;
+  justify-self:center;
+  text-align:center;
+}
+.nt-status-inner{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.nt-status-topline{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 14px;
+  width:100%;
+}
+.nt-status-fact{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;line-height:1.35;
+  color:var(--qp-text-secondary);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  letter-spacing:.01em;
+  padding:3px 10px;border-radius:999px;
+  background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.2);
+  max-width:100%;
+}
+.nt-status-fact .grok-mini-mark{color:var(--qp-text-muted);flex-shrink:0;opacity:.95}
+.nt-status-fact .nt-fact-strong{color:var(--qp-text);font-weight:600}
+.nt-status-fact time{color:var(--qp-text-muted);font-weight:400}
+.nt-status-actions{display:inline-flex;align-items:center;gap:2px;flex-shrink:0}
+.nt-top-icon-btn{
+  width:28px;height:28px;padding:0;border-radius:8px;cursor:pointer;flex-shrink:0;
+  border:1px solid var(--iss-line);background:var(--iss-chrome);color:var(--iss-muted);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:border-color .15s,color .15s,background .15s;
+}
+.nt-top-icon-btn:hover{border-color:var(--qp-accent);color:var(--qp-accent);background:rgba(88,166,255,.08)}
+.nt-top-icon-btn svg{width:15px;height:15px;display:block}
+.nt-status-metrics{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;
+  font-size:11px;color:var(--iss-muted);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  line-height:1.35;
+}
+.nt-top .status .dot{width:5px;height:5px;border-radius:50%;background:var(--qp-success);flex-shrink:0}
+.nt-top .status .sep{color:var(--iss-line);opacity:.85}
+.nt-edits-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:flex-start;justify-content:center;padding:max(16px, env(safe-area-inset-top)) 16px 16px;box-sizing:border-box}
+.nt-edits-modal[hidden]{display:none!important}
+.nt-edits-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.nt-edits-modal-panel{
+  position:relative;margin-top:8vh;width:min(400px, 100%);max-height:min(70dvh, 520px);
+  background:var(--iss-input-bg);border:1px solid var(--iss-line);border-radius:8px;
+  box-shadow:0 12px 40px var(--qp-shadow-lg);display:flex;flex-direction:column;overflow:hidden;
+}
+.nt-edits-modal-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--iss-line)}
+.nt-edits-modal-head h3{margin:0;font-size:11px;font-weight:500;line-height:1.35;color:var(--iss-text-strong);font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.nt-edits-close{
+  width:32px;height:32px;border:none;border-radius:8px;background:transparent;color:var(--iss-muted);
+  font-size:20px;line-height:1;cursor:pointer;
+}
+.nt-edits-close:hover{background:var(--qp-bg-hover);color:var(--qp-text)}
+.nt-edits-tabs{display:flex;gap:4px;padding:6px 14px;border-bottom:1px solid var(--iss-line);background:var(--iss-hint-bg)}
+.nt-edits-tab{font-size:11px;line-height:1.35;padding:6px 12px;border-radius:6px;border:1px solid transparent;background:transparent;color:var(--iss-muted);cursor:pointer;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.nt-edits-tab.active{background:var(--iss-chrome);border-color:var(--iss-line);color:var(--iss-text-strong)}
+.nt-edits-body{padding:24px 16px;text-align:center;font-size:11px;line-height:1.35;color:var(--iss-muted);font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.nt-top-btn{background:var(--iss-chrome);border:1px solid var(--iss-line);color:var(--iss-text-strong);height:28px;padding:0 12px;border-radius:var(--radius);cursor:pointer;font-size:11px;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:.15s;display:flex;align-items:center;gap:6px;font-weight:500;flex-shrink:0}
+.nt-top-btn:hover{border-color:var(--qp-accent);box-shadow:0 0 0 2px var(--qp-accent-subtle)}
+.nt-top-btn.active{background:var(--qp-bg-hover);color:var(--qp-accent)}
+/* Match #nt-toolbar-nb-actions .nt-toolbar-add-cell button (+ MD / Code / …) */
+.nt-top #btn-toggle-pad.nt-top-btn,
+.nt-top #btn-toggle-notes.nt-top-btn,
+.nt-top #btn-toggle-draw.nt-top-btn,
+.nt-top #btn-toggle-status.nt-top-btn{
+  min-height:18px;height:18px;padding:0 8px;font-size:12px;line-height:18px;
+  font-weight:600;border-radius:4px;gap:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  box-sizing:border-box;box-shadow:none;
+}
+.nt-top #btn-toggle-pad.nt-top-btn:hover,
+.nt-top #btn-toggle-notes.nt-top-btn:hover,
+.nt-top #btn-toggle-draw.nt-top-btn:hover,
+.nt-top #btn-toggle-status.nt-top-btn:hover{box-shadow:none}
+#notebook-pane.nt-body-hidden .nt-body{display:none!important}
+
+/* FigJam-style infinite canvas over #main when + Draw is on */
+.nt-draw-layer{
+  position:absolute;inset:0;z-index:200;
+  display:none;flex-direction:column;
+  background:#161616;
+  touch-action:none;
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-select:none;
+}
+html.nt-draw-open #main.nt-draw-active .nt-draw-layer{display:flex}
+.nt-draw-canvas-wrap{flex:1;min-height:0;position:relative;touch-action:none}
+#nt-draw-canvas{
+  display:block;width:100%;height:100%;
+  cursor:crosshair;touch-action:none;
+}
+html.nt-draw-open #main.nt-draw-active .nt-draw-canvas-wrap{cursor:crosshair}
+.nt-draw-hud{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;row-gap:6px;
+  padding:4px 10px;font-size:10px;line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--iss-muted);
+  background:rgba(0,0,0,.35);
+  border-top:1px solid var(--iss-line);
+}
+.nt-draw-hud-hints{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.nt-draw-hud-tools{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-left:auto;flex-shrink:0;
+}
+.nt-draw-hud-btn{
+  -webkit-appearance:none;appearance:none;margin:0;padding:2px 10px;min-height:22px;
+  font-size:10px;font-weight:600;line-height:1.2;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--iss-text-strong);
+  background:var(--iss-chrome);
+  border:1px solid var(--iss-line);
+  border-radius:6px;cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.nt-draw-hud-btn:hover{border-color:var(--iss-blue);color:var(--qp-accent-hover)}
+.nt-draw-hud-btn[aria-pressed="true"]{
+  background:rgba(74,158,255,.14);border-color:rgba(74,158,255,.45);color:var(--qp-accent);
+}
+.nt-draw-pen-label{font-size:9px;opacity:.85;margin:0 2px 0 4px}
+.nt-draw-pen-size{
+  min-width:22px;text-align:center;font-size:10px;font-variant-numeric:tabular-nums;
+  color:var(--iss-text-strong);
+}
+.nt-draw-canvas-wrap.nt-draw-3d{
+  perspective:900px;
+}
+.nt-draw-canvas-wrap.nt-draw-3d #nt-draw-canvas{
+  transform:rotateX(7deg) rotateY(-5deg);
+  transform-origin:center center;
+  box-shadow:0 24px 48px rgba(0,0,0,.45);
+  border-radius:4px;
+}
+.nt-draw-hud kbd{font-size:9px;padding:1px 4px;border-radius:4px;background:var(--iss-chrome);border:1px solid var(--iss-line);color:var(--iss-text-strong)}
+
+/* Built-in hexcast broadcast / test (Live modality) — overlays #main, no iframe */
+.nt-live-hexcast{
+  position:absolute;
+  inset:0;
+  z-index:55;
+  display:none;
+  flex-direction:column;
+  min-height:0;
+  background:var(--iss-hint-bg);
+  border-bottom:1px solid var(--iss-line);
+  overflow:hidden;
+  pointer-events:auto;
+}
+.main.nt-live-embed-active .nt-live-hexcast{display:flex!important}
+.nt-live-hexcast-rainbow{display:flex;height:2px;flex-shrink:0;width:100%}
+.nt-live-hexcast-rainbow span{flex:1}
+.nt-live-hexcast-rainbow .hx-r1{background:#ff3838}.nt-live-hexcast-rainbow .hx-r2{background:#ff8c38}
+.nt-live-hexcast-rainbow .hx-r3{background:#ffe138}.nt-live-hexcast-rainbow .hx-r4{background:#3fb950}
+.nt-live-hexcast-rainbow .hx-r5{background:#38a5ff}.nt-live-hexcast-rainbow .hx-r6{background:#bc8cff}
+.nt-live-hexcast-head{
+  flex-shrink:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;
+  padding:4px 10px;font-size:11px;color:var(--iss-muted);
+  border-bottom:1px solid var(--iss-line);background:var(--iss-input-bg);
+}
+.nt-hx-tabs{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:6px;flex:1;min-width:0;
+  position:relative;z-index:3;pointer-events:auto;
+}
+.nt-hx-tab{
+  -webkit-appearance:none;appearance:none;margin:0;
+  font-size:10px;font-weight:600;padding:5px 12px;min-height:28px;min-width:52px;border-radius:6px;
+  border:1px solid var(--iss-line);background:var(--iss-chrome);color:var(--iss-muted);
+  cursor:pointer;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  line-height:1.2;pointer-events:auto;position:relative;z-index:4;
+}
+.nt-hx-tab:hover{color:var(--qp-text);border-color:rgba(74,158,255,.35)}
+.nt-hx-tab.active,.nt-hx-tab[aria-selected="true"]{
+  background:rgba(74,158,255,.12);color:var(--qp-accent);border-color:rgba(74,158,255,.45);
+}
+.nt-hx-head-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;font-size:10px;max-width:100%}
+.nt-hx-head-meta .hx-sub{opacity:.85;max-width:min(420px,45vw);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nt-hx-body{
+  flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;
+}
+/* [hidden] must win — class display:flex was overriding UA hidden and kept Studio UI under uvspeed tabs */
+#nt-hx-panel-embed[hidden],
+.nt-hx-panel-embed[hidden]{
+  display:none!important;
+}
+#nt-hx-panel-external[hidden]{
+  display:none!important;
+}
+.nt-hx-panel-embed{
+  flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;
+}
+.nt-hx-panel-external{
+  flex:1;min-height:0;display:flex;flex-direction:column;position:relative;background:#0d1117;
+}
+.nt-hx-ext-toolbar{
+  flex-shrink:0;display:flex;flex-direction:column;gap:8px;padding:8px 10px;
+  border-bottom:1px solid var(--iss-line);background:var(--iss-input-bg);
+}
+.nt-hx-ext-toolbar-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.nt-hx-ext-url-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font-size:10px;max-width:100%}
+.nt-hx-ext-url-row .nt-hx-ext-k{color:var(--iss-muted);flex-shrink:0}
+.nt-hx-ext-url-disp{
+  flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;
+  color:var(--qp-accent);word-break:break-all;line-height:1.35;
+}
+.nt-hx-ext-hint{
+  margin:0;font-size:10px;line-height:1.4;color:var(--iss-muted);
+  padding:8px;border-radius:6px;background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);
+}
+.nt-hx-panel-external.nt-hx-has-url .nt-hx-ext-iframe{display:block}
+.nt-hx-panel-external.nt-hx-has-url .nt-hx-ext-fallback{display:none!important}
+.nt-hx-panel-external:not(.nt-hx-has-url) .nt-hx-ext-iframe{display:none!important}
+.nt-hx-panel-external:not(.nt-hx-has-url) .nt-hx-ext-fallback{display:flex!important}
+.nt-hx-ext-iframe{
+  flex:1;width:100%;min-height:200px;border:0;background:#0d1117;
+  align-self:stretch;
+}
+.nt-hx-ext-fallback{
+  flex:1;min-height:200px;align-items:center;justify-content:center;padding:16px;font-size:11px;line-height:1.45;
+  color:var(--iss-muted);text-align:center;max-width:420px;margin:0 auto;align-self:stretch;
+}
+.nt-hx-ext-fallback code{font-size:10px;color:var(--qp-accent)}
+.nt-live-hexcast-head .hx-title{font-weight:600;color:var(--qp-text)}
+.nt-live-hexcast-head .hx-live-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;background:#484f58;margin-right:6px;vertical-align:middle;
+}
+.nt-live-hexcast-head .hx-live-dot.on{background:#da3633;box-shadow:0 0 8px rgba(218,54,51,.6);animation:nt-hx-pulse 1.2s ease infinite}
+@keyframes nt-hx-pulse{50%{opacity:.65}}
+.nt-live-hexcast-ctrl{
+  flex-shrink:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 10px;
+  border-bottom:1px solid var(--iss-line);background:var(--iss-chrome);
+}
+.nt-hx-btn{
+  font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid var(--iss-line);
+  background:var(--iss-input-bg);color:var(--iss-text-strong);cursor:pointer;font-family:inherit;
+}
+.nt-hx-btn:hover{border-color:var(--iss-blue);color:var(--qp-accent)}
+.nt-hx-btn.nt-hx-btn-primary{background:rgba(35,134,54,.25);border-color:#238636;color:#3fb950}
+.nt-hx-btn.active{background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.5);color:var(--qp-accent)}
+.nt-hx-lbl{font-size:10px;color:var(--iss-muted);margin-left:4px}
+.nt-hx-sel{
+  font-size:10px;padding:3px 6px;border-radius:4px;border:1px solid var(--iss-line);
+  background:var(--iss-chrome);color:var(--qp-text);max-width:120px;
+}
+.nt-live-hexcast-stats{
+  flex-shrink:0;display:flex;flex-wrap:wrap;gap:10px 14px;padding:4px 10px;font-size:9px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  color:var(--iss-muted);border-bottom:1px solid var(--iss-line);background:rgba(0,0,0,.2);
+}
+.nt-live-hexcast-stats .hx-sv{color:var(--qp-accent)}
+.nt-live-hexcast-stats .hx-sg{color:#3fb950}
+.nt-live-hexcast-stats .hx-so{color:#f0883e}
+.nt-live-hexcast-panels{
+  flex:1 1 auto;min-height:200px;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;
+  align-content:stretch;
+}
+@media (max-width:900px){
+  .nt-live-hexcast-panels{grid-template-columns:1fr;min-height:160px}
+}
+.nt-hx-panel{
+  display:flex;flex-direction:column;min-height:180px;border:1px solid var(--iss-line);border-radius:8px;overflow:hidden;background:var(--iss-chrome);
+}
+.nt-hx-panel-hd{
+  flex-shrink:0;padding:4px 8px;font-size:10px;font-weight:600;border-bottom:1px solid var(--iss-line);color:var(--iss-muted);
+}
+.nt-hx-panel-body{
+  flex:1;min-height:160px;position:relative;background:#010409;
+}
+.nt-hx-panel-body video,.nt-hx-panel-body .nt-hx-cv-src{display:block;width:100%;height:100%;object-fit:contain;position:absolute;inset:0}
+.nt-hx-panel-body .nt-hx-cv-src{object-fit:contain}
+.nt-hx-ph{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  font-size:11px;color:var(--iss-muted);text-align:center;padding:12px;pointer-events:none;
+}
+.nt-hx-cv-hex{display:block;width:100%;height:100%}
+.nt-live-hexcast-lat{
+  flex-shrink:0;height:72px;min-height:72px;padding:0 8px 8px;border-top:1px solid var(--iss-line);
+}
+.nt-live-hexcast-lat .nt-hx-lat-hd{font-size:9px;color:var(--iss-muted);padding:4px 2px}
+#nt-hx-cv-lat{display:block;width:100%;height:calc(100% - 18px);background:#161b22;border-radius:4px}
+
+/* Desktop grid: term | Grokipedia | splitter | notebook | rail/notes (col 2 width 0 when Grokipedia off) */
+.main{
+  position:relative;
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,0px) 4px minmax(0,1fr) minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr);
+  gap:0;
+  grid-auto-columns:minmax(0,1fr);
+}
+.main.notes-panel-open:not(.grokipedia-panel-active){
+  grid-template-columns:minmax(0,1fr) minmax(0,0px) 4px minmax(0,1fr) minmax(200px,min(320px,33vw));
+}
+/* Grokipedia on: term and Grokipedia share space equally (avoid 40vw starving the terminal) */
+.main.grokipedia-panel-active:not(.notes-panel-open){
+  grid-template-columns:minmax(200px,1fr) minmax(200px,1fr) 4px minmax(0,1fr) minmax(0,1fr);
+}
+.main.grokipedia-panel-active.notes-panel-open{
+  grid-template-columns:minmax(200px,1fr) minmax(200px,1fr) 4px minmax(0,1fr) minmax(200px,min(320px,33vw));
+}
+/* Terminal off: col1 collapsed + pane removed from layout — left area stays blank; notebook expands */
+.main.term-io-hidden:not(.notes-panel-open):not(.grokipedia-panel-active){
+  grid-template-columns:minmax(0,0px) minmax(0,0px) 4px minmax(0,1fr) minmax(0,1fr);
+}
+.main.term-io-hidden.notes-panel-open:not(.grokipedia-panel-active){
+  grid-template-columns:minmax(0,0px) minmax(0,0px) 4px minmax(0,1fr) minmax(200px,min(320px,33vw));
+}
+.main.term-io-hidden.grokipedia-panel-active:not(.notes-panel-open){
+  grid-template-columns:minmax(0,0px) minmax(200px,1fr) 4px minmax(200px,1fr) minmax(0,1fr);
+}
+.main.term-io-hidden.grokipedia-panel-active.notes-panel-open{
+  grid-template-columns:minmax(0,0px) minmax(200px,1fr) 4px minmax(200px,1fr) minmax(200px,min(320px,33vw));
+}
+/* Reading (Grokipedia + pad collapsed): narrow notebook rail left, article pane right */
+.main.term-io-hidden.grokipedia-panel-active.nt-reading-sidebar:not(.notes-panel-open){
+  grid-template-columns:minmax(0,0px) minmax(200px,min(28vw,320px)) 4px minmax(240px,1fr) minmax(0,1fr);
+}
+.main.term-io-hidden.grokipedia-panel-active.nt-reading-sidebar.notes-panel-open{
+  grid-template-columns:minmax(0,0px) minmax(200px,min(28vw,320px)) 4px minmax(240px,1fr) minmax(200px,min(320px,33vw));
+}
+.main.nt-reading-sidebar .notebook-pane{grid-column:2}
+.main.nt-reading-sidebar #splitter-notebook{grid-column:3}
+.main.nt-reading-sidebar .grokipedia-pane{grid-column:4}
+.main.term-io-hidden .term-pane{display:none!important}
+.grokipedia-pane{
+  grid-column:2;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  background:var(--iss-hint-bg);
+  border-left:1px solid var(--iss-line);
+  border-right:1px solid var(--iss-line);
+  overflow:hidden;
+}
+.grokipedia-pane-hd{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 10px;
+  font-size:11px;
+  line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--iss-input-bg);
+  border-bottom:1px solid var(--iss-line);
+  color:var(--iss-muted);
+}
+.grokipedia-pane-hd .gp-brand{font-weight:600;color:var(--iss-blue);letter-spacing:.02em}
+.grokipedia-pane-hd .gp-open-tab{
+  color:var(--iss-blue,#4a9eff);
+  text-decoration:none;
+  white-space:nowrap;
+}
+.grokipedia-pane-hd .gp-open-tab:hover{text-decoration:underline}
+
+/* Grokipedia: qbit browser bar + iron tools (scoped) */
+.grokipedia-pane .gp-chrome{
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  background:var(--iss-input-bg);
+  border-bottom:1px solid var(--iss-line);
+}
+.gpb-bar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px;
+  border-bottom:1px solid var(--iss-line);
+}
+.gpb-btn,.gpb-go{
+  flex-shrink:0;
+  height:26px;
+  padding:0 8px;
+  font-size:11px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--iss-muted);
+  background:var(--iss-hint-bg);
+  border:1px solid var(--iss-line);
+  border-radius:4px;
+  cursor:pointer;
+}
+.gpb-btn:hover,.gpb-go:hover{color:var(--qp-text);border-color:var(--iss-blue);}
+.gpb-url{
+  flex:1;
+  min-width:0;
+  height:26px;
+  padding:0 8px;
+  font-size:11px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--qp-text);
+  background:var(--iss-chrome);
+  border:1px solid var(--iss-line);
+  border-radius:4px;
+}
+.gpb-url:focus{outline:none;border-color:var(--iss-blue);}
+.gi-url-row{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 8px;
+  border-bottom:1px solid var(--iss-line);
+}
+.gi-btn{
+  flex-shrink:0;
+  width:28px;
+  height:28px;
+  padding:0;
+  font-size:12px;
+  line-height:1;
+  color:var(--iss-muted);
+  background:transparent;
+  border:1px solid var(--iss-line);
+  border-radius:4px;
+  cursor:pointer;
+}
+.gi-btn:hover{color:var(--qp-text);border-color:var(--iss-blue);}
+.gi-url{
+  flex:1;
+  min-width:0;
+  height:28px;
+  padding:0 8px;
+  font-size:11px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--qp-text);
+  background:var(--iss-chrome);
+  border:1px solid var(--iss-line);
+  border-radius:4px;
+}
+.gi-url:focus{outline:none;border-color:var(--iss-blue);}
+.gi-search-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 8px;
+  border-bottom:1px solid var(--iss-line);
+}
+.gi-search{
+  flex:1;
+  min-width:0;
+  height:30px;
+  padding:0 10px;
+  font-size:12px;
+  color:var(--qp-text);
+  background:var(--iss-chrome);
+  border:1px solid var(--iss-line);
+  border-radius:6px;
+}
+.gi-search:focus{outline:none;border-color:var(--iss-blue);}
+.gi-search-go{
+  flex-shrink:0;
+  height:30px;
+  padding:0 14px;
+  font-size:11px;
+  font-weight:600;
+  color:var(--iss-chrome);
+  background:linear-gradient(135deg,var(--grok-purple),var(--grok-cyan));
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+.gi-search-go:hover{filter:brightness(1.08);}
+.gp-connectors{
+  display:flex;
+  gap:4px;
+  padding:4px 8px;
+  overflow-x:auto;
+  scrollbar-width:thin;
+  border-bottom:1px solid var(--iss-line);
+}
+.gp-connectors::-webkit-scrollbar{height:4px}
+.gp-cpill{
+  font-size:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  padding:3px 8px;
+  border-radius:4px;
+  border:1px solid var(--iss-line);
+  color:var(--iss-muted);
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.gp-cpill:hover{color:var(--qp-text);border-color:var(--iss-blue);}
+.gp-cpill.active{color:var(--grok-cyan);border-color:rgba(34,211,238,.35);}
+.gp-iron-mini{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  padding:4px 8px;
+  border-bottom:1px solid var(--iss-line);
+}
+.gp-mt{
+  font-size:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  padding:2px 8px;
+  border-radius:4px;
+  border:1px solid var(--iss-line);
+  background:transparent;
+  color:var(--iss-muted);
+  cursor:pointer;
+}
+.gp-mt:hover{color:var(--qp-text);border-color:var(--iss-blue);}
+.gp-rainbow{display:flex;height:2px;flex-shrink:0;width:100%;}
+.gp-rainbow span{flex:1}
+.gp-r1{background:var(--grok-purple)}
+.gp-r2{background:var(--grok-gold)}
+.gp-r3{background:var(--grok-cyan)}
+.gp-r4{background:var(--iss-blue)}
+.gp-r5{background:#34d399}
+.gp-r6{background:#f85149}
+
+.gp-body-stack{
+  flex:1;
+  min-height:0;
+  position:relative;
+}
+.grokipedia-frame,.grokipedia-empty,.gp-viewer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  box-sizing:border-box;
+}
+.grokipedia-frame{
+  border:0;
+  background:var(--iss-chrome);
+}
+.grokipedia-empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  padding:16px;
+  font-size:11px;
+  line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--iss-muted);
+  text-align:center;
+  overflow:auto;
+}
+.gp-viewer{
+  overflow-y:auto;
+  padding:8px;
+  background:var(--iss-hint-bg);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.gp-viewer .gp-res{
+  padding:10px 12px;
+  background:var(--iss-input-bg);
+  border:1px solid var(--iss-line);
+  border-radius:6px;
+  margin-bottom:6px;
+  cursor:pointer;
+}
+.gp-viewer .gp-res:hover{border-color:var(--iss-blue);background:var(--iss-chrome);}
+.gp-viewer .gp-r-src{
+  font-size:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--iss-muted);
+  margin-bottom:4px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.gp-viewer .gp-r-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.gp-viewer .gp-r-title{font-size:13px;font-weight:600;color:var(--qp-text);margin-bottom:2px}
+.gp-viewer .gp-r-snip{font-size:11px;color:var(--iss-muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gp-viewer .gp-viewer-hd{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+  font-size:11px;
+  color:var(--iss-muted);
+}
+.gp-viewer .gp-close-view{
+  font-size:10px;
+  padding:2px 8px;
+  border-radius:4px;
+  border:1px solid var(--iss-line);
+  background:var(--iss-input-bg);
+  color:var(--iss-muted);
+  cursor:pointer;
+}
+.gp-viewer .gp-close-view:hover{color:var(--qp-text);border-color:var(--iss-blue);}
+.gp-timeline{
+  height:44px;
+  flex-shrink:0;
+  background:var(--iss-input-bg);
+  border-top:1px solid var(--iss-line);
+  position:relative;
+}
+#gp-tl-canvas{width:100%;height:100%;display:block}
+#gp-tl-label{
+  position:absolute;
+  top:2px;
+  left:8px;
+  font-size:9px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--iss-muted);
+  pointer-events:none;
+}
+.gpb-info{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:4px 8px;
+  font-size:9px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:var(--iss-muted);
+  border-top:1px solid var(--iss-line);
+  background:var(--iss-chrome);
+}
+.gpb-beat{color:var(--grok-gold);}
+.gpb-status{opacity:.9}
+.grokipedia-empty a{color:var(--iss-blue);text-decoration:underline}
+.grokipedia-empty a:hover{color:var(--qp-accent-hover)}
+.main:not(.grokipedia-panel-active) .grokipedia-pane{
+  visibility:hidden;
+  pointer-events:none;
+  min-width:0;
+  max-width:0;
+  overflow:hidden;
+  border:none;
+  padding:0;
+}
+
+.term-pane{
+  grid-column:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  background:var(--iss-hint-bg);
+  border:1px solid var(--iss-line);
+}
+#term-output{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:8px 16px;
+  font-size:12px;
+  line-height:1.6;
+  white-space:pre-wrap;
+  word-break:break-word;
+  -webkit-overflow-scrolling:touch;
+  color:var(--iss-text-strong);
+}
+#term-output .ln{min-height:16px}
+.term-prompt{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  padding-bottom:max(6px, env(safe-area-inset-bottom));
+  border-top:1px solid var(--iss-line);
+  background:var(--iss-input-bg);
+}
+.term-prompt .tp-label{
+  color:var(--grok-gold);
+  font-weight:700;
+  flex-shrink:0;
+  user-select:none;
+  font-family:var(--font-mono);
+  font-size:12px;
+  line-height:18px;
+}
+.term-prompt #term-input{
+  flex:1;
+  min-width:0;
+  border:none;
+  background:transparent;
+  color:var(--qp-text);
+  font:inherit;
+  outline:none;
+  padding:4px 0;
+}
+.c-prompt{color:var(--qp-success)}
+.c-cmd{color:var(--qp-text)}
+.c-ok{color:var(--qp-success)}
+.c-err{color:var(--qp-danger)}
+.c-warn{color:var(--qp-warning)}
+.c-info{color:var(--qp-accent)}
+.c-dim{color:var(--iss-muted)}
+.c-purple{color:var(--grok-purple)}
+.c-cyan{color:var(--grok-cyan)}
+.c-gold{color:var(--grok-gold)}
+.c-bold{font-weight:700}
+
+.notebook-pane{
+  grid-column:4;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  background:var(--iss-hint-bg);
+  border-left:1px solid var(--iss-line);
+  border-right:1px solid var(--iss-line);
+  position:relative;
+  z-index:1;
+}
+.notebook-pane-hd{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 10px;
+  font-size:11px;
+  line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--iss-input-bg);
+  border-bottom:1px solid var(--iss-line);
+  color:var(--iss-muted);
+}
+.notebook-pane-hd .nb-brand{font-weight:600;color:var(--iss-blue);letter-spacing:.02em}
+.notebook-pane-hd .nb-sub{font-size:10px;opacity:.88}
+
+/* Article outline: +Pad = viewport overlay; pad collapsed = float inside #notebook-pane; reading = Grokipedia right */
+.nt-toc-backdrop{
+  position:fixed;inset:0;z-index:100069;background:rgba(0,0,0,.35);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s,visibility .15s;
+}
+.nt-toc-backdrop.is-open{opacity:1;visibility:visible;pointer-events:auto}
+.notebook-pane.nt-body-hidden .nt-toc-backdrop{
+  position:absolute;inset:0;z-index:30;border-radius:0;
+}
+.nt-toc-popup{
+  position:fixed;z-index:100070;left:24px;top:96px;width:min(312px,calc(100vw - 32px));max-height:min(70dvh,520px);
+  display:flex;flex-direction:column;box-sizing:border-box;
+  background:var(--iss-input-bg);border:1px solid var(--iss-line);border-radius:10px;
+  box-shadow:0 16px 48px var(--qp-shadow-lg);
+  opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-6px);transition:opacity .15s,visibility .15s,transform .15s;
+}
+.notebook-pane.nt-body-hidden .nt-toc-popup{
+  position:absolute;left:8px;right:8px;top:40px;width:auto;max-height:min(calc(100% - 48px),70dvh);z-index:40;
+}
+.nt-toc-popup.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+.nt-toc-popup-panel{display:flex;flex-direction:column;min-height:0;max-height:inherit}
+.nt-toc-popup-head{
+  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px;border-bottom:1px solid var(--iss-line);
+}
+.nt-toc-popup-head #nt-toc-title{margin:0;font-size:11px;font-weight:600;color:var(--iss-text-strong);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:.02em}
+.nt-toc-close{
+  width:28px;height:28px;padding:0;border:none;border-radius:6px;background:transparent;
+  color:var(--iss-muted);font-size:18px;line-height:1;cursor:pointer;
+}
+.nt-toc-close:hover{background:var(--qp-bg-hover);color:var(--iss-text-strong)}
+#nt-toc-nav{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px 12px;min-height:0;flex:1}
+.nt-toc-list.nt-toc-space-y-2{
+  list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;
+  font-size:14px;line-height:1.45;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.nt-toc-list.nt-toc-text-sm{font-size:14px}
+.nt-toc-list a{
+  display:block;color:var(--iss-muted);text-decoration:none;padding:2px 0;border-radius:4px;
+}
+.nt-toc-list a:hover{color:var(--qp-accent);background:rgba(74,158,255,.08)}
+.grokipedia-empty .gp-outline-wrap{margin-top:12px;padding-top:10px;border-top:1px solid var(--iss-line)}
+.gp-outline-btn{
+  font-size:11px;font-weight:500;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--qp-accent);background:transparent;border:1px solid var(--iss-line);border-radius:6px;
+  padding:6px 12px;cursor:pointer;
+}
+.gp-outline-btn:hover{border-color:var(--qp-accent);background:rgba(74,158,255,.08)}
+@media (max-width:768px){
+  /* Viewport overlay only while +Pad shows notebook body; in-pane TOC keeps absolute top */
+  .notebook-pane:not(.nt-body-hidden) .nt-toc-popup{
+    left:16px;right:16px;top:auto;bottom:max(16px, env(safe-area-inset-bottom));width:auto;max-height:min(60dvh,420px);
+  }
+}
+
+.notes-drawer{
+  grid-column:5;
+  position:relative;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  display:none;
+  flex-direction:column;
+  border:1px solid var(--iss-line);
+  border-left:none;
+  background:var(--iss-input-bg);
+  overflow:hidden;
+}
+.notes-drawer.open{display:flex}
+
+.splitter{
+  grid-column:3;
+  width:4px;
+  cursor:col-resize;
+  background:var(--iss-chrome);
+  flex-shrink:0;
+  position:relative;
+  z-index:10;
+  transition:background .15s;
+  touch-action:none;
+  user-select:none;
+}
+.splitter:hover,.splitter.active{background:var(--qp-accent)}
+.splitter::after{content:'';position:absolute;inset:-2px -6px;}
+
+.nt-body{
+  flex:1;min-height:0;display:flex;flex-direction:column;
+  overflow:hidden;padding:8px 10px;
+}
+.nt-notebook-col{display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+
+.nt-rd-cell-toolbar{display:flex;gap:8px;padding:8px 10px;background:var(--qp-bg-secondary);border-bottom:1px solid var(--qp-border);flex-shrink:0;align-items:center;flex-wrap:wrap;border-radius:var(--radius) var(--radius) 0 0}
+/* Top: run controls left; bottom (under #nt-blocks): + MD / Code / Math */
+.nt-toolbar-nb{
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.nt-toolbar-nb-run{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;justify-content:flex-start}
+.nt-toolbar-nb-actions{
+  display:flex;
+  flex:0 0 auto;
+  width:100%;
+  box-sizing:border-box;
+  flex-direction:row;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.nt-toolbar-nb-foot{
+  border-bottom:none!important;
+  border-top:1px solid var(--qp-border);
+  border-radius:0 0 var(--radius) var(--radius);
+  margin-top:0;
+}
+.nt-toolbar-add-cell{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;flex-shrink:0;flex:0 0 auto;min-width:0}
+#nt-toolbar-nb-actions > .nt-tb-spacer{flex:1 1 auto;min-width:8px}
+@media (max-width:520px){
+  .nt-toolbar-nb,.nt-toolbar-nb-actions{flex-wrap:wrap}
+}
+/* Default toolbar buttons (e.g. workpad) */
+.nt-rd-cell-toolbar button{background:var(--qp-bg-tertiary);border:1px solid var(--qp-border);color:var(--qp-text);min-height:32px;padding:0 12px;border-radius:var(--radius);cursor:pointer;font-family:var(--font-mono);font-size:12px;transition:.15s;font-weight:500}
+.nt-rd-cell-toolbar button:hover{border-color:var(--qp-accent)}
+.nt-rd-cell-toolbar .nt-tb-spacer{flex:1;min-width:8px}
+.nt-rd-cell-toolbar .nt-layout-btn{
+  min-width:2.25rem;min-height:2.25rem;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;
+  font-size:14px;line-height:1;
+}
+/* Match .term-prompt .tp-label metrics (12px / 18px) on run + add strips */
+#nt-toolbar-nb.nt-rd-cell-toolbar,
+#nt-toolbar-nb-actions.nt-rd-cell-toolbar{
+  padding:6px 12px;
+  gap:6px;
+  align-items:center;
+}
+#nt-toolbar-nb .nt-toolbar-nb-run,
+#nt-toolbar-nb-actions .nt-toolbar-add-cell{align-items:center}
+#nt-toolbar-nb button.nt-layout-btn,
+#nt-toolbar-nb-actions .nt-toolbar-add-cell button,
+#nt-toolbar-nb-actions #nt-clear{
+  min-height:18px;
+  height:18px;
+  padding:0 8px;
+  font-size:12px;
+  line-height:18px;
+  font-family:var(--font-mono);
+  font-weight:600;
+  border-radius:4px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+}
+#nt-toolbar-nb-actions #nt-clear{
+  color:var(--qp-danger,#f85149);
+  border-color:rgba(248,81,73,.45);
+  flex-shrink:0;
+}
+#nt-toolbar-nb-actions #nt-clear:hover{
+  background:rgba(248,81,73,.12);
+  border-color:var(--qp-danger,#f85149);
+}
+#nt-toolbar-nb button.nt-layout-btn{
+  min-width:auto;
+  padding:0 8px;
+  font-size:12px;
+  line-height:18px;
+}
+
+.nt-blocks{
+  flex:1;min-height:0;padding:12px;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+
+.nt-notes{display:flex;flex-direction:column;gap:8px;padding:12px;flex:1;min-height:0;overflow:hidden}
+.nt-notes-editor{
+  flex:0 1 auto;min-height:80px;max-height:40vh;
+  background:var(--qp-bg);border:1px solid var(--qp-border);border-radius:var(--radius);padding:12px;
+  font-size:14px;font-family:var(--font-mono);color:var(--qp-text);outline:none;resize:vertical;
+}
+.nt-notes-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 12px;background:var(--iss-chrome);border-bottom:1px solid var(--iss-line);flex-shrink:0}
+/* Match #nt-toolbar-nb .nt-layout-btn (18px strip, e.g. ▶ Funnel) */
+.nt-notes-toolbar button.nt-layout-btn{
+  min-height:18px;height:18px;padding:0 8px;font-size:12px;line-height:18px;
+  font-family:var(--font-mono);font-weight:600;border-radius:4px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+  background:var(--qp-bg-tertiary);border:1px solid var(--qp-border);color:var(--qp-text);
+  transition:border-color .15s;
+}
+.nt-notes-toolbar button.nt-layout-btn:hover{border-color:var(--qp-accent)}
+.nt-notes-toolbar #clear-notes{
+  color:var(--qp-danger,#f85149);border-color:rgba(248,81,73,.45);
+}
+.nt-notes-toolbar #clear-notes:hover{background:rgba(248,81,73,.12);border-color:var(--qp-danger,#f85149)}
+.nt-notes-cards{
+  flex:1 1 0%;
+  min-height:0;
+  display:flex;flex-direction:column;gap:8px;padding:8px;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+.nt-note-card{
+  flex-shrink:0;
+  background:var(--qp-card);border:1px solid var(--qp-border);border-radius:var(--radius);
+  padding:10px 12px;font-size:13px;color:var(--qp-text);font-family:var(--font-mono);
+  display:flex;flex-direction:column;gap:6px;
+}
+.nt-note-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.nt-note-card-label{margin:0;font-weight:700}
+.nt-note-card-dismiss{
+  flex-shrink:0;margin:-4px -4px 0 0;width:26px;height:26px;padding:0;border-radius:var(--radius);
+  border:1px solid var(--qp-border);background:var(--qp-bg-secondary);color:var(--qp-text-muted);
+  font-size:16px;line-height:1;cursor:pointer;font-family:var(--font-mono);
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.nt-note-card-dismiss:hover{border-color:var(--qp-danger);color:var(--qp-danger);background:rgba(248,81,73,.1)}
+.nt-note-card-body{white-space:pre-wrap;word-break:break-word}
+
+/* Footer rows: inherit ISS tokens from body.notes-surface-page */
+.iron-search-staff{
+  display:flex;flex-direction:column;align-items:stretch;width:100%;min-width:0;
+  background:var(--iss-chrome);border-top:1px solid var(--iss-line);
+  --iss-input-bg:var(--qp-bg-secondary);
+  --iss-hint-bg:var(--qp-bg);
+  --iss-blue:var(--qp-accent);
+  --iss-muted:var(--qp-text-muted);
+  --iss-text:var(--qp-text);
+}
+.iron-search-staff-form{
+  margin:0;width:100%;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:stretch;
+  padding:0;
+}
+.iron-search-staff-input-row{
+  display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;
+  width:100%;box-sizing:border-box;
+  min-height:52px;
+  padding:10px 16px;
+  padding-left:max(16px, env(safe-area-inset-left));
+  padding-right:max(16px, env(safe-area-inset-right));
+  background:var(--iss-input-bg);
+  border-bottom:1px solid var(--iss-line);
+}
+/* Model chip: engine row + mode row (depth / money) */
+.iron-search-staff-model-wrap{
+  display:flex;flex-direction:column;align-items:stretch;
+  flex-shrink:0;gap:6px;max-width:min(440px,92vw);
+  margin:0;padding:8px 10px;box-sizing:border-box;
+  background:var(--iss-chrome);border:1px solid var(--iss-line);border-radius:8px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.iron-search-staff-model-wrap .iss-row{
+  display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;
+  gap:4px;min-width:0;
+}
+.iron-search-staff-model-wrap .iss-row-depth .iss-depth-label{
+  flex-shrink:0;
+  font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--iss-muted);user-select:none;
+}
+.iron-search-staff-model-wrap:focus-within{
+  border-color:#3d3d3d;
+  box-shadow:0 0 0 1px var(--qp-accent-subtle);
+}
+.iron-search-staff-model-wrap .iss-model-brand{
+  color:var(--iss-blue);
+  font-size:11px;font-weight:500;line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  letter-spacing:.02em;user-select:none;white-space:nowrap;
+}
+.iron-search-staff-model-wrap .iss-model-sep{
+  color:#ffffff;font-size:11px;font-weight:500;line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  opacity:.95;user-select:none;
+}
+.iron-search-staff-model-wrap .iron-search-staff-model{
+  -webkit-appearance:none;appearance:none;
+  flex:1 1 auto;min-width:0;cursor:pointer;margin:0;padding:0 18px 0 0;
+  border:none;border-radius:0;
+  background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23ffffff' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 2px center;
+  background-size:10px 6px;
+  color:#ffffff;
+  font-size:11px;font-weight:500;line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+.iron-search-staff-model-wrap .iron-search-staff-model:focus{outline:none}
+.iron-search-staff-model-wrap .iron-search-staff-model option{
+  color:#111;background:#fff;font-weight:500;
+}
+.iron-search-staff-model-wrap.iss-hide-depth .iss-row-depth{display:none!important}
+.iron-search-staff-model-wrap.iss-hide-depth .iss-row-metrics{display:none!important}
+.iron-search-staff-model-wrap .iss-row-metrics{
+  flex-wrap:wrap;
+  gap:3px 4px;
+  padding-top:2px;
+  margin-top:1px;
+  border-top:1px solid rgba(255,255,255,.06);
+  font-size:10px;
+  line-height:1.35;
+  font-family:var(--font-mono);
+  color:var(--iss-muted);
+}
+.iron-search-staff-model-wrap .iss-metric-k{
+  font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--iss-muted);opacity:.9;
+}
+.iron-search-staff-model-wrap .iss-metric-val{
+  color:var(--iss-text-strong);
+  font-weight:500;
+  min-width:1.5em;
+}
+/* Modality chip: 3 columns · stacked (matches model-wrap chrome) */
+.iron-search-staff-modality-wrap{
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  padding:8px 10px;box-sizing:border-box;
+  max-width:min(320px,88vw);
+  background:var(--iss-chrome);border:1px solid var(--iss-line);border-radius:8px;
+  transition:border-color .15s,box-shadow .15s;
+}
+.iron-search-staff-modality-wrap:focus-within{
+  border-color:#3d3d3d;
+  box-shadow:0 0 0 1px var(--qp-accent-subtle);
+}
+.iron-search-staff-modality-wrap.iss-modality-hidden{display:none!important}
+/* 3×3 row-major: r1 Text·Image·Files · r2 —·Video·Edit · r3 —·Audio·Live */
+.iron-search-staff-modality.iss-modality-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,auto);
+  gap:6px;
+  align-items:stretch;
+  min-width:0;
+}
+.iron-search-staff-modality.iss-modality-grid > .iss-mod-btn,
+.iron-search-staff-modality.iss-modality-grid > .iss-mod-placeholder{
+  width:100%;
+  box-sizing:border-box;
+}
+.iron-search-staff-modality.iss-modality-grid > .iss-mod-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.iss-mod-placeholder{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  width:100%;
+  min-height:22px;
+  padding:4px 8px;
+  border-radius:6px;
+  border:1px dashed var(--iss-line);
+  background:rgba(0,0,0,.12);
+  color:var(--iss-muted);
+  font-size:10px;
+  font-weight:500;
+  line-height:1.2;
+  opacity:0.75;
+  cursor:default;
+  user-select:none;
+  pointer-events:none;
+}
+.iss-mod-btn{
+  -webkit-appearance:none;appearance:none;margin:0;padding:4px 8px;border-radius:6px;cursor:pointer;
+  font-size:10px;font-weight:500;line-height:1.2;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--iss-chrome);border:1px solid var(--iss-line);color:var(--iss-muted);
+  transition:color .15s,border-color .15s,background .15s;
+  white-space:nowrap;
+}
+.iss-mod-btn:hover{color:var(--qp-accent);border-color:rgba(74,158,255,.35)}
+.iss-mod-btn.active{background:rgba(74,158,255,.12);color:var(--qp-accent);border-color:rgba(74,158,255,.45)}
+/* Live modality — hexcast / grid / feed pairing */
+.iss-mod-btn[data-mod="live"].active{
+  color:#3fb950;
+  background:rgba(63,185,80,.14);
+  border-color:rgba(63,185,80,.42);
+  box-shadow:0 0 0 1px rgba(63,185,80,.18);
+  animation:iss-live-mod-pulse 2.2s ease-in-out infinite;
+}
+@keyframes iss-live-mod-pulse{
+  0%,100%{ box-shadow:0 0 0 1px rgba(63,185,80,.15); }
+  50%{ box-shadow:0 0 0 3px rgba(63,185,80,.12); }
+}
+.iron-search-staff-q-shell{
+  flex:1 1 160px;display:flex;align-items:center;min-width:0;
+  background:var(--iss-chrome);border:1px solid var(--iss-line);border-radius:8px;
+  padding:6px 12px;box-sizing:border-box;
+  transition:border-color .15s,box-shadow .15s;
+  color-scheme:dark;
+}
+.iron-search-staff-q-shell:focus-within{
+  border-color:#3d3d3d;
+  box-shadow:0 0 0 1px var(--qp-accent-subtle);
+}
+.iron-search-staff-q{
+  flex:1;min-width:0;width:100%;
+  -webkit-appearance:none;appearance:none;
+  margin:0;
+  background-color:var(--iss-chrome);
+  border:none;color:var(--iss-text);
+  font-size:12px;line-height:1.45;padding:0;outline:none;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  caret-color:var(--iss-blue);
+}
+/* Chrome / Electron: reset search-input chrome so dark bg isn’t overridden (Safari is looser) */
+.iron-search-staff-q::-webkit-search-cancel-button,
+.iron-search-staff-q::-webkit-search-decoration,
+.iron-search-staff-q::-webkit-search-results-button,
+.iron-search-staff-q::-webkit-search-results-decoration{
+  -webkit-appearance:none;appearance:none;display:none;
+}
+.iron-search-staff-q:-webkit-autofill,
+.iron-search-staff-q:-webkit-autofill:hover,
+.iron-search-staff-q:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 1000px var(--iss-chrome) inset;
+  -webkit-text-fill-color:var(--qp-text);
+  caret-color:var(--iss-blue);
+}
+.iron-search-staff-q::placeholder{color:var(--iss-muted);opacity:1}
+.iron-search-staff-q:focus{box-shadow:none}
+.iron-search-staff-go{
+  background:transparent;border:1px solid #444;color:var(--iss-text);
+  padding:6px 14px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  transition:background .15s,border-color .15s,color .15s;flex-shrink:0;
+}
+.iron-search-staff-go:hover{background:var(--qp-bg-hover);border-color:#555;color:#fff}
+
+/* Main prompt + Ask, with quick chat stacked underneath (same column as q-shell) */
+.iron-search-staff-prompt-stack{
+  flex:1 1 200px;min-width:min(100%,260px);display:flex;flex-direction:column;align-items:stretch;gap:8px;
+}
+.iron-search-staff-prompt-line{
+  display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;width:100%;min-width:0;
+}
+.iron-search-staff-prompt-line .iron-search-staff-q-shell{flex:1 1 160px}
+.iron-search-staff-prompt-line .iron-search-staff-go{align-self:center}
+
+/* Quick chat: under prompt line, width follows prompt stack */
+.iron-search-staff-reply-row{
+  width:100%;box-sizing:border-box;
+  padding:8px 0 0;margin:0;
+  border-top:1px solid var(--iss-line);
+  background:transparent;
+  display:flex;flex-direction:column;gap:8px;min-width:0;
+}
+.iss-reply-row-head{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;
+  font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--iss-text-strong);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.iss-reply-head-brand{color:var(--iss-text-strong)}
+.iss-reply-row-head .iss-reply-head-sep{color:var(--iss-muted);font-weight:500;opacity:.85}
+.iss-reply-cols{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:10px;align-items:stretch;min-width:0;
+  /* Matched pair: From block ↔ reply textarea (same box model) */
+  --iss-reply-min-h:49px;
+  --iss-reply-max-h:140px;
+}
+@media (max-width:900px){
+  .iss-reply-cols{grid-template-columns:1fr}
+}
+.iss-reply-pane{display:flex;flex-direction:column;gap:0;min-width:0}
+.iss-reply-pane-label{
+  font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--iss-muted);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.iss-reply-from,.iron-search-staff-reply{
+  margin:0;width:100%;
+  min-height:var(--iss-reply-min-h);max-height:var(--iss-reply-max-h);
+  padding:6px 8px;border-radius:6px;box-sizing:border-box;
+  font-size:12px;line-height:1.45;font-family:var(--font-mono);
+  background:var(--iss-chrome);border:1px solid var(--iss-line);
+}
+.iss-reply-from{
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  color:var(--iss-text-strong);
+  white-space:pre-wrap;word-break:break-word;
+}
+.iss-reply-from.iss-reply-placeholder{color:var(--iss-muted);font-style:italic}
+.iron-search-staff-reply{
+  resize:vertical;color:var(--iss-text);
+  -webkit-appearance:none;appearance:none;outline:none;
+}
+.iron-search-staff-reply:focus{
+  border-color:#3d3d3d;
+  box-shadow:0 0 0 1px var(--qp-accent-subtle);
+}
+.iron-search-staff-reply::placeholder{color:var(--iss-muted);opacity:1}
+
+.iron-search-staff-hint{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;
+  min-height:32px;padding:6px 16px;
+  padding-left:max(16px, env(safe-area-inset-left));
+  padding-right:max(16px, env(safe-area-inset-right));
+  padding-bottom:max(6px, env(safe-area-inset-bottom));
+  background:var(--iss-hint-bg);
+  font-size:11px;line-height:1.35;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--iss-muted);
+}
+.iron-search-staff-hint .iss-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:0 1 auto;min-width:0}
+.iron-search-staff-hint .iss-hint-mid{
+  flex:1 1 200px;min-width:min(100%,160px);max-width:100%;display:flex;align-items:center;min-height:0;
+}
+.iron-search-staff-hint .iss-hint-q-shell{
+  width:100%;min-height:28px;padding:4px 10px;border-radius:8px;
+}
+.iron-search-staff-hint .iss-hint-q-shell .iron-search-staff-q{font-size:11px;line-height:1.35}
+.iron-search-staff-hint .iss-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end;text-align:right;flex:0 1 auto;min-width:0}
+.iron-search-staff-hint kbd,.iron-search-staff-hint .iss-k{font-size:11px;color:var(--iss-text);font-weight:500;font-family:inherit}
+.iron-search-staff-hint .iss-dim{color:var(--iss-muted)}
+.iron-search-staff-hint .iss-strong{color:var(--iss-text);font-weight:500}
+
+.footer{
+  border-top:1px solid var(--iss-line);
+  background:var(--iss-chrome);
+  padding:0;
+  display:block;
+  width:100%;
+  flex-shrink:0;
+}
+
+/* Aligned with .nt-edits-modal-panel: 400px cap, ~8vh from top, compact ~169px stack */
+.shortcut-popup{
+  position:fixed;z-index:100060;
+  left:50%;transform:translateX(-50%);
+  top:calc(8vh + env(safe-area-inset-top, 0px));
+  width:min(400px,calc(100vw - 32px));
+  max-height:169px;
+  box-sizing:border-box;
+  background:var(--iss-input-bg);border:1px solid var(--iss-line);
+  border-radius:8px;
+  box-shadow:0 12px 40px var(--qp-shadow-lg);
+  display:none;flex-direction:column;overflow:hidden;padding:0;
+}
+.shortcut-popup.is-open{display:flex!important}
+.shortcut-popup-content{
+  display:flex;flex-direction:column;gap:6px;
+  padding:12px 14px;min-height:0;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.shortcut-popup-head{
+  display:flex;align-items:center;gap:8px;position:relative;
+  flex-shrink:0;padding-right:2px;
+}
+.shortcut-popup-head h4{
+  flex:1;margin:0;color:var(--iss-text-strong);font-size:11px;font-weight:500;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  line-height:1.35;
+  text-align:left;padding:0 36px 0 0;
+}
+.shortcut-popup-close{
+  position:absolute;top:-2px;right:-4px;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;margin:0;padding:0;
+  border:none;border-radius:8px;
+  background:transparent;color:var(--qp-text-muted);
+  font:400 20px/1 system-ui,sans-serif;cursor:pointer;line-height:1;
+  transition:color .15s,background .15s;
+}
+.shortcut-popup-close:hover{color:var(--qp-text);background:var(--qp-bg-hover)}
+.quick-input-area{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:stretch;gap:8px;min-height:0}
+.quick-input-area #quick-send{
+  flex-shrink:0;align-self:stretch;
+  background:var(--qp-accent);border:1px solid var(--qp-accent);color:#fff;
+  padding:6px 10px;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.quick-input-area textarea{
+  flex:1;min-width:0;min-height:44px;max-height:56px;width:auto;
+  background:var(--iss-chrome);border:1px solid var(--iss-line);color:var(--qp-text);
+  padding:8px;border-radius:var(--radius);font-size:12px;font-family:var(--font-mono);resize:none;outline:none;
+}
+.quick-input-area textarea:focus{border-color:var(--qp-accent);box-shadow:0 0 0 2px var(--qp-accent-subtle)}
+.quick-modes{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;flex-shrink:0}
+.mode-btn{
+  background:var(--iss-chrome);border:1px solid var(--iss-line);color:var(--iss-muted);
+  padding:4px 8px;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:500;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  line-height:1.35;transition:.15s;
+}
+.mode-btn:hover{color:var(--qp-text);border-color:var(--qp-accent)}
+.mode-btn.active{background:rgba(201,168,76,.15);color:var(--grok-gold);border-color:rgba(201,168,76,.4)}
+
+@media (max-width:1024px){
+  .main:not(.notes-panel-open):not(.grokipedia-panel-active){grid-template-columns:minmax(0,1fr) minmax(0,0px) 4px minmax(0,1fr) minmax(0,1fr)}
+  .main.notes-panel-open:not(.grokipedia-panel-active){grid-template-columns:minmax(0,1fr) minmax(0,0px) 4px minmax(0,1fr) minmax(180px,260px)}
+  .main.grokipedia-panel-active:not(.notes-panel-open){grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) 4px minmax(0,1fr) minmax(0,1fr)}
+  .main.grokipedia-panel-active.notes-panel-open{grid-template-columns:minmax(180px,1fr) minmax(180px,1fr) 4px minmax(0,1fr) minmax(180px,260px)}
+  .main.term-io-hidden:not(.notes-panel-open):not(.grokipedia-panel-active){grid-template-columns:minmax(0,0px) minmax(0,0px) 4px minmax(0,1fr) minmax(0,1fr)}
+  .main.term-io-hidden.notes-panel-open:not(.grokipedia-panel-active){grid-template-columns:minmax(0,0px) minmax(0,0px) 4px minmax(0,1fr) minmax(180px,260px)}
+  .main.term-io-hidden.grokipedia-panel-active:not(.notes-panel-open){grid-template-columns:minmax(0,0px) minmax(180px,1fr) 4px minmax(0,1fr) minmax(0,1fr)}
+  .main.term-io-hidden.grokipedia-panel-active.notes-panel-open{grid-template-columns:minmax(0,0px) minmax(180px,1fr) 4px minmax(0,1fr) minmax(180px,260px)}
+  .main.term-io-hidden.grokipedia-panel-active.nt-reading-sidebar:not(.notes-panel-open){grid-template-columns:minmax(0,0px) minmax(200px,min(28vw,300px)) 4px minmax(200px,1fr) minmax(0,1fr)}
+  .main.term-io-hidden.grokipedia-panel-active.nt-reading-sidebar.notes-panel-open{grid-template-columns:minmax(0,0px) minmax(200px,min(28vw,300px)) 4px minmax(200px,1fr) minmax(180px,260px)}
+}
+@media (max-width:768px){
+  .main.nt-reading-sidebar .grokipedia-pane{order:3}
+  .main.nt-reading-sidebar .notebook-pane{order:2}
+  body.notes-surface-page{max-height:none;min-height:100dvh}
+  .main{
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .term-pane{order:1;max-height:min(38vh, 360px);min-height:140px;width:100%!important;flex-shrink:0}
+  .grokipedia-pane{order:2;width:100%!important;min-height:min(36vh, 380px);max-height:min(50vh, 520px);border:1px solid var(--qp-border);border-radius:var(--radius);margin:0 8px;visibility:visible!important;max-width:none!important;pointer-events:auto!important}
+  .main:not(.grokipedia-panel-active) .grokipedia-pane{display:none!important}
+  .splitter{display:none!important}
+  .notebook-pane{order:3;flex:1 1 auto;min-height:min(50vh, 520px);width:100%!important;border-left:none;border-right:none;max-height:none}
+  .notes-drawer{order:4;display:flex;width:100%!important;max-height:min(36vh, 420px);border:1px solid var(--qp-border);border-radius:var(--radius);margin:0 8px 8px;overflow:hidden}
+  .notes-drawer:not(.open){display:none}
+  #btn-toggle-notes{display:inline-flex}
+  .nt-top{min-height:44px;padding:6px 12px}
+  .nt-top-btn{height:28px;font-size:11px;padding:0 10px}
+  .nt-top #btn-toggle-pad.nt-top-btn,
+  .nt-top #btn-toggle-notes.nt-top-btn,
+  .nt-top #btn-toggle-draw.nt-top-btn,
+  .nt-top #btn-toggle-status.nt-top-btn{height:18px;min-height:18px;font-size:12px;padding:0 8px}
+  #term-output{font-size:12px;padding:8px 12px}
+  .iron-search-staff-input-row{flex-direction:column;align-items:stretch;min-height:auto;padding-top:12px;padding-bottom:12px}
+  .iron-search-staff-prompt-stack{width:100%;min-width:0;flex:1 1 auto}
+  .iss-reply-cols{grid-template-columns:1fr}
+  .iron-search-staff-reply-row{padding-top:10px;padding-bottom:max(4px, env(safe-area-inset-bottom))}
+  .iron-search-staff-modality-wrap{width:100%;max-width:none}
+  .iron-search-staff-go{width:100%}
+  .iron-search-staff-hint{flex-direction:column;align-items:stretch}
+  .iron-search-staff-hint .iss-left{width:100%}
+  .iron-search-staff-hint .iss-hint-mid{flex:1 1 auto;width:100%}
+  .iron-search-staff-hint .iss-right{justify-content:flex-start;text-align:left;width:100%}
+  .nt-top .status{justify-content:center}
+  .shortcut-popup{
+    top:auto;bottom:0;left:0;right:0;transform:none;
+    width:100%;max-width:none;min-width:0;
+    border-radius:12px 12px 0 0;
+    max-height:min(85dvh, 420px);
+    padding-bottom:max(12px, env(safe-area-inset-bottom));
+  }
+}
+@media (max-width:480px){
+  #term-output{font-size:11px}
+  .iron-search-staff-q-shell{min-height:44px}
+  .iron-search-staff-q{font-size:16px}
+  .nt-top .status{font-size:9px}
+  .nt-status-fact{font-size:9px;padding:2px 8px}
+  .nt-top-icon-btn{width:26px;height:26px}
+  .nt-top .logo-btn,.nt-top .logo-cli{font-size:12px}
+}
+</style>
+</head>
+<body class="notes-surface-page dark">
+<div class="nt-top">
+  <div class="nt-top-left">
+    <button type="button" class="nt-top-btn logo-btn" id="btn-toggle-status" title="Show terminal input" aria-label="Toggle terminal output and prompt" aria-pressed="false"><span class="logo-cli" translate="no"><span class="logo-cli-brand">.grok</span> <span class="logo-cli-chev" aria-hidden="true">❯</span> <span class="logo-cli-tail">cli</span></span></button>
+  <span class="badge badge-live">LIVE</span>
+    <span class="nt-top-live-strip" aria-label="Clock and host hints" translate="no">
+      <span class="nt-mkv nt-mkv-time">
+        <span class="nt-mk" title="Unix seconds · epoch ms — sub-second suffix in blue">unix/epoch</span>
+        <span class="nt-mv nt-time-combo" id="nt-live-time-combo" aria-label="Unix seconds and epoch milliseconds"></span>
+      </span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="Local date and time (browser locale)">local</span><span class="nt-mv" id="nt-live-local">—</span></span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="IANA time zone and locale">region</span><span class="nt-mv" id="nt-live-region">—</span></span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="Date vs performance clock skew (ms)">drift</span><span class="nt-mv nt-mv-fixed-num" id="nt-live-drift">—</span></span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="Traceroute hops (not available in browser)">hops</span><span class="nt-mv" id="nt-live-hops">—</span></span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="RTT — Network Information API or favicon fetch (speedtest proxy)">spt</span><span class="nt-mv nt-mv-fixed-num" id="nt-live-rtt">—</span></span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="WebGL renderer">gpu</span><span class="nt-mv" id="nt-live-gpu">—</span></span>
+      <span class="nt-sep">·</span>
+      <span class="nt-mkv"><span class="nt-mk" title="Logical CPU cores">cpu</span><span class="nt-mv" id="nt-live-cpu">—</span></span>
+    </span>
+  </div>
+  <div class="status" role="status" aria-live="polite">
+    <div class="nt-status-inner">
+      <div class="nt-status-topline">
+        <div class="nt-status-fact">
+          <svg class="grok-mini-mark" width="14" height="14" viewBox="0 0 33 33" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M13.237 21.041l11.082-8.19a.75.75 0 0 1 1.578.379c1.363 3.289.754 7.242-1.957 9.955-2.71 2.714-6.482 3.31-9.93 1.954l-3.765 1.745c5.401 3.697 11.96 2.783 16.059-1.324 3.25-3.255 4.258-7.692 3.316-11.693l.009.008C27.965 7.998 29.666 5.65 33.15.845 33.232.73 33.314.617 33.397.5l-4.586 4.59v-.014L13.234 21.044z"/>
+            <path d="M10.95 23.031c-3.877-3.707-3.208-9.446.1-12.755 2.446-2.45 6.454-3.449 9.952-1.98l3.758-1.737a12.5 12.5 0 0 0-2.54-1.386c-4.5-1.854-9.887-.931-13.545 2.728-3.518 3.523-4.625 8.94-2.725 13.561 1.42 3.454-.906 5.898-3.25 8.363-.83.874-1.664 1.749-2.335 2.674L10.947 23.034z"/>
+          </svg>
+          <span class="nt-fact-text"><span class="nt-fact-strong">Fact-checked</span> by Grok <time id="nt-fact-time" datetime="2026-02-14">2 months ago</time></span>
+        </div>
+        <div class="nt-status-actions" role="toolbar" aria-label="Article actions">
+          <button type="button" class="nt-top-icon-btn" id="nt-top-listen" title="Listen (read aloud)" aria-label="Listen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M11 5L6 9H4a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2l5 4V5z"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07M17.66 6.34a8 8 0 0 1 0 11.32"/>
+            </svg>
+          </button>
+          <button type="button" class="nt-top-icon-btn" id="nt-top-copy-link" title="Copy link" aria-label="Copy link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1"/>
+              <path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1"/>
+            </svg>
+          </button>
+          <button type="button" class="nt-top-icon-btn" id="nt-top-edits" title="Edits history" aria-label="Edits history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 7v5l3 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="nt-status-metrics">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="st-state">ready</span>
+        <span class="sep">│</span>
+        <span>blocks: <span id="nt-sb-count">0</span></span>
+        <span class="sep">│</span>
+        <span>cov: <span id="nt-sb-cov">—</span></span>
+        <span class="sep">│</span>
+        <span>v1</span>
+      </div>
+    </div>
+  </div>
+  <div class="nt-top-right">
+    <button type="button" class="nt-top-btn active" id="btn-toggle-pad" title="Hide notebook pad" aria-label="Hide notebook pad" aria-pressed="true">+ Pad</button>
+    <button type="button" class="nt-top-btn" id="btn-toggle-notes" title="Toggle notes panel" aria-label="Toggle notes panel">+Note</button>
+    <button type="button" class="nt-top-btn" id="btn-toggle-draw" title="Drawing tools" aria-label="Toggle drawing tools" aria-pressed="false">+ Draw</button>
+  </div>
+</div>
+
+<div id="nt-edits-modal" class="nt-edits-modal" role="dialog" aria-modal="true" aria-labelledby="nt-edits-title" hidden>
+  <div class="nt-edits-modal-backdrop" data-nt-edits-close tabindex="-1" aria-hidden="true"></div>
+  <div class="nt-edits-modal-panel">
+    <div class="nt-edits-modal-head">
+      <h3 id="nt-edits-title">Edits</h3>
+      <button type="button" class="nt-edits-close" data-nt-edits-close aria-label="Close">×</button>
+    </div>
+    <div class="nt-edits-tabs" role="tablist">
+      <button type="button" class="nt-edits-tab active" role="tab" aria-selected="true">All Edits</button>
+      <button type="button" class="nt-edits-tab" role="tab" aria-selected="false" disabled>Your Edits</button>
+    </div>
+    <div class="nt-edits-body">No edits yet for this article.</div>
+  </div>
+</div>
+
+<div class="main term-io-hidden" id="main">
+  <div id="nt-live-hexcast" class="nt-live-hexcast" aria-hidden="true">
+    <div class="nt-live-hexcast-rainbow" aria-hidden="true">
+      <span class="hx-r1"></span><span class="hx-r2"></span><span class="hx-r3"></span><span class="hx-r4"></span><span class="hx-r5"></span><span class="hx-r6"></span>
+    </div>
+    <div class="nt-live-hexcast-head">
+      <div class="nt-hx-tabs" role="tablist" aria-label="Live stack (Studio vs uvspeed pages)">
+        <button type="button" class="nt-hx-tab active" role="tab" id="nt-hx-tab-embed" aria-selected="true" aria-controls="nt-hx-panel-embed" data-hx-view="embed">Studio</button>
+        <button type="button" class="nt-hx-tab" role="tab" aria-selected="false" aria-controls="nt-hx-panel-external" data-hx-view="hexcast">hexcast</button>
+        <button type="button" class="nt-hx-tab" role="tab" aria-selected="false" data-hx-view="grid">grid</button>
+        <button type="button" class="nt-hx-tab" role="tab" aria-selected="false" data-hx-view="send">send</button>
+        <button type="button" class="nt-hx-tab" role="tab" aria-selected="false" data-hx-view="feed">feed</button>
+      </div>
+      <div class="nt-hx-head-meta">
+        <span><span class="hx-live-dot" id="nt-hx-live-dot" aria-hidden="true"></span><span class="hx-title">live stack</span></span>
+        <span id="nt-hx-sub" class="hx-sub">Built-in · encoder + hexcast-stream</span>
+      </div>
+    </div>
+    <div class="nt-hx-body">
+    <div id="nt-hx-panel-embed" class="nt-hx-panel-embed" role="tabpanel" aria-labelledby="nt-hx-tab-embed">
+    <div class="nt-live-hexcast-ctrl" role="toolbar" aria-label="Hexcast controls">
+      <button type="button" class="nt-hx-btn nt-hx-btn-primary" id="nt-hx-test">Test pattern</button>
+      <button type="button" class="nt-hx-btn" id="nt-hx-cam">Camera</button>
+      <button type="button" class="nt-hx-btn" id="nt-hx-screen">Screen</button>
+      <span class="nt-hx-lbl">Encode</span>
+      <select class="nt-hx-sel" id="nt-hx-enc" title="Encode mode">
+        <option value="color">Color thermal</option>
+        <option value="gray">Grayscale</option>
+        <option value="fax">Fax B/W</option>
+        <option value="signal">Signal</option>
+      </select>
+      <span class="nt-hx-lbl">Res</span>
+      <select class="nt-hx-sel" id="nt-hx-res" title="Grid resolution">
+        <option value="36">36²</option>
+        <option value="72" selected>72²</option>
+        <option value="108">108²</option>
+      </select>
+      <span class="nt-hx-lbl">FPS</span>
+      <select class="nt-hx-sel" id="nt-hx-fps" title="Target FPS">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15" selected>15</option>
+        <option value="30">30</option>
+      </select>
+      <button type="button" class="nt-hx-btn" id="nt-hx-broadcast" title="Broadcast frames on hexcast-stream">Broadcast</button>
+      <button type="button" class="nt-hx-btn" id="nt-hx-receive" title="Receive hex frames from another tab">Receive</button>
+      <button type="button" class="nt-hx-btn" id="nt-hx-stop">Stop</button>
+    </div>
+    <div class="nt-live-hexcast-stats" id="nt-hx-stats" aria-live="polite">
+      <span>src <span class="hx-sv" id="nt-hx-s-src">none</span></span>
+      <span>fps <span class="hx-sg" id="nt-hx-s-fps">0</span></span>
+      <span>enc <span class="hx-so" id="nt-hx-s-enc">0ms</span></span>
+      <span>dec <span class="hx-sv" id="nt-hx-s-dec">0ms</span></span>
+      <span>rt <span class="hx-sg" id="nt-hx-s-rt">0ms</span></span>
+      <span>jit <span class="hx-so" id="nt-hx-s-jit">0ms</span></span>
+      <span>frames <span id="nt-hx-s-frames">0</span></span>
+      <span id="nt-hx-s-bc" style="opacity:.85">off</span>
+    </div>
+    <div class="nt-live-hexcast-panels">
+      <div class="nt-hx-panel">
+        <div class="nt-hx-panel-hd" style="color:#da3633">◉ Source</div>
+        <div class="nt-hx-panel-body" id="nt-hx-source-wrap">
+          <video id="nt-hx-video" autoplay muted playsinline style="display:none"></video>
+          <canvas class="nt-hx-cv-src" id="nt-hx-cv-src" width="72" height="72"></canvas>
+          <div class="nt-hx-ph" id="nt-hx-ph"><div style="font-size:28px;line-height:1">📷</div><div>Test, Camera, or Screen</div></div>
+        </div>
+      </div>
+      <div class="nt-hx-panel">
+        <div class="nt-hx-panel-hd" style="color:#f0883e">⬡ Hex stream</div>
+        <div class="nt-hx-panel-body" id="nt-hx-hex-wrap">
+          <canvas class="nt-hx-cv-hex" id="nt-hx-cv-hex" width="300" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="nt-live-hexcast-lat">
+      <div class="nt-hx-lat-hd">Latency · encode (orange) · decode (violet) · round-trip (green) · jitter (gold)</div>
+      <canvas id="nt-hx-cv-lat" width="800" height="54"></canvas>
+    </div>
+    </div>
+    <div id="nt-hx-panel-external" class="nt-hx-panel-external" role="tabpanel" hidden aria-hidden="true">
+      <div class="nt-hx-ext-toolbar" id="nt-hx-ext-toolbar" hidden>
+        <div class="nt-hx-ext-url-row">
+          <span class="nt-hx-ext-k">URL</span>
+          <code class="nt-hx-ext-url-disp" id="nt-hx-ext-url-disp"></code>
+        </div>
+        <div class="nt-hx-ext-toolbar-actions">
+          <button type="button" class="nt-hx-btn nt-hx-btn-primary" id="nt-hx-ext-open">Open in new tab</button>
+          <button type="button" class="nt-hx-btn" id="nt-hx-ext-copy">Copy URL</button>
+        </div>
+        <p class="nt-hx-ext-hint" id="nt-hx-ext-hint" hidden></p>
+      </div>
+      <iframe id="nt-hx-ext-frame" class="nt-hx-ext-iframe" title="uvspeed page" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads allow-modals allow-pointer-lock" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div id="nt-hx-ext-fallback" class="nt-hx-ext-fallback">
+        Set <code>data-uvspeed-web</code> on the root <code>&lt;html&gt;</code> element to your <strong>uvspeed/web</strong> folder URL (with trailing <code>/</code>), or rely on the default. Original uvspeed HTML files are unchanged — only this embed URL is used.
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="term-pane">
+    <div id="term-output"></div>
+    <div class="term-prompt">
+      <span class="tp-label">grok ❯</span>
+      <input id="term-input" type="text" placeholder="type command…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <div class="grokipedia-pane" id="grokipedia-pane" aria-label="Grokipedia">
+    <div class="gp-chrome">
+      <div class="gpb-bar" role="toolbar" aria-label="Navigator">
+        <button type="button" class="gpb-btn" id="gpb-back" title="Back">◀</button>
+        <button type="button" class="gpb-btn" id="gpb-refresh" title="Refresh">⟳</button>
+        <input type="text" class="gpb-url" id="gpb-url" spellcheck="false" autocomplete="off" placeholder="https://grokipedia.com/…">
+        <button type="button" class="gpb-go" id="gpb-go" title="Go">Go</button>
+        <button type="button" class="gpb-btn" id="gpb-extract" title="Copy URL">⧉</button>
+    </div>
+      <div class="gi-url-row" role="toolbar" aria-label="Iron URL">
+        <button type="button" class="gi-btn" id="gi-back" title="Back">◀</button>
+        <button type="button" class="gi-btn" id="gi-fwd" title="Forward">▶</button>
+        <button type="button" class="gi-btn" id="gi-reload" title="Reload">⟳</button>
+        <input type="text" class="gi-url" id="gi-url" spellcheck="false" autocomplete="off" placeholder="location — syncs with bar above">
+      </div>
+      <div class="gi-search-row">
+        <input type="search" class="gi-search" id="gi-search" spellcheck="false" autocomplete="off" placeholder="Search connectors &amp; catalog…">
+        <button type="button" class="gi-search-go" id="gi-search-go">Search</button>
+      </div>
+      <div class="gp-connectors" id="gp-connectors" aria-label="Connectors"></div>
+      <div class="gp-iron-mini">
+        <button type="button" class="gp-mt" id="gp-btn-3d">◇ 3D</button>
+        <button type="button" class="gp-mt" id="gp-btn-steno">⎔ Steno</button>
+        <button type="button" class="gp-mt" id="gp-btn-bench">⚡ Bench</button>
+      </div>
+      <div class="gp-rainbow" aria-hidden="true"><span class="gp-r1"></span><span class="gp-r2"></span><span class="gp-r3"></span><span class="gp-r4"></span><span class="gp-r5"></span><span class="gp-r6"></span></div>
+    </div>
+    <div class="grokipedia-pane-hd">
+      <span class="gp-brand">Grokipedia</span>
+      <a class="gp-open-tab" id="grokipedia-open-tab" href="https://grokipedia.com/" target="_blank" rel="noopener noreferrer">Open in tab</a>
+    </div>
+    <div class="gp-body-stack" id="gp-body-stack">
+      <iframe class="grokipedia-frame" id="grokipedia-frame" title="Grokipedia search" hidden sandbox="allow-scripts allow-popups allow-forms allow-downloads allow-top-navigation-by-user-activation" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="gp-viewer" id="gp-viewer" hidden aria-live="polite"></div>
+      <div class="grokipedia-empty" id="grokipedia-empty">
+        <span>Select <strong>Grokipedia</strong> in the footer and search — results load here. Same catalog as <a href="https://grokipedia.com/search?q=plants" target="_blank" rel="noopener">grokipedia.com/search</a>.</span>
+        <p class="gp-outline-wrap"><button type="button" class="gp-outline-btn" id="gp-open-toc">Article outline</button></p>
+      </div>
+    </div>
+    <div class="gp-timeline" aria-hidden="true">
+      <canvas id="gp-tl-canvas" width="400" height="40"></canvas>
+      <span id="gp-tl-label"></span>
+    </div>
+    <div class="gpb-info" id="gpb-info"><span class="gpb-beat" id="gpb-beat">grokipedia</span><span class="gpb-status" id="gpb-status">ready</span></div>
+  </div>
+
+  <div class="splitter" id="splitter-notebook" data-target="notebook-pane"></div>
+  <div class="notebook-pane" id="notebook-pane">
+  <div class="notebook-pane-hd"><span class="nb-brand" id="nb-brand" title="Notebook · cells &amp; runs">Notebook</span><span class="nb-sub" id="nb-sub" title="Markdown, code, and math cells">Markdown</span></div>
+  <div class="nt-body">
+    <div class="nt-notebook-col">
+      <div id="nt-toolbar-wp" class="nt-rd-cell-toolbar nt-hidden" aria-label="Workpad">
+        <button type="button" id="nt-wp-add-note" title="Add note">+ Note</button>
+        <button type="button" id="nt-wp-add-code" title="Add code">+ Code</button>
+        <span class="nt-tb-spacer"></span>
+        <button type="button" id="nt-wp-run-all" title="Run all (independent)">▸ All</button>
+        <button type="button" id="nt-wp-run-funnel" title="Funnel pipeline">▸ Funnel</button>
+      </div>
+      <div id="nt-toolbar-nb" class="nt-rd-cell-toolbar nt-toolbar-nb" aria-label="Run all notebook cells">
+        <div class="nt-toolbar-nb-run">
+        <button type="button" class="nt-layout-btn" id="nt-run-all" title="Run all cells (independent)">&#9654; All</button>
+        <button type="button" class="nt-layout-btn nt-funnel-btn" id="nt-run-funnel" title="Funnel: row-major (2-col) — each cell gets prior output as funnel / prev">&#9654; Funnel</button>
+          <button type="button" class="nt-layout-btn" id="nt-toc-open" title="Article outline (on this page)">TOC</button>
+        </div>
+      </div>
+
+      <div class="nt-blocks" id="nt-blocks" aria-live="polite"></div>
+
+      <div id="nt-toolbar-nb-actions" class="nt-rd-cell-toolbar nt-toolbar-nb-actions nt-toolbar-nb-foot" aria-label="Add notebook cells">
+        <div class="nt-toolbar-add-cell">
+          <button type="button" id="nt-add-md" title="Markdown">+ MD</button>
+          <button type="button" id="nt-add-code" title="Code">+ Code</button>
+          <button type="button" id="nt-add-math" title="Math">+ Math</button>
+    </div>
+        <span class="nt-tb-spacer" aria-hidden="true"></span>
+        <button type="button" id="nt-clear" title="Remove all notebook cells">Clear</button>
+    </div>
+    </div>
+    </div>
+  <aside id="nt-toc-popup" class="nt-toc-popup" role="dialog" aria-modal="true" aria-labelledby="nt-toc-title" aria-hidden="true">
+  <div class="nt-toc-popup-panel">
+    <div class="nt-toc-popup-head">
+      <span id="nt-toc-title">On this page</span>
+      <button type="button" class="nt-toc-close" id="nt-toc-close" aria-label="Close outline">×</button>
+    </div>
+    <nav id="nt-toc-nav" aria-label="Article outline">
+      <ul class="nt-toc-list nt-toc-space-y-2 nt-toc-text-sm">
+        <li><a href="#toc-overview" data-nt-toc-jump>Overview</a></li>
+        <li><a href="#toc-history" data-nt-toc-jump>History and Development</a></li>
+        <li><a href="#toc-content" data-nt-toc-jump>Content Coverage</a></li>
+        <li><a href="#toc-taxonomy" data-nt-toc-jump>Taxonomy and Nomenclature</a></li>
+        <li><a href="#toc-distribution" data-nt-toc-jump>Distribution and Ecology</a></li>
+        <li><a href="#toc-wetland" data-nt-toc-jump>Wetland Indicator Status</a></li>
+        <li><a href="#toc-search" data-nt-toc-jump>Search and Access Tools</a></li>
+        <li><a href="#toc-species" data-nt-toc-jump>Species Profiles</a></li>
+        <li><a href="#toc-resources" data-nt-toc-jump>Specialized Resources</a></li>
+        <li><a href="#toc-application" data-nt-toc-jump>Application</a></li>
+      </ul>
+    </nav>
+  </div>
+  </aside>
+  <div id="nt-toc-backdrop" class="nt-toc-backdrop" aria-hidden="true"></div>
+  </div>
+
+  <div class="notes-drawer" id="notes-pane">
+    <div class="nt-notes">
+      <div class="nt-notes-toolbar">
+        <button type="button" class="nt-layout-btn" id="add-note-card" title="Add note">+ Note</button>
+        <button type="button" class="nt-layout-btn" id="add-text-card" title="Add text">+ Text</button>
+        <button type="button" class="nt-layout-btn" id="clear-notes" title="Clear all notes">Clear All</button>
+      </div>
+      <textarea class="nt-notes-editor" id="notes-editor" placeholder="Type your notes here..."></textarea>
+      <div class="nt-notes-cards" id="notes-cards"></div>
+    </div>
+  </div>
+
+  <div id="nt-draw-layer" class="nt-draw-layer" aria-hidden="true">
+    <div class="nt-draw-canvas-wrap">
+      <canvas id="nt-draw-canvas" width="800" height="600" aria-label="Infinite drawing canvas"></canvas>
+    </div>
+    <div class="nt-draw-hud">
+      <div class="nt-draw-hud-hints">
+        <span>Wheel <kbd>pan</kbd></span>
+        <span><kbd>Ctrl</kbd> wheel <kbd>zoom</kbd></span>
+        <span>Drag <kbd>draw</kbd></span>
+        <span><kbd>Space</kbd> drag <kbd>pan</kbd></span>
+        <span>Middle <kbd>pan</kbd></span>
+      </div>
+      <div class="nt-draw-hud-tools" role="toolbar" aria-label="Draw canvas tools">
+        <button type="button" class="nt-draw-hud-btn" id="nt-draw-3d" aria-pressed="false" title="Toggle 3D tilt (presentation)">3D</button>
+        <button type="button" class="nt-draw-hud-btn" id="nt-draw-clear" title="Clear all strokes">Clear</button>
+        <span class="nt-draw-pen-label">Pen</span>
+        <button type="button" class="nt-draw-hud-btn" id="nt-draw-pen-minus" title="Thinner (−)">−</button>
+        <span class="nt-draw-pen-size" id="nt-draw-pen-val" title="Stroke width (px)">2</span>
+        <button type="button" class="nt-draw-hud-btn" id="nt-draw-pen-plus" title="Thicker (+)">+</button>
+        <button type="button" class="nt-draw-hud-btn" id="nt-draw-import" title="Import strokes (JSON)">Import</button>
+        <input type="file" id="nt-draw-import-file" accept="application/json,.json" hidden aria-hidden="true" />
+        <button type="button" class="nt-draw-hud-btn" id="nt-draw-export" title="Export strokes (JSON)">Export</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="iron-search-staff" data-iron-search-staff>
+    <form class="iron-search-staff-form" id="iron-search-staff-form" action="https://console.x.ai" method="get" autocomplete="off">
+      <div class="iron-search-staff-input-row">
+        <div class="iron-search-staff-model-wrap">
+          <div class="iss-row iss-row-engine">
+            <span class="iss-model-brand" id="iss-engine-brand">Grok</span>
+            <span class="iss-model-sep">·</span>
+            <select class="iron-search-staff-model" id="iron-search-engine" aria-label="Company or engine" title="Grok, Grokipedia, xAI, and partner sites">
+              <option value="grok" selected>Grok</option>
+              <option value="grokipedia">Grokipedia</option>
+              <option value="xai">X.ai</option>
+              <option value="docsxai">docs.x.ai</option>
+              <option value="xcom">X.com</option>
+              <option value="spacex">SpaceX</option>
+              <option value="starlink">Starlink</option>
+              <option value="terrafab">Terrafab</option>
+              <option value="neuralink">Neuralink</option>
+              <option value="boring">Boring Co.</option>
+            </select>
+          </div>
+          <div class="iss-row iss-row-depth">
+            <span class="iss-depth-label">Mode</span>
+            <span class="iss-model-sep iss-depth-sep">·</span>
+            <select name="model" class="iron-search-staff-model" id="iron-search-model" aria-label="Depth or money mode" title="Depth (Auto…) or Money (Stock, Crypto, Live)">
+              <optgroup label="Depth">
+                <option value="auto" selected>Auto</option>
+        <option value="fast">Fast</option>
+        <option value="balanced">Balanced</option>
+        <option value="deep">Deep</option>
+        <option value="code">Code</option>
+              </optgroup>
+              <optgroup label="Money">
+                <option value="money">Money</option>
+                <option value="stock">Stock</option>
+                <option value="crypto">Crypto</option>
+                <option value="live">Live</option>
+              </optgroup>
+      </select>
+          </div>
+          <div class="iss-row iss-row-metrics" aria-label="Context · tokens · speed">
+            <span class="iss-metric-k">%</span>
+            <span class="iss-metric-val" id="iss-metric-pct" title="Approx. share of a 128k context (estimated from prompt)">—</span>
+            <span class="iss-model-sep">·</span>
+            <span class="iss-metric-k">tok</span>
+            <span class="iss-metric-val" id="iss-metric-tokens" title="Estimated token count (chars÷4)">—</span>
+            <span class="iss-model-sep">·</span>
+            <span class="iss-metric-k">spd</span>
+            <span class="iss-metric-val" id="iss-metric-speed" title="Tokens/s when streaming (not connected)">—</span>
+          </div>
+        </div>
+        <div class="iron-search-staff-modality-wrap" id="iron-search-modality-outer">
+          <input type="hidden" name="modality" id="iron-modality" value="text" />
+          <!-- Row-major 3×3: row1 Text|Image|Files · row2 Games|Video|Edit · row3 Train|Audio|Live -->
+          <div class="iron-search-staff-modality iss-modality-grid" id="iron-search-modality-bar" role="group" aria-label="Message type">
+            <button type="button" class="iss-mod-btn active" data-mod="text" aria-pressed="true">Text</button>
+            <button type="button" class="iss-mod-btn" data-mod="image" aria-pressed="false">Image</button>
+            <button type="button" class="iss-mod-btn" data-mod="files" aria-pressed="false">Files</button>
+            <button type="button" class="iss-mod-btn" data-mod="games" aria-pressed="false">Games</button>
+            <button type="button" class="iss-mod-btn" data-mod="video" aria-pressed="false">Video</button>
+            <button type="button" class="iss-mod-btn" data-mod="edit" aria-pressed="false">Edit</button>
+            <button type="button" class="iss-mod-btn" data-mod="train" aria-pressed="false">Train</button>
+            <button type="button" class="iss-mod-btn" data-mod="audio" aria-pressed="false">Audio</button>
+            <button type="button" class="iss-mod-btn" data-mod="live" aria-pressed="false">Live</button>
+          </div>
+        </div>
+        <div class="iron-search-staff-prompt-stack">
+          <div class="iron-search-staff-prompt-line">
+            <div class="iron-search-staff-q-shell">
+              <input type="search" name="q" class="iron-search-staff-q" id="iron-search-q" placeholder="Message Grok . . ." enterkeyhint="send" autocomplete="off" />
+            </div>
+            <button type="submit" class="iron-search-staff-go" id="iron-search-go">Ask</button>
+          </div>
+          <div class="iron-search-staff-reply-row" aria-label="Quick chat">
+            <div class="iss-reply-row-head">
+              <span class="iss-reply-head-brand">Quick chat</span>
+              <span class="iss-reply-head-sep" aria-hidden="true">·</span>
+              <span class="iss-reply-pane-label" id="iss-reply-from-label">From</span>
+              <span class="iss-reply-head-sep" aria-hidden="true">·</span>
+              <label class="iss-reply-pane-label" for="iss-reply-to" id="iss-reply-to-label">To</label>
+            </div>
+            <div class="iss-reply-cols">
+              <div class="iss-reply-pane">
+                <div class="iss-reply-from iss-reply-placeholder" id="iss-reply-from" role="status" aria-live="polite" aria-labelledby="iss-reply-from-label">Incoming messages will show here.</div>
+              </div>
+              <div class="iss-reply-pane">
+                <textarea class="iron-search-staff-reply" id="iss-reply-to" rows="2" autocomplete="off" placeholder="Quick reply…" enterkeyhint="send" aria-labelledby="iss-reply-to-label"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="iron-search-staff-hint">
+      <div class="iss-left">
+        <span class="iss-strong">Grok</span>
+        <span class="iss-dim" id="iss-hint-model">Auto</span>
+        <span class="iss-dim">·</span>
+        <span class="iss-dim" id="iss-hint-target">console.x.ai</span>
+  </div>
+      <div class="iss-hint-mid">
+        <div class="iron-search-staff-q-shell iss-hint-q-shell">
+          <input type="text" class="iron-search-staff-q" id="iss-hint-input" placeholder="Scratchpad — Enter → Notebook" autocomplete="off" enterkeyhint="send" aria-label="Footer scratchpad (Enter sends to notebook)" />
+        </div>
+      </div>
+      <div class="iss-right">
+        <span><span class="iss-dim">@</span> <span class="iss-k">files</span></span>
+        <span><span class="iss-k">enter</span> <span class="iss-dim">scratchpad → notebook</span></span>
+        <span><span class="iss-k">tab</span> <span class="iss-dim">quick chat</span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="shortcut-popup" class="shortcut-popup">
+  <div class="shortcut-popup-content">
+    <div class="shortcut-popup-head">
+    <h4 id="popup-title">Quick Chat</h4>
+      <button type="button" class="shortcut-popup-close" id="shortcut-popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="quick-input-area">
+      <button type="button" id="quick-send">Send</button>
+      <textarea id="quick-input" placeholder="Type your message..." rows="3"></textarea>
+    </div>
+    <div class="quick-modes">
+      <button id="mode-chat" class="mode-btn active">💬 Chat</button>
+      <button id="mode-search" class="mode-btn">🔍 Search</button>
+      <button id="mode-note" class="mode-btn">📝 Note</button>
+      <button id="mode-toggle-notes" class="mode-btn">📋 Notes</button>
+    </div>
+  </div>
+</div>
+
+<script src="quantum-prefixes.js"></script>
+<script src="notes-surface.js"></script>
+<script>
+// Grok Notes - Advanced Terminal Integration Loaded
+
+// Performance monitoring
+class PerformanceMonitor {
+  constructor() {
+    this.metrics = {
+      loadTime: performance.now(),
+      renderTime: 0,
+      memoryUsage: 0,
+      fps: 0
+    };
+    this.frames = 0;
+    this.monitorFPS();
+    this.monitorMemory();
+  }
+
+  monitorFPS() {
+    const updateFPS = () => {
+      this.frames++;
+      requestAnimationFrame(updateFPS);
+    };
+    updateFPS();
+
+    setInterval(() => {
+      this.metrics.fps = this.frames;
+      this.frames = 0;
+    }, 1000);
+  }
+
+  monitorMemory() {
+    if ('memory' in performance) {
+      setInterval(() => {
+        this.metrics.memoryUsage = performance.memory.usedJSHeapSize;
+      }, 5000);
+    }
+  }
+
+  getReport() {
+    return {
+      ...this.metrics,
+      uptime: performance.now() - this.metrics.loadTime,
+      userAgent: navigator.userAgent
+    };
+  }
+}
+
+// Error boundary
+class ErrorBoundary {
+  constructor(element) {
+    this.element = element;
+    this.errorCount = 0;
+  }
+
+  catch(error) {
+    this.errorCount++;
+    console.error('Grok Notes Error:', error);
+
+    if (this.errorCount > 3) {
+      this.fallback();
+    } else {
+      this.recover();
+    }
+  }
+
+  fallback() {
+    this.element.innerHTML = `
+      <div style="padding:20px;text-align:center;color:#ff6b6b;background:#1a1a1a;">
+        <h3>⚠️ System Error</h3>
+        <p>Grok Notes encountered multiple issues.</p>
+        <button onclick="location.reload()" style="padding:10px 20px;margin:10px;background:#4a9eff;color:white;border:none;border-radius:5px;">Reload</button>
+        <button onclick="window.grokTools?.clearTerminal?.()" style="padding:10px 20px;margin:10px;background:#666;color:white;border:none;border-radius:5px;">Reset Terminal</button>
+      </div>
+    `;
+  }
+
+  recover() {
+    try {
+      initXTerm?.();
+      connectWebSocket?.();
+    } catch (err) {
+      console.error('Recovery failed:', err);
+    }
+  }
+}
+
+// Advanced state management
+class GrokState {
+  constructor() {
+    this.terminal = { history: [], active: true };
+    this.notebook = { cells: [], activeCell: null };
+    this.collaboration = { peers: [], active: false };
+    this.ml = { models: [], active: false };
+    this.graphics = { scene: null, renderer: null };
+    this.listeners = [];
+  }
+
+  subscribe(listener) {
+    this.listeners.push(listener);
+    return () => this.listeners = this.listeners.filter(l => l !== listener);
+  }
+
+  update(path, value) {
+    const keys = path.split('.');
+    let current = this;
+    for (let i = 0; i < keys.length - 1; i++) {
+      current = current[keys[i]] || (current[keys[i]] = {});
+    }
+    current[keys[keys.length - 1]] = value;
+    this.listeners.forEach(listener => listener(this));
+  }
+
+  getState() {
+    return JSON.parse(JSON.stringify(this));
+  }
+}
+
+// WebAssembly loader
+const loadWasmModule = async (url) => {
+  try {
+    const response = await fetch(url);
+    const buffer = await response.arrayBuffer();
+    const module = await WebAssembly.instantiate(buffer, {
+      env: {
+        memory: new WebAssembly.Memory({ initial: 256 }),
+        console_log: (ptr) => console.log('WASM:', new TextDecoder().decode(new Uint8Array(buffer.slice(ptr)))))
+      }
+    });
+    return module.instance.exports;
+  } catch (error) {
+    console.warn('WASM loading failed:', error);
+    return null;
+  }
+};
+
+// Advanced graphics pipeline
+class GraphicsEngine {
+  constructor() {
+    this.canvas = document.createElement('canvas');
+    this.canvas.style.display = 'none';
+    document.body.appendChild(this.canvas);
+
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
+
+    this.camera.position.z = 5;
+    this.setupLighting();
+  }
+
+  setupLighting() {
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    this.scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(10, 10, 5);
+    this.scene.add(directionalLight);
+  }
+
+  loadGaussianSplats(data) {
+    console.log('Loading gaussian splats:', data?.length || 0, 'points');
+    // Implementation for gaussian splats
+    if (data && data.length > 0) {
+      const geometry = new THREE.BufferGeometry();
+      const positions = [];
+      const colors = [];
+      const sizes = [];
+
+      data.forEach(point => {
+        positions.push(point.x, point.y, point.z);
+        colors.push(point.r, point.g, point.b);
+        sizes.push(point.size || 1.0);
+      });
+
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          size: { value: 10.0 }
+        },
+        vertexShader: `
+          attribute float size;
+          attribute vec3 color;
+          varying vec3 vColor;
+          void main() {
+            vColor = color;
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = size * (300.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vColor;
+          void main() {
+            float r = distance(gl_PointCoord, vec2(0.5));
+            if (r > 0.5) discard;
+            gl_FragColor = vec4(vColor, 1.0 - r * 2.0);
+          }
+        `,
+        transparent: true,
+        vertexColors: true
+      });
+
+      const points = new THREE.Points(geometry, material);
+      this.scene.add(points);
+      console.log('Gaussian splats loaded and rendered');
+    }
+  }
+
+  createDrawingCanvas() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 600;
+    canvas.style.border = '1px solid #666';
+    canvas.style.background = '#000';
+
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#00ff00';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    let drawing = false;
+    let lastX, lastY;
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    function startDrawing(e) {
+      drawing = true;
+      [lastX, lastY] = [e.offsetX, e.offsetY];
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+      [lastX, lastY] = [e.offsetX, e.offsetY];
+    }
+
+    function stopDrawing() {
+      drawing = false;
+    }
+
+    return canvas;
+  }
+
+  render() {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  resize(width, height) {
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  }
+}
+
+// ML Engine
+class MLEngine {
+  constructor() {
+    this.models = new Map();
+    this.activeModel = null;
+  }
+
+  async loadModel(name, url) {
+    try {
+      const model = await tf.loadGraphModel(url);
+      this.models.set(name, model);
+      console.log(`ML Model ${name} loaded`);
+      return model;
+    } catch (error) {
+      console.error(`Failed to load ML model ${name}:`, error);
+      return null;
+    }
+  }
+
+  async predict(modelName, input) {
+    const model = this.models.get(modelName);
+    if (!model) return null;
+
+    const tensor = tf.tensor(input);
+    const prediction = await model.predict(tensor);
+    return prediction.dataSync();
+  }
+
+  startRealTimeInference(modelName, callback) {
+    console.log(`Starting real-time inference with ${modelName}`);
+    // Implementation would use webcam/media streams
+  }
+}
+
+// Initialize advanced components
+const perfMonitor = new PerformanceMonitor();
+const errorBoundary = new ErrorBoundary(document.body);
+const grokState = new GrokState();
+const graphicsEngine = new GraphicsEngine();
+const mlEngine = new MLEngine();
+
+// Add to global tools
+if (!window.grokTools) window.grokTools = {};
+window.grokTools.perfMonitor = perfMonitor;
+window.grokTools.graphicsEngine = graphicsEngine;
+window.grokTools.mlEngine = mlEngine;
+window.grokTools.state = grokState;
+window.grokTools.loadWasm = loadWasmModule;
+
+(function(){
+'use strict';
+
+const $=id=>document.getElementById(id);
+const term=$('term-output');
+const termInput=$('term-input');
+
+(function initNtTopLiveStrip(){
+  const elTimeCombo=$('nt-live-time-combo'), elLocal=$('nt-live-local'), elRegion=$('nt-live-region');
+  const elDrift=$('nt-live-drift'), elHops=$('nt-live-hops'), elRtt=$('nt-live-rtt'), elGpu=$('nt-live-gpu'), elCpu=$('nt-live-cpu');
+  if(!elTimeCombo) return;
+  const fmtLocal=new Intl.DateTimeFormat(undefined,{
+    weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'
+  });
+  let lastDriftStr='';
+  let lastRttRounded=-1;
+  if(elRegion){
+    try{
+      const o=Intl.DateTimeFormat().resolvedOptions();
+      const tz=o.timeZone||'—';
+      const loc=o.locale||'—';
+      elRegion.textContent=loc+' · '+tz;
+    }catch(_){ elRegion.textContent='—'; }
+  }
+  if(elHops) elHops.textContent='—';
+  if(elCpu){
+    const n=typeof navigator!=='undefined'&&navigator.hardwareConcurrency;
+    elCpu.textContent=typeof n==='number'&&n>0?String(n)+' cores':'—';
+  }
+  if(elGpu){
+    try{
+      const c=document.createElement('canvas');
+      const gl=c.getContext('webgl')||c.getContext('experimental-webgl');
+      if(gl){
+        const dbg=gl.getExtension('WEBGL_debug_renderer_info');
+        const s=dbg?gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
+        elGpu.textContent=s&&String(s).trim()?String(s).trim():'—';
+      }else elGpu.textContent='—';
+    }catch(_){ elGpu.textContent='—'; }
+  }
+  function timeComboLcpLen(su,se){
+    const a=String(su),b=String(se);
+    let k=0,n=Math.min(a.length,b.length);
+    while(k<n&&a.charCodeAt(k)===b.charCodeAt(k)) k++;
+    return k;
+  }
+  function fillTimeCombo(ms){
+    const su=String(Math.floor(ms/1000)), se=String(ms);
+    const k=timeComboLcpLen(su,se);
+    const tail=se.slice(k);
+    elTimeCombo.textContent='';
+    const ap=(cls,t)=>{ const s=document.createElement('span'); if(cls) s.className=cls; s.textContent=t; elTimeCombo.appendChild(s); };
+    ap('nt-time-num',su);
+    ap('nt-time-sep-mid',' · ');
+    if(k===su.length){
+      if(tail.length){
+        const sp=document.createElement('span');
+        sp.className='nt-time-num-epoch-tail';
+        sp.textContent=tail;
+        elTimeCombo.appendChild(sp);
+      }
+    }else{
+      if(k>0) ap('nt-time-num',se.slice(0,k));
+      if(tail.length){
+        const sp=document.createElement('span');
+        sp.className='nt-time-num-epoch-tail';
+        sp.textContent=tail;
+        elTimeCombo.appendChild(sp);
+      }
+    }
+    elTimeCombo.setAttribute('aria-label','Unix '+su+' · epoch '+se);
+  }
+  function tickClock(){
+    const now=Date.now();
+    const d=new Date(now);
+    fillTimeCombo(now);
+    if(elLocal) elLocal.textContent=fmtLocal.format(d);
+  }
+  tickClock();
+  setInterval(tickClock,1000);
+  function tickDrift(){
+    if(!elDrift) return;
+    const now=Date.now();
+    const perfEpoch=performance.timeOrigin+performance.now();
+    const raw=now-perfEpoch;
+    const s=(Math.abs(raw)<0.05?'0':raw.toFixed(1))+'ms';
+    if(s!==lastDriftStr){ lastDriftStr=s; elDrift.textContent=s; }
+  }
+  tickDrift();
+  setInterval(tickDrift,400);
+
+  function applyRttMs(ms){
+    if(!elRtt||typeof ms!=='number'||!isFinite(ms)) return;
+    const r=Math.round(ms);
+    if(r===lastRttRounded) return;
+    lastRttRounded=r;
+    elRtt.textContent=r+'ms';
+  }
+  function pingRtt(){
+    const nc=navigator.connection;
+    if(nc&&typeof nc.rtt==='number'&&nc.rtt>=0){
+      applyRttMs(nc.rtt);
+      return;
+    }
+    const url='icons/favicon.png?ntping='+Date.now();
+    const t0=performance.now();
+    fetch(url,{cache:'no-store',credentials:'same-origin'}).then(
+      ()=>applyRttMs(performance.now()-t0),
+      ()=>{ lastRttRounded=-2; elRtt.textContent='—'; }
+    );
+  }
+  pingRtt();
+  setInterval(pingRtt,30000);
+  if(navigator.connection){
+    let rttT=0;
+    navigator.connection.addEventListener('change',()=>{
+      const nc=navigator.connection;
+      if(nc&&typeof nc.rtt==='number'&&nc.rtt>=0){
+        clearTimeout(rttT);
+        rttT=setTimeout(()=>applyRttMs(nc.rtt),150);
+      }
+    });
+  }
+})();
+
+/** Footer engine: UI labels + hint domain; depth shown only for Grok / X.ai (console). */
+const IRON_ENGINE_UI={
+  grok:{ brand:'Grok', hint:'console.x.ai', hideDepth:false, grokipediaPanel:false },
+  grokipedia:{ brand:'Grokipedia', hint:'grokipedia.com', hideDepth:true, grokipediaPanel:true },
+  xai:{ brand:'X.ai', hint:'console.x.ai', hideDepth:false, grokipediaPanel:false },
+  docsxai:{ brand:'x.ai docs', hint:'docs.x.ai', hideDepth:true, grokipediaPanel:false },
+  xcom:{ brand:'X.com', hint:'x.com', hideDepth:true, grokipediaPanel:false },
+  spacex:{ brand:'SpaceX', hint:'spacex.com', hideDepth:true, grokipediaPanel:false },
+  starlink:{ brand:'Starlink', hint:'starlink.com', hideDepth:true, grokipediaPanel:false },
+  terrafab:{ brand:'Terrafab', hint:'terrafab.ai', hideDepth:true, grokipediaPanel:false },
+  neuralink:{ brand:'Neuralink', hint:'neuralink.com', hideDepth:true, grokipediaPanel:false },
+  boring:{ brand:'Boring Co.', hint:'boringcompany.com', hideDepth:true, grokipediaPanel:false }
+};
+function ironEngineUi(v){
+  return IRON_ENGINE_UI[v]||IRON_ENGINE_UI.grok;
+}
+/** Money modes live in #iron-search-model (Stock / Crypto / Live). */
+function ironMoneyUrl(model,qraw){
+  const q=(qraw||'').trim();
+  switch(model){
+    case'stock':
+      return q?'https://www.google.com/search?q='+encodeURIComponent('stock quote '+q):'https://www.google.com/finance';
+    case'crypto':
+      return q?'https://www.coingecko.com/en/search?query='+encodeURIComponent(q):'https://www.coingecko.com';
+    case'live':
+      return q?'https://www.youtube.com/results?search_query='+encodeURIComponent(q+' live stream'):'https://www.youtube.com/live';
+    default:
+      return '';
+  }
+}
+/** Open / share URL for non-console engines (empty q → company home or search). */
+function ironEngineExternalUrl(v,qraw){
+  const q=(qraw||'').trim();
+  switch(v){
+    case'spacex':
+      return q?'https://www.google.com/search?q='+encodeURIComponent('site:spacex.com '+q):'https://www.spacex.com';
+    case'starlink':
+      return q?'https://www.google.com/search?q='+encodeURIComponent('site:starlink.com '+q):'https://www.starlink.com';
+    case'neuralink':
+      return q?'https://www.google.com/search?q='+encodeURIComponent('site:neuralink.com '+q):'https://neuralink.com';
+    case'terrafab':
+      if(!q) return 'https://www.terrafab.ai/';
+      return 'https://www.terrafab.ai/?s='+encodeURIComponent(q);
+    case'boring':
+      return q?'https://www.google.com/search?q='+encodeURIComponent('site:boringcompany.com '+q):'https://www.boringcompany.com';
+    case'docsxai':
+      return q?'https://www.google.com/search?q='+encodeURIComponent('site:docs.x.ai '+q):'https://docs.x.ai';
+    case'xcom':
+      return q?'https://x.com/search?q='+encodeURIComponent(q):'https://x.com';
+    default:
+      return '';
+  }
+}
+function getIronModality(){
+  const m=$('iron-modality');
+  return (m&&m.value?m.value:'text').trim()||'text';
+}
+function broadcastNotesLive(payload){
+  const ts=Date.now();
+  const base={ t:ts, surface:'grok-notes', ...payload };
+  try{
+    const bc=new BroadcastChannel('hexterm');
+    bc.postMessage({ type:'notes-live', ...base });
+    bc.close();
+  }catch(e){}
+  try{
+    const hx=new BroadcastChannel('hexcast-stream');
+    hx.postMessage({ type:'notes-live', ...base });
+    hx.close();
+  }catch(e){}
+  const QP=window.QuantumPrefixes;
+  if(QP&&typeof QP.broadcastState==='function'){
+    try{
+      QP.broadcastState('grok-notes',{
+        modality:base.modality||getIronModality(),
+        q:base.q||'',
+        phase:base.phase||'ping',
+        role:'footer-live',
+        totalLines:0,
+        classifiedLines:0,
+        coverage:0,
+        prefixCounts:{}
+      });
+    }catch(e){}
+  }
+}
+function openUvspeedLiveCompanion(){
+  const raw=document.documentElement.getAttribute('data-uvspeed-web');
+  let base=(raw||'').trim();
+  if(!base) return;
+  if(!base.endsWith('/')) base+='/';
+  try{
+    window.open(new URL('hexcast.html',base).href,'uvspeed-hexcast','noopener,noreferrer');
+  }catch(e){}
+}
+
+(function initNotesLiveHexcast(){
+  const layer=$('nt-live-hexcast'), vEl=$('nt-hx-video'), cvSrc=$('nt-hx-cv-src'), cvHex=$('nt-hx-cv-hex'), cvLat=$('nt-hx-cv-lat');
+  const phEl=$('nt-hx-ph'), liveDot=$('nt-hx-live-dot');
+  if(!layer||!cvSrc||!cvHex||!cvLat) return;
+  const ctxS=cvSrc.getContext('2d',{ willReadFrequently:true });
+  const ctxH=cvHex.getContext('2d');
+  const ctxL=cvLat.getContext('2d');
+  const phHTML=phEl?phEl.innerHTML:'';
+  const STATE={
+    source:'none', streaming:false, broadcasting:false, receiving:false,
+    encodeMode:'color', resolution:72, fps:15, frameCount:0,
+    hexData:null, latency:{ encode:0, decode:0, roundTrip:0, jitter:0 },
+    latencyHistory:[], frameSize:0, startTime:0, animId:null, stream:null, broadcastChannel:null
+  };
+  let lastFrameTime=0, fpsT0=0, fpsAcc=0;
+
+  function thermalColor(val,mode){
+    const n=val/255;
+    if(mode==='color'){ const hue=(1-n)*200; return 'hsl('+hue+',85%,'+(20+n*50)+'%)'; }
+    if(mode==='gray'){ const g=Math.floor(n*220); return 'rgb('+g+','+g+','+g+')'; }
+    if(mode==='fax') return n>0.5?'#fff':'#000';
+    const g=Math.floor(n*200); return 'rgb(0,'+g+','+Math.floor(g*0.3)+')';
+  }
+  function syncControls(){
+    const enc=$('nt-hx-enc'), res=$('nt-hx-res'), fps=$('nt-hx-fps');
+    if(enc) STATE.encodeMode=enc.value;
+    if(res) STATE.resolution=+res.value||72;
+    if(fps) STATE.fps=+fps.value||15;
+  }
+  $('nt-hx-enc')?.addEventListener('change',syncControls);
+  $('nt-hx-res')?.addEventListener('change',syncControls);
+  $('nt-hx-fps')?.addEventListener('change',syncControls);
+  syncControls();
+
+  function stopSource(){
+    if(STATE.animId!=null){ cancelAnimationFrame(STATE.animId); STATE.animId=null; }
+    if(STATE.stream){ try{ STATE.stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} STATE.stream=null; }
+    if(vEl){ vEl.srcObject=null; vEl.style.display='none'; }
+    STATE.streaming=false; STATE.source='none';
+    if(liveDot) liveDot.classList.remove('on');
+    if(phEl){ phEl.innerHTML=phHTML; phEl.style.display='flex'; }
+  }
+
+  function captureFrame(){
+    const res=STATE.resolution;
+    cvSrc.width=res; cvSrc.height=res;
+    if(STATE.source==='test'){
+      const t=(performance.now()/50)%res;
+      const colors=[[255,255,255],[255,255,0],[0,255,255],[0,255,0],[255,0,255],[255,0,0],[0,0,255],[0,0,0]];
+      for(let y=0;y<res;y++)for(let x=0;x<res;x++){
+        const barIdx=Math.floor(x/(res/8));
+        const c=colors[barIdx]||[0,0,0];
+        const sc=Math.abs(y-t)<3?1.5:1;
+        ctxS.fillStyle='rgb('+Math.min(255,c[0]*sc)+','+Math.min(255,c[1]*sc)+','+Math.min(255,c[2]*sc)+')';
+        ctxS.fillRect(x,y,1,1);
+      }
+    }else if(vEl&&vEl.readyState>=vEl.HAVE_CURRENT_DATA){
+      ctxS.drawImage(vEl,0,0,res,res);
+    }else return null;
+    return ctxS.getImageData(0,0,res,res);
+  }
+
+  function encodeToHex(imageData){
+    const t0=performance.now();
+    const pixels=imageData.data; const len=imageData.width*imageData.height;
+    const hex=new Uint8Array(len);
+    for(let i=0;i<len;i++){
+      const off=i*4, r=pixels[off], g=pixels[off+1], b=pixels[off+2];
+      if(STATE.encodeMode==='gray'||STATE.encodeMode==='fax'||STATE.encodeMode==='signal'){
+        hex[i]=Math.floor(0.299*r+0.587*g+0.114*b);
+      }else{
+        const lum=0.299*r+0.587*g+0.114*b;
+        const maxC=Math.max(r,g,b), minC=Math.min(r,g,b);
+        const sat=maxC>0?(maxC-minC)/maxC:0;
+        hex[i]=Math.floor(lum*(0.5+sat*0.5));
+      }
+    }
+    return{ hex:hex, encodeTime:performance.now()-t0 };
+  }
+
+  function renderHex(){
+    const wrap=$('nt-hx-hex-wrap'); if(!wrap||!ctxH) return;
+    const W=cvHex.width=wrap.clientWidth, H=cvHex.height=Math.max(80,wrap.clientHeight);
+    ctxH.fillStyle='#0d1117'; ctxH.fillRect(0,0,W,H);
+    if(!STATE.hexData) return;
+    const t0=performance.now(); const res=STATE.resolution; const cw=W/res, ch=H/res; const mode=STATE.encodeMode;
+    for(let r=0;r<res;r++)for(let c=0;c<res;c++){
+      const val=STATE.hexData[r*res+c]||0;
+      ctxH.fillStyle=thermalColor(val,mode);
+      ctxH.fillRect(c*cw,r*ch,cw-0.3,ch-0.3);
+    }
+    const scanY=((performance.now()/30)%res)*ch;
+    ctxH.fillStyle=mode==='signal'?'rgba(0,255,80,0.08)':'rgba(255,255,255,0.05)';
+    ctxH.fillRect(0,scanY,W,ch*2);
+    STATE.latency.decode=performance.now()-t0;
+  }
+
+  function renderLatencyChart(){
+    const par=cvLat.parentElement; if(!par||!ctxL) return;
+    const W=cvLat.width=par.clientWidth, H=cvLat.height=Math.max(36,par.clientHeight-2);
+    ctxL.fillStyle='#161b22'; ctxL.fillRect(0,0,W,H);
+    const hist=STATE.latencyHistory;
+    if(hist.length<2){
+      ctxL.fillStyle='#666'; ctxL.font='10px monospace'; ctxL.textAlign='center';
+      ctxL.fillText('Stream or receive to plot encode / decode / latency…',W/2,H/2); ctxL.textAlign='start'; return;
+    }
+    const maxPts=Math.min(hist.length,280);
+    const data=hist.slice(-maxPts);
+    let maxVal=1;
+    for(let i=0;i<data.length;i++){
+      const d=data[i];
+      maxVal=Math.max(maxVal,d.encode,d.decode,d.roundTrip,0.1);
+    }
+    const xStep=W/(maxPts-1||1), padB=10;
+    const series=[{ k:'encode', c:'#f0883e' },{ k:'decode', c:'#d2a8ff' },{ k:'roundTrip', c:'#7ee787' },{ k:'jitter', c:'#e6b422' }];
+    for(let s=0;s<series.length;s++){
+      const se=series[s];
+      ctxL.strokeStyle=se.c; ctxL.lineWidth=1; ctxL.beginPath();
+      for(let i=0;i<data.length;i++){
+        const d=data[i], x=i*xStep, y=(H-padB)-(d[se.k]/maxVal)*(H-padB-4);
+        if(i===0) ctxL.moveTo(x,y); else ctxL.lineTo(x,y);
+      }
+      ctxL.stroke();
+    }
+  }
+
+  function updateStats(){
+    const ss=function(id,t){ const el=$(id); if(el) el.textContent=t; };
+    ss('nt-hx-s-src',STATE.source);
+    ss('nt-hx-s-enc',STATE.latency.encode.toFixed(1)+'ms');
+    ss('nt-hx-s-dec',STATE.latency.decode.toFixed(1)+'ms');
+    ss('nt-hx-s-rt',STATE.latency.roundTrip.toFixed(1)+'ms');
+    ss('nt-hx-s-jit',STATE.latency.jitter.toFixed(1)+'ms');
+    ss('nt-hx-s-frames',String(STATE.frameCount));
+    if(STATE.broadcasting) ss('nt-hx-s-bc','broadcast on');
+    else if(STATE.receiving) ss('nt-hx-s-bc','receive on');
+    else ss('nt-hx-s-bc','off');
+  }
+
+  function frameLoop(now){
+    if(!STATE.streaming) return;
+    const interval=1000/STATE.fps;
+    if(now-lastFrameTime<interval){ STATE.animId=requestAnimationFrame(frameLoop); return; }
+    lastFrameTime=now;
+    const frameStart=performance.now();
+    const imageData=captureFrame();
+    if(!imageData){ STATE.animId=requestAnimationFrame(frameLoop); return; }
+    const enc=encodeToHex(imageData);
+    STATE.hexData=enc.hex; STATE.latency.encode=enc.encodeTime; STATE.frameSize=enc.hex.length;
+    renderHex();
+    STATE.latency.roundTrip=STATE.latency.encode+STATE.latency.decode;
+    const actual=performance.now()-frameStart;
+    STATE.latency.jitter=Math.abs(actual-interval);
+    STATE.frameCount++;
+    fpsAcc++;
+    const tnow=performance.now();
+    if(tnow-fpsT0>400){
+      const f=fpsAcc/((tnow-fpsT0)/1000);
+      const el=$('nt-hx-s-fps'); if(el) el.textContent=f.toFixed(1);
+      fpsT0=tnow; fpsAcc=0;
+    }
+    STATE.latencyHistory.push({
+      encode:STATE.latency.encode, decode:STATE.latency.decode, roundTrip:STATE.latency.roundTrip, jitter:STATE.latency.jitter,
+      t:tnow
+    });
+    if(STATE.latencyHistory.length>500) STATE.latencyHistory.shift();
+    if(STATE.broadcasting&&STATE.broadcastChannel){
+      try{
+        STATE.broadcastChannel.postMessage({ type:'hexframe', hex:Array.from(enc.hex), res:STATE.resolution, mode:STATE.encodeMode, t:performance.now() });
+      }catch(e){}
+    }
+    updateStats(); renderLatencyChart();
+    if(phEl&&(STATE.source==='test'||(vEl&&vEl.style.display==='block'))) phEl.style.display='none';
+    STATE.animId=requestAnimationFrame(frameLoop);
+  }
+
+  function startLoop(){
+    STATE.frameCount=0; STATE.latencyHistory=[]; STATE.startTime=performance.now();
+    lastFrameTime=0; fpsT0=performance.now(); fpsAcc=0;
+    const el=$('nt-hx-s-fps'); if(el) el.textContent='0';
+    STATE.animId=requestAnimationFrame(frameLoop);
+  }
+
+  function stopBroadcast(){
+    STATE.broadcasting=false; $('nt-hx-broadcast')?.classList.remove('active');
+  }
+  function startBroadcast(){
+    if(STATE.receiving) stopRecv();
+    if(STATE.broadcastChannel){ try{ STATE.broadcastChannel.close(); }catch(e){} STATE.broadcastChannel=null; }
+    STATE.broadcastChannel=new BroadcastChannel('hexcast-stream');
+    STATE.broadcasting=true; $('nt-hx-broadcast')?.classList.add('active');
+  }
+  function stopRecv(){
+    STATE.receiving=false; $('nt-hx-receive')?.classList.remove('active');
+    if(STATE.broadcastChannel){ try{ STATE.broadcastChannel.onmessage=null; }catch(e){} }
+  }
+  function startRecv(){
+    stopSource();
+    stopBroadcast();
+    if(STATE.broadcastChannel){ try{ STATE.broadcastChannel.close(); }catch(e){} }
+    STATE.broadcastChannel=new BroadcastChannel('hexcast-stream');
+    STATE.broadcastChannel.onmessage=function(e){
+      const d=e.data; if(!d||d.type!=='hexframe') return;
+      try{
+        STATE.hexData=new Uint8Array(d.hex);
+        if(typeof d.res==='number') STATE.resolution=d.res;
+        if(d.mode) STATE.encodeMode=d.mode;
+        renderHex();
+        var ss=$('nt-hx-s-src'); if(ss) ss.textContent='receive';
+      }catch(err){}
+    };
+    STATE.receiving=true; STATE.streaming=false;
+    $('nt-hx-receive')?.classList.add('active');
+    if(liveDot) liveDot.classList.add('on');
+    if(phEl){ phEl.innerHTML='<div style="font-size:22px;line-height:1">⏬</div><div>Listening on hexcast-stream…</div>'; phEl.style.display='flex'; }
+    renderLatencyChart();
+  }
+
+  function hardStop(){
+    stopBroadcast(); stopRecv();
+    stopSource();
+    if(STATE.broadcastChannel){ try{ STATE.broadcastChannel.close(); }catch(e){} STATE.broadcastChannel=null; }
+    STATE.hexData=null;
+    if(ctxH){ const w=cvHex.parentElement&&cvHex.parentElement.clientWidth||300, h=cvHex.parentElement&&cvHex.parentElement.clientHeight||120;
+      cvHex.width=w; cvHex.height=h; ctxH.fillStyle='#0d1117'; ctxH.fillRect(0,0,w,h);
+    }
+    if(phEl){ phEl.innerHTML=phHTML; phEl.style.display='flex'; }
+    if(liveDot) liveDot.classList.remove('on');
+    updateStats(); renderLatencyChart();
+  }
+
+  $('nt-hx-test')?.addEventListener('click',function(){
+    if(STATE.receiving) hardStop();
+    syncControls(); stopSource();
+    STATE.source='test'; STATE.streaming=true; if(liveDot) liveDot.classList.add('on'); if(phEl) phEl.style.display='none';
+    startLoop();
+  });
+  $('nt-hx-cam')?.addEventListener('click',function(){
+    if(STATE.receiving) hardStop();
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ if(typeof info==='function') info('Camera API not available'); return; }
+    navigator.mediaDevices.getUserMedia({ video:{ width:{ ideal:640 }, height:{ ideal:480 } }, audio:false }).then(function(stream){
+      syncControls(); stopSource();
+      STATE.stream=stream; vEl.srcObject=stream; vEl.style.display='block';
+      STATE.source='camera'; STATE.streaming=true; if(liveDot) liveDot.classList.add('on'); if(phEl) phEl.style.display='none';
+      startLoop();
+    }).catch(function(e){ if(typeof info==='function') info('Camera: '+e.message); });
+  });
+  $('nt-hx-screen')?.addEventListener('click',function(){
+    if(STATE.receiving) hardStop();
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){ if(typeof info==='function') info('Screen share not available'); return; }
+    navigator.mediaDevices.getDisplayMedia({ video:true, audio:false }).then(function(stream){
+      syncControls(); stopSource();
+      STATE.stream=stream; vEl.srcObject=stream; vEl.style.display='block';
+      STATE.source='screen'; STATE.streaming=true; if(liveDot) liveDot.classList.add('on'); if(phEl) phEl.style.display='none';
+      var tr=stream.getVideoTracks()[0]; if(tr) tr.onended=function(){ hardStop(); };
+      startLoop();
+    }).catch(function(e){ if(typeof info==='function') info('Screen: '+e.message); });
+  });
+  $('nt-hx-broadcast')?.addEventListener('click',function(){
+    if(STATE.broadcasting){ stopBroadcast(); if(!STATE.receiving&&!STATE.streaming){ if(STATE.broadcastChannel){ try{ STATE.broadcastChannel.close(); }catch(e){} STATE.broadcastChannel=null; } } }
+    else startBroadcast();
+    updateStats();
+  });
+  $('nt-hx-receive')?.addEventListener('click',function(){
+    if(STATE.receiving){ hardStop(); return; }
+    startRecv();
+  });
+  $('nt-hx-stop')?.addEventListener('click',hardStop);
+
+  window.__ntHxHardStop=hardStop;
+
+  let ro=null;
+  window.__ntLiveHexcastSync=function(on){
+    if(!on){
+      hardStop();
+      if(typeof window.__ntHxSelectTab==='function') window.__ntHxSelectTab('embed');
+      if(ro){ ro.disconnect(); ro=null; }
+      layer.setAttribute('aria-hidden','true');
+      return;
+    }
+    layer.setAttribute('aria-hidden','false');
+    if(!ro){
+      ro=new ResizeObserver(function(){
+        if(STATE.hexData) renderHex();
+        renderLatencyChart();
+      });
+      const hw=$('nt-hx-hex-wrap'), lp=cvLat&&cvLat.parentElement;
+      if(hw) ro.observe(hw);
+      if(lp) ro.observe(lp);
+    }
+    requestAnimationFrame(function(){ renderHex(); renderLatencyChart(); });
+  };
+})();
+
+(function initNtHxTabStrip(){
+  const layer=$('nt-live-hexcast');
+  if(!layer) return;
+  const HX_URL={ hexcast:'hexcast.html', grid:'grid.html', send:'hexcast-send.html', feed:'feed.html' };
+  function resolveUvspeedAsset(file){
+    let base=(document.documentElement.getAttribute('data-uvspeed-web')||'').trim();
+    if(!base){
+      try{
+        if(location.protocol==='file:'){
+          base='file:///Users/tref/dev/projects/uvspeed/web/';
+        }
+      }catch(e){}
+    }
+    if(!base) base='file:///Users/tref/dev/projects/uvspeed/web/';
+    if(!base.endsWith('/')) base+='/';
+    if(!file) return '';
+    try{ return new URL(file,base).href; }catch(e){ return ''; }
+  }
+  function selectHxTab(view){
+    const emb=$('nt-hx-panel-embed'), ext=$('nt-hx-panel-external'), ifr=$('nt-hx-ext-frame');
+    const fb=$('nt-hx-ext-fallback'), hint=$('nt-hx-ext-hint'), tb=$('nt-hx-ext-toolbar'), urlDisp=$('nt-hx-ext-url-disp');
+    const btnOpen=$('nt-hx-ext-open'), btnCopy=$('nt-hx-ext-copy');
+    if(!emb||!ext) return;
+    layer.querySelectorAll('.nt-hx-tab').forEach(function(t){
+      const on=t.getAttribute('data-hx-view')===view;
+      t.classList.toggle('active',on);
+      t.setAttribute('aria-selected',on?'true':'false');
+    });
+    const sub=$('nt-hx-sub');
+    if(view==='embed'){
+      emb.removeAttribute('hidden');
+      ext.setAttribute('hidden','');
+      emb.setAttribute('aria-hidden','false');
+      ext.setAttribute('aria-hidden','true');
+      ext.classList.remove('nt-hx-has-url');
+      if(ifr){ ifr.removeAttribute('src'); ifr.src='about:blank'; ifr.style.display=''; }
+      if(tb) tb.hidden=true;
+      if(hint) hint.hidden=true;
+      if(fb){
+        fb.innerHTML='Set <code>data-uvspeed-web</code> on the root <code>&lt;html&gt;</code> element to your <strong>uvspeed/web</strong> folder URL (with trailing <code>/</code>), or rely on the default. Original uvspeed HTML files are unchanged — only this embed URL is used.';
+      }
+      if(sub) sub.textContent='Built-in · encoder + hexcast-stream';
+    }else{
+      emb.setAttribute('hidden','');
+      ext.removeAttribute('hidden');
+      emb.setAttribute('aria-hidden','true');
+      ext.setAttribute('aria-hidden','false');
+      if(typeof window.__ntHxHardStop==='function'){
+        try{ window.__ntHxHardStop(); }catch(e){}
+      }
+      const file=HX_URL[view], url=file?resolveUvspeedAsset(file):'';
+      if(tb) tb.hidden=!url;
+      if(urlDisp) urlDisp.textContent=url||'';
+      var openUrl=function(){ if(url) window.open(url,'_blank','noopener,noreferrer'); };
+      if(btnOpen){ btnOpen.onclick=openUrl; }
+      if(btnCopy){
+        btnCopy.onclick=function(){
+          if(!url) return;
+          if(navigator.clipboard&&navigator.clipboard.writeText){
+            navigator.clipboard.writeText(url).then(function(){
+              if(typeof info==='function') info('URL copied');
+            }).catch(function(){ window.prompt('Copy URL:',url); });
+          }else window.prompt('Copy URL:',url);
+        };
+      }
+      var cantEmbed=false;
+      try{
+        if(url){
+          var U=new URL(url);
+          cantEmbed=(location.protocol==='file:'&&U.protocol==='file:');
+        }
+      }catch(e){ cantEmbed=true; }
+      if(url&&ifr){
+        if(cantEmbed){
+          ext.classList.remove('nt-hx-has-url');
+          ifr.removeAttribute('src');
+          ifr.style.display='none';
+          if(fb){
+            fb.hidden=false;
+            fb.innerHTML='<div style="max-width:520px;text-align:left"><strong>Preview is off for file:// → file://</strong> — browsers block one local page embedding another, so the area below stays blank. Use <strong>Open in new tab</strong> (always works) or serve uvspeed over HTTP, e.g. run <code>python3 -m http.server</code> in <code>uvspeed/web</code> and set <code>data-uvspeed-web=&quot;http://127.0.0.1:8000/&quot;</code> on <code>&lt;html&gt;</code>.</div>';
+          }
+          if(hint){
+            hint.hidden=false;
+            hint.textContent='file:// iframes: use Open in new tab, or HTTP + data-uvspeed-web for embedded preview.';
+          }
+        }else{
+          ext.classList.add('nt-hx-has-url');
+          ifr.style.display='';
+          ifr.src=url;
+          if(fb) fb.innerHTML='';
+          if(hint) hint.hidden=true;
+        }
+      }else{
+        ext.classList.remove('nt-hx-has-url');
+        if(ifr){ ifr.removeAttribute('src'); ifr.style.display='none'; }
+        if(hint) hint.hidden=true;
+      }
+      if(sub) sub.textContent=file?'uvspeed · '+file:'external';
+    }
+  }
+  layer.querySelectorAll('.nt-hx-tab').forEach(function(tab){
+    tab.addEventListener('click',function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      const v=tab.getAttribute('data-hx-view');
+      if(v) selectHxTab(v);
+    });
+  });
+  window.__ntHxSelectTab=selectHxTab;
+})();
+
+function syncLiveModalityUi(){
+  const mod=getIronModality();
+  const eng=$('iron-search-engine');
+  const ev=eng&&eng.value?eng.value:'grok';
+  const staff=document.querySelector('[data-iron-search-staff]');
+  const iq=$('iron-search-q');
+  const isLive=mod==='live';
+  const embedLive=isLive&&(ev==='grok'||ev==='xai');
+  if(staff) staff.classList.toggle('iss-footer-live',!!isLive);
+  $('main')?.classList.toggle('nt-live-embed-active',!!embedLive);
+  const hxLayer=$('nt-live-hexcast');
+  if(hxLayer) hxLayer.setAttribute('aria-hidden',embedLive?'false':'true');
+  if(typeof window.__ntLiveHexcastSync==='function') window.__ntLiveHexcastSync(!!embedLive);
+  if(iq){
+    if(isLive){
+      if(iq.dataset._phSaved==null){ iq.dataset._phSaved=iq.placeholder||''; }
+      iq.placeholder='Live message — console + built-in hexcast below (BroadcastChannel)…';
+    }else if(mod==='games'){
+      if(iq.dataset._phSaved==null){ iq.dataset._phSaved=iq.placeholder||''; }
+      iq.placeholder='Games · select or search…';
+    }else if(mod==='train'){
+      if(iq.dataset._phSaved==null){ iq.dataset._phSaved=iq.placeholder||''; }
+      iq.placeholder='Train · objective, data, or training step…';
+    }else if(iq.dataset._phSaved!=null){
+      iq.placeholder=iq.dataset._phSaved;
+      delete iq.dataset._phSaved;
+    }
+  }
+  if(isLive) broadcastNotesLive({ modality:'live', phase:'select' });
+}
+function ironEnginePageUrl(){
+  const eng=$('iron-search-engine');
+  const v=eng&&eng.value?eng.value:'grok';
+  const q=($('iron-search-q')?.value||'').trim();
+  const model=$('iron-search-model')?.value||'auto';
+  const ui=ironEngineUi(v);
+  if(!ui.hideDepth&&['stock','crypto','live'].includes(model)){
+    const mu=ironMoneyUrl(model,q);
+    if(mu) return mu;
+  }
+  if(v==='grokipedia'&&q) return 'https://grokipedia.com/search?q='+encodeURIComponent(q);
+  if(v==='grok'||v==='xai'){
+    const mod=getIronModality();
+    if(q){
+      let s='https://console.x.ai?q='+encodeURIComponent(q);
+      if(mod&&mod!=='text') s+='&modality='+encodeURIComponent(mod);
+      return s;
+    }
+    return String(location.href);
+  }
+  const ext=ironEngineExternalUrl(v,q);
+  return ext||String(location.href);
+}
+
+(function syncFooterModelHint(){
+  const eng=$('iron-search-engine'), sel=$('iron-search-model'), hint=$('iss-hint-model'), ht=$('iss-hint-target');
+  const wrap=document.querySelector('.iron-search-staff-model-wrap');
+  function sync(){
+    const v=eng&&eng.value?eng.value:'grok';
+    const ui=ironEngineUi(v);
+    const gk=v==='grokipedia';
+    const mod=getIronModality();
+    if(wrap){
+      wrap.classList.toggle('iss-hide-depth',!!ui.hideDepth);
+    }
+    const modOuter=$('iron-search-modality-outer');
+    if(modOuter) modOuter.classList.toggle('iss-modality-hidden',!(v==='grok'||v==='xai'));
+    if($('main')) $('main').classList.toggle('grokipedia-panel-active',!!gk||mod==='games');
+    if($('iss-engine-brand')) $('iss-engine-brand').textContent=ui.brand;
+    const issStrong=document.querySelector('.iron-search-staff-hint .iss-left .iss-strong');
+    if(issStrong) issStrong.textContent=ui.brand;
+    if(sel&&hint){
+      const o=sel.options[sel.selectedIndex];
+      hint.textContent=ui.hideDepth?'—':(o?String(o.textContent).trim()||'—':'—');
+    }
+    if(ht) ht.textContent=ui.hint;
+    const iq=$('iron-search-q'), go=$('iron-search-go');
+    if(iq){
+      if(gk) iq.placeholder='Search Grokipedia…';
+      else if(v==='grok'||v==='xai') iq.placeholder='Message Grok . . .';
+      else if(mod==='games') iq.placeholder='Games · select or search…';
+      else iq.placeholder='Search '+ui.brand+'…';
+    }
+    if(go){
+      if(gk) go.textContent='Search';
+      else if(v==='grok'||v==='xai') go.textContent='Ask';
+      else if(mod==='games') go.textContent='Play';
+      else go.textContent='Open';
+    }
+    if($('main')) $('main').style.removeProperty('grid-template-columns');
+    if(mod==='games'){
+      const frame=$('grokipedia-frame');
+      if(frame){
+        frame.removeAttribute('hidden');
+        var hubUrl=(typeof window.__GROK_GAMES_HUB__==='string'&&window.__GROK_GAMES_HUB__.trim())?window.__GROK_GAMES_HUB__.trim():new URL('games-ugrad-hub.html',window.location.href).href;
+        frame.src=hubUrl;
+      }
+      const emp=$('grokipedia-empty');
+      if(emp) emp.hidden=true;
+      const vw=$('gp-viewer');
+      if(vw) vw.hidden=true;
+      const bar=$('gpb-bar');
+      if(bar) bar.style.display='none';
+      if(window.__gpNavReset) window.__gpNavReset();
+    }
+    if(!gk&&mod!=='games'){
+      const frame=$('grokipedia-frame'), emp=$('grokipedia-empty'), vw=$('gp-viewer');
+      if(frame){ frame.setAttribute('hidden',''); frame.removeAttribute('src'); }
+      if(emp) emp.hidden=false;
+      if(vw){ vw.hidden=true; vw.innerHTML=''; }
+      const gu=$('gpb-url'), giu=$('gi-url');
+      if(gu) gu.value='';
+      if(giu) giu.value='';
+      const gpbBar=$('gpb-bar');
+      if(gpbBar) gpbBar.style.removeProperty('display');
+      if(window.__gpNavReset) window.__gpNavReset();
+    }
+    syncReadingSidebar();
+    if(typeof syncLiveModalityUi==='function') syncLiveModalityUi();
+  }
+  if(sel) sel.addEventListener('change',sync);
+  if(eng) eng.addEventListener('change',sync);
+  sync();
+  window.__syncFooterModelHint=sync;
+})();
+
+(function syncIssFooterMetrics(){
+  const BUDGET=128000;
+  function run(){
+    const q=$('iron-search-q');
+    const pct=$('iss-metric-pct'), tok=$('iss-metric-tokens'), spd=$('iss-metric-speed');
+    if(!q||!tok)return;
+    const raw=q.value||'';
+    if(!raw.trim()){
+      if(pct) pct.textContent='—';
+      tok.textContent='—';
+      if(spd) spd.textContent='—';
+      return;
+    }
+    const est=Math.max(1,Math.ceil(raw.length/4));
+    tok.textContent=String(est);
+    if(pct) pct.textContent=Math.min(100,Math.round((est/BUDGET)*100))+'%';
+    if(spd) spd.textContent='—';
+  }
+  $('iron-search-q')?.addEventListener('input',run);
+  run();
+})();
+
+(function initIronModality(){
+  const bar=$('iron-search-modality-bar');
+  const hid=$('iron-modality');
+  if(!bar||!hid)return;
+  bar.addEventListener('click',e=>{
+    const b=e.target.closest('.iss-mod-btn');
+    if(!b)return;
+    bar.querySelectorAll('.iss-mod-btn').forEach(x=>{
+      const on=x===b;
+      x.classList.toggle('active',on);
+      x.setAttribute('aria-pressed',on?'true':'false');
+    });
+    hid.value=b.getAttribute('data-mod')||'text';
+    syncLiveModalityUi();
+    if(typeof window.__syncFooterModelHint==='function') window.__syncFooterModelHint();
+  });
+  syncLiveModalityUi();
+})();
+
+const state={
+  history:[],histIdx:-1
+};
+
+function ts(){return new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+
+function print(html,cls=''){
+  const d=document.createElement('div');d.className='ln';
+  if(cls)d.innerHTML=`<span class="${cls}">${html}</span>`;
+  else d.innerHTML=html;
+  term.appendChild(d);
+  term.scrollTop=term.scrollHeight;
+}
+
+function printPrompt(cmd){
+  print(`<span class="c-prompt">${ts()} grok.notes ❯</span> <span class="c-cmd">${esc(cmd)}</span>`);
+}
+
+function ok(msg){print(`<span class="c-ok">  ✓</span> ${msg}`)}
+function err(msg){print(`<span class="c-err">  ✗</span> ${msg}`)}
+function info(msg){print(`<span class="c-info">  →</span> ${msg}`)}
+function dim(msg){print(msg,'c-dim')}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+(function initGrokipediaIronChrome(){
+  const GP_CONNECTORS=[
+    {name:'Wikipedia',icon:'📚',color:'#58a6ff',enabled:true},
+    {name:'Open Library',icon:'📖',color:'#34d399',enabled:true},
+    {name:'Wayback',icon:'⏪',color:'#f0883e',enabled:true},
+    {name:'Sacred Texts',icon:'📜',color:'#c9a84c',enabled:true},
+    {name:'Yale Archives',icon:'🏛️',color:'#a78bfa',enabled:true},
+    {name:'ARDA',icon:'🧝',color:'#3fb950',enabled:true},
+    {name:'arXiv',icon:'📄',color:'#ff6b6b',enabled:true},
+    {name:'PubChem',icon:'⚗️',color:'#56d4dd',enabled:true},
+    {name:'GenBank',icon:'🧬',color:'#f85149',enabled:true},
+    {name:'Internet Archive',icon:'🌐',color:'#34d399',enabled:true},
+    {name:'Iron Line',icon:'⚡',color:'#ff6b6b',enabled:true},
+    {name:'qbit Codec',icon:'⎔',color:'#a78bfa',enabled:true}
+  ];
+  let nav=[], navIdx=-1;
+  window.__gpNavReset=function(){ nav=[]; navIdx=-1; };
+  function pushNav(url){
+    nav=nav.slice(0,navIdx+1);
+    nav.push(url);
+    navIdx=nav.length-1;
+  }
+  function syncBars(url){
+    const gu=$('gpb-url'), giu=$('gi-url');
+    if(gu) gu.value=url;
+    if(giu) giu.value=url;
+    const tab=$('grokipedia-open-tab');
+    if(tab){ tab.href=url; tab.title='Open results in a new tab'; }
+  }
+  function setStatus(t){
+    const s=$('gpb-status'); if(s) s.textContent=t;
+  }
+  function exitViewerToFrame(){
+    const vw=$('gp-viewer'); if(vw){ vw.hidden=true; vw.innerHTML=''; }
+    const fr=$('grokipedia-frame'), emp=$('grokipedia-empty');
+    if(fr && fr.getAttribute('src')){
+      fr.removeAttribute('hidden');
+      if(emp) emp.hidden=true;
+    }else{
+      if(fr) fr.setAttribute('hidden','');
+      if(emp) emp.hidden=false;
+    }
+  }
+  function loadFrame(url, opts){
+    const skipPush=opts&&opts.skipPush;
+    if(!url) return;
+    let u=String(url).trim();
+    if(!/^https?:\/\//i.test(u)) u='https://'+u;
+    const frame=$('grokipedia-frame'), emp=$('grokipedia-empty'), vw=$('gp-viewer');
+    if(vw){ vw.hidden=true; vw.innerHTML=''; }
+    if(emp) emp.hidden=true;
+    if(frame){
+      frame.removeAttribute('hidden');
+      frame.src=u;
+    }
+    if(!skipPush) pushNav(u);
+    syncBars(u);
+    setStatus('loading…');
+  }
+  window.loadGrokipediaFromFooter=function(q){
+    if(!q) return;
+    const url='https://grokipedia.com/search?q='+encodeURIComponent(q);
+    loadFrame(url);
+    print('<span class="c-dim">Grokipedia search:</span> <span class="c-info">'+esc(q)+'</span>');
+  };
+  function drawTimeline(ms){
+    const c=$('gp-tl-canvas'), lab=$('gp-tl-label');
+    if(!c) return;
+    const wrap=c.parentElement;
+    const w=wrap?wrap.clientWidth:400;
+    const h=44;
+    const dpr=window.devicePixelRatio||1;
+    c.width=Math.max(1,Math.floor(w*dpr));
+    c.height=Math.floor(h*dpr);
+    c.style.width=w+'px';
+    c.style.height=h+'px';
+    const ctx=c.getContext('2d');
+    if(!ctx) return;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr,dpr);
+    ctx.fillStyle='#1e1e1e';
+    ctx.fillRect(0,0,w,h);
+    const grad=ctx.createLinearGradient(0,0,w,0);
+    grad.addColorStop(0,'#a78bfa'); grad.addColorStop(.25,'#c9a84c'); grad.addColorStop(.5,'#22d3ee');
+    grad.addColorStop(.75,'#4a9eff'); grad.addColorStop(1,'#34d399');
+    ctx.strokeStyle=grad;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    const amp=Math.min(14,4+Math.log1p(ms||0));
+    for(let x=0;x<=w;x+=3){
+      const t=x/w*Math.PI*3+(ms||0)*.001;
+      const y=h/2+Math.sin(t)*amp*.6+Math.sin(t*1.7)*amp*.35;
+      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    if(lab) lab.textContent='trace · '+(ms!=null?Math.round(ms)+'ms':'idle');
+  }
+  function renderResults(results, ms){
+    const vw=$('gp-viewer');
+    if(!vw) return;
+    vw.innerHTML='';
+    vw.removeAttribute('hidden');
+    const fr=$('grokipedia-frame'), emp=$('grokipedia-empty');
+    if(fr) fr.setAttribute('hidden','');
+    if(emp) emp.hidden=true;
+    const hd=document.createElement('div');
+    hd.className='gp-viewer-hd';
+    const closeBtn=document.createElement('button');
+    closeBtn.type='button'; closeBtn.className='gp-close-view'; closeBtn.id='gp-close-viewer';
+    closeBtn.textContent='Back to page';
+    const span=document.createElement('span');
+    span.textContent='connector results · '+results.length+' · '+Math.round(ms)+'ms';
+    hd.appendChild(span); hd.appendChild(closeBtn);
+    vw.appendChild(hd);
+    if(!results.length){
+      const empty=document.createElement('div');
+      empty.style.cssText='color:var(--iss-muted);padding:24px;text-align:center;font-size:12px';
+      empty.textContent='No enabled connectors — toggle pills above.';
+      vw.appendChild(empty);
+    }else{
+      results.forEach(function(r){
+        const d=document.createElement('div');
+        d.className='gp-res';
+        d.innerHTML='<div class="gp-r-src"><span class="gp-r-dot" style="background:'+(r.color||'#666')+'"></span>'+esc(r.source||'unknown')+'</div>'+
+          '<div class="gp-r-title">'+esc(r.title||'')+'</div><div class="gp-r-snip">'+esc(r.snippet||'')+'</div>';
+        d.addEventListener('click',function(){ if(r.url&&r.url!=='#') window.open(r.url,'_blank','noopener,noreferrer'); });
+        vw.appendChild(d);
+      });
+    }
+    closeBtn.addEventListener('click',exitViewerToFrame);
+    setStatus('search · '+Math.round(ms)+'ms');
+    drawTimeline(ms);
+  }
+  function mockSearch(query){
+    const t0=performance.now();
+    const sources=GP_CONNECTORS.filter(function(c){ return c.enabled; });
+    const results=[];
+    sources.forEach(function(c){
+      results.push({
+        title:query+' — '+c.name,
+        snippet:'Results from '+c.name+' for "'+query+'"',
+        source:c.name,
+        url:'#',
+        color:c.color
+      });
+    });
+    renderResults(results, performance.now()-t0);
+  }
+  function renderConnectors(){
+    const el=$('gp-connectors');
+    if(!el) return;
+    el.innerHTML='';
+    GP_CONNECTORS.forEach(function(c, i){
+      const d=document.createElement('span');
+      d.className='gp-cpill'+(c.enabled?' active':'');
+      d.textContent=c.icon+' '+c.name;
+      d.addEventListener('click',function(){
+        c.enabled=!c.enabled;
+        d.classList.toggle('active',c.enabled);
+      });
+      el.appendChild(d);
+    });
+  }
+  const frame=$('grokipedia-frame');
+  if(frame){
+    frame.addEventListener('load',function(){
+      setStatus('ready');
+      let u=frame.src||'';
+      try{
+        if(frame.contentWindow&&frame.contentWindow.location&&frame.contentWindow.location.href)
+          u=frame.contentWindow.location.href;
+      }catch(e){}
+      if(u&&u!=='about:blank') syncBars(u);
+      drawTimeline(performance.now()%200);
+    });
+  }
+  $('gpb-back')?.addEventListener('click',function(){
+    if(navIdx<=0) return;
+    navIdx--;
+    loadFrame(nav[navIdx], {skipPush:true});
+  });
+  $('gi-back')?.addEventListener('click',function(){
+    if(navIdx<=0) return;
+    navIdx--;
+    loadFrame(nav[navIdx], {skipPush:true});
+  });
+  $('gi-fwd')?.addEventListener('click',function(){
+    if(navIdx>=nav.length-1) return;
+    navIdx++;
+    loadFrame(nav[navIdx], {skipPush:true});
+  });
+  function doGo(){
+    const raw=($('gpb-url')?.value||$('gi-url')?.value||'').trim();
+    if(!raw) return;
+    let u=raw;
+    if(!/^https?:\/\//i.test(u)) u='https://'+u;
+    loadFrame(u);
+  }
+  $('gpb-go')?.addEventListener('click',doGo);
+  $('gpb-url')?.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); doGo(); } });
+  $('gi-url')?.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); doGo(); } });
+  $('gpb-refresh')?.addEventListener('click',function(){
+    const fr=$('grokipedia-frame');
+    if(fr&&fr.getAttribute('src')){ fr.src=fr.src; setStatus('reload…'); }
+  });
+  $('gi-reload')?.addEventListener('click',function(){
+    const fr=$('grokipedia-frame');
+    if(fr&&fr.getAttribute('src')) fr.src=fr.src;
+  });
+  $('gpb-extract')?.addEventListener('click',async function(){
+    const u=($('gpb-url')?.value||'').trim();
+    if(!u) return;
+    try{ await navigator.clipboard.writeText(u); setStatus('copied'); }
+    catch(e){ window.prompt('URL:',u); }
+  });
+  $('gi-search-go')?.addEventListener('click',function(){
+    const q=($('gi-search')?.value||'').trim();
+    if(!q) return;
+    mockSearch(q);
+  });
+  $('gi-search')?.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){ e.preventDefault(); $('gi-search-go')?.click(); }
+  });
+  $('gp-btn-3d')?.addEventListener('click',function(){ setStatus('3D view — stub'); info('Grokipedia 3D: not wired in this surface'); });
+  $('gp-btn-steno')?.addEventListener('click',function(){ setStatus('Steno — stub'); info('Steno: not wired in this surface'); });
+  $('gp-btn-bench')?.addEventListener('click',function(){ setStatus('Bench — stub'); info('Bench: not wired in this surface'); });
+  renderConnectors();
+  drawTimeline(0);
+  window.addEventListener('resize',function(){ drawTimeline(0); });
+})();
+
+$('iron-search-staff-form')?.addEventListener('submit',e=>{
+  const eng=$('iron-search-engine');
+  const v=eng&&eng.value?eng.value:'grok';
+  const q=($('iron-search-q')?.value||'').trim();
+  const model=$('iron-search-model')?.value||'auto';
+  const ui=ironEngineUi(v);
+  if(!ui.hideDepth&&['stock','crypto','live'].includes(model)){
+    e.preventDefault();
+    const url=ironMoneyUrl(model,q);
+    if(url) window.open(url,'_blank','noopener,noreferrer');
+    return;
+  }
+  if(v==='grokipedia'){
+    e.preventDefault();
+    if(!q)return;
+    if(typeof loadGrokipediaFromFooter==='function') loadGrokipediaFromFooter(q);
+    return;
+  }
+  if(v==='grok'||v==='xai'){
+    const mod=getIronModality();
+    if(mod==='live'){
+      broadcastNotesLive({ modality:mod, phase:'submit', q });
+      e.preventDefault();
+      const params=new URLSearchParams();
+      if(q) params.set('q',q);
+      params.set('modality','live');
+      const depth=$('iron-search-model')?.value;
+      if(depth) params.set('model',depth);
+      window.open('https://console.x.ai?'+params.toString(),'_blank','noopener,noreferrer');
+      if(q) print('<span class="c-dim">Live → console.x.ai</span> <span class="c-info">'+esc(q)+'</span>');
+      info('Live modality: console opened in new tab; hexterm + hexcast-stream notified (pair with grid / hexcast / feed).');
+      return;
+    }
+    return;
+  }
+  e.preventDefault();
+  const url=ironEngineExternalUrl(v,q);
+  if(url) window.open(url,'_blank','noopener,noreferrer');
+});
+
+(function initStatusBarActions(){
+  const listen=$('nt-top-listen'),copy=$('nt-top-copy-link'),edits=$('nt-edits-modal');
+  const factTime=$('nt-fact-time');
+  if(factTime){
+    const iso=factTime.getAttribute('datetime');
+    if(iso){
+      try{
+        const d=new Date(iso);
+        const mo=Math.max(0,Math.round((Date.now()-d.getTime())/(30.44*24*3600*1000)));
+        if(mo>=1) factTime.textContent=mo===1?'1 month ago':mo+' months ago';
+      }catch(e){}
+    }
+  }
+  listen?.addEventListener('click',()=>{
+    const v=$('iron-search-engine')?.value||'grok';
+    const q=($('iron-search-q')?.value||'').trim();
+    const ui=ironEngineUi(v);
+    let text;
+    if(v==='grokipedia'&&q) text='Grokipedia search: '+q+'. Fact-checked by Grok.';
+    else if((v==='grok'||v==='xai')&&q){
+      const m=getIronModality();
+      text=(m==='live'?'Grok live: ':m==='games'?'Grok games: ':m==='train'?'Grok train: ':'Grok: ')+q;
+    }
+    else if(q) text=ui.brand+': '+q;
+    else text=String(document.title||'Grok notes');
+    if(!window.speechSynthesis){info('Listen: speech not available');return;}
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.rate=1;
+    speechSynthesis.speak(u);
+    info('Listen: speaking…');
+  });
+  copy?.addEventListener('click',async ()=>{
+    const url=ironEnginePageUrl();
+    try{
+      await navigator.clipboard.writeText(url);
+      info('Link copied to clipboard');
+    }catch(e){
+      window.prompt('Copy this URL:',url);
+    }
+  });
+  function openEdits(){
+    if(!edits)return;
+    edits.hidden=false;
+    edits.querySelector('.nt-edits-close')?.focus();
+  }
+  function closeEdits(){
+    if(!edits)return;
+    edits.hidden=true;
+  }
+  $('nt-top-edits')?.addEventListener('click',openEdits);
+  edits?.querySelectorAll('[data-nt-edits-close]').forEach(el=>{
+    el.addEventListener('click',closeEdits);
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&edits&&!edits.hidden) closeEdits();
+  });
+})();
+
+async function runCommand(raw){
+  const input=raw.trim();
+  if(!input)return;
+  state.history.push(input);
+  state.histIdx=state.history.length;
+  printPrompt(input);
+
+  const parts=input.split(/\s+/);
+  const cmd=parts[0].toLowerCase();
+  const arg=parts.slice(1).join(' ');
+
+  if(input.match(/^https?:\/\//i)){
+    await cmdOpenUrl(input);
+    return;
+  }
+
+  switch(cmd){
+    case'help':cmdHelp();break;
+    case'clear':term.innerHTML='';break;
+    case'ask':
+    case'grok':cmdAsk(parts.slice(1).join(' '));break;
+    case'note':addNoteCard(arg, 'note');ok('Note added to notes panel');break;
+    case'card':addNoteCard(arg, 'card');ok('Card added to notes panel');break;
+    case'ls':cmdLs();break;
+    case'perf':cmdPerf();break;
+    case'wasm':arg?cmdWasmLoad(arg):err('Usage: wasm <url>');break;
+    case'ml':arg?cmdML(arg):err('Usage: ml <load|predict|realtime> [args]');break;
+    default:
+      if(cmd.includes('.')){await cmdOpenUrl('https://'+input);}
+      else if(input.endsWith('?') || input.includes('what') || input.includes('how') || input.includes('why')){step(`Opening Grok Console for: "${esc(input)}"`);window.open(`https://console.x.ai?q=${encodeURIComponent(input)}`,'_blank');info('Opened Grok Console in new tab');}
+      else err(`Unknown command: ${esc(cmd)} — type <span class="c-info">help</span>`);
+  }
+}
+
+function cmdHelp(){
+  print('<span class="c-purple c-bold">Grok Notes Terminal</span>');
+  print('<span class="c-dim">  Type commands to interact with Grok AI and tools</span>');
+  dim('');
+  info('<span class="c-bold">ask [query]</span> — Ask Grok AI a question');
+  info('<span class="c-bold">grok [query]</span> — Alias for ask');
+  info('<span class="c-bold">note [text]</span> — Add note to notes panel');
+  info('<span class="c-bold">card [text]</span> — Add card to notes panel');
+  info('<span class="c-bold">ls</span> — List notes and cards');
+  info('<span class="c-bold">perf</span> — Show performance metrics');
+  info('<span class="c-bold">wasm [url]</span> — Load WebAssembly module');
+  info('<span class="c-bold">ml [cmd]</span> — ML operations (load/predict/realtime)');
+  info('<span class="c-bold">clear</span> — Clear terminal');
+  info('<span class="c-bold">help</span> — Show this help');
+  info('Auto-handoff: Questions → Grok, URLs → open, Notes → notes panel');
+}
+
+async function cmdAsk(query){
+  if(!query){err('Usage: ask <query>');return;}
+  step(`Asking Grok: "${esc(query)}"`);
+  // Simulate live streaming response
+  const response = `Grok AI Response: Based on your query "${query}", here's a thoughtful answer. This is a simulated live response to demonstrate the terminal integration. In a real implementation, this would connect to the Grok API for actual AI responses.`;
+  await typeResponse(response);
+}
+
+function cmdLs(){
+  step('Listing notes and cards:');
+  const cards = notesCards.children;
+  if(cards.length===0){
+    info('No notes or cards yet. Use "note <text>" or "card <text>" to add.');
+  }else{
+    Array.from(cards).forEach((card,i)=>{
+      const type = card.querySelector('strong').textContent.replace(':','').toLowerCase();
+      const content = card.textContent.replace(`${type}: `,'').slice(0,50);
+      info(`${i+1}. [${type}] ${content}${content.length>50?'...':''}`);
+    });
+  }
+}
+
+function cmdPerf(){
+  const report = perfMonitor.getReport();
+  step('Performance Report:');
+  info(`Load Time: ${(report.loadTime/1000).toFixed(2)}s`);
+  info(`Uptime: ${(report.uptime/1000/60).toFixed(1)}min`);
+  info(`FPS: ${report.fps}`);
+  info(`Memory: ${(report.memoryUsage/1024/1024).toFixed(1)}MB`);
+  info(`User Agent: ${report.userAgent.split(' ').slice(-2).join(' ')}`);
+}
+
+async function cmdWasmLoad(url){
+  step(`Loading WASM module: ${url}`);
+  try {
+    const module = await loadWasmModule(url);
+    if(module){
+      info('WASM module loaded successfully');
+      window.wasmModule = module;
+    }else{
+      err('WASM module loading failed');
+    }
+  }catch(e){
+    err(`WASM error: ${e.message}`);
+  }
+}
+
+async function cmdML(args){
+  const parts = args.split(' ');
+  const cmd = parts[0];
+  const rest = parts.slice(1).join(' ');
+
+  switch(cmd){
+    case 'load':
+      const [name, url] = rest.split(' ');
+      if(name && url){
+        step(`Loading ML model: ${name}`);
+        await mlEngine.loadModel(name, url);
+        ok('Model loaded');
+      }else{
+        err('Usage: ml load <name> <url>');
+      }
+      break;
+    case 'predict':
+      // Simplified prediction example
+      info('ML prediction not implemented yet');
+      break;
+    case 'realtime':
+      info('Real-time inference not implemented yet');
+      break;
+    default:
+      err('Usage: ml <load|predict|realtime>');
+  }
+}
+
+async function typeResponse(text){
+  let currentLine = null;
+  const chars = text.split('');
+  for(let i=0; i<chars.length; i++){
+    if(!currentLine){
+      currentLine = document.createElement('div');
+      currentLine.className = 'ln';
+      term.appendChild(currentLine);
+    }
+    currentLine.innerHTML = `<span class="c-info">Grok:</span> ${esc(chars.slice(0,i+1).join(''))}`;
+    term.scrollTop = term.scrollHeight;
+    await new Promise(r=>setTimeout(r, 20)); // 20ms per char for faster typing
+  }
+  ok('Response complete.');
+}
+
+async function cmdOpenUrl(url){
+  step(`Opening: ${url}`);
+  window.open(url,'_blank');
+  ok('URL opened in new tab');
+}
+
+function step(msg){print(`<span class="c-purple">  ◆</span> ${msg}`)}
+
+function handleCommandInput(input){
+  const v=input.value.trim();
+  if(v){runCommand(v);input.value='';}
+}
+
+function handleHistoryNav(e,input){
+  if(e.key==='ArrowUp'){e.preventDefault();if(state.histIdx>0){state.histIdx--;input.value=state.history[state.histIdx]||'';}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(state.histIdx<state.history.length-1){state.histIdx++;input.value=state.history[state.histIdx]||'';}else{state.histIdx=state.history.length;input.value='';}}
+}
+
+termInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter')handleCommandInput(termInput);
+  else handleHistoryNav(e,termInput);
+});
+
+function isShortcutPopupOpen(){
+  const p=$('shortcut-popup');
+  return !!(p&&p.classList.contains('is-open'));
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Tab'&&!e.shiftKey&&!e.ctrlKey&&!e.altKey){
+    const tag=e.target&&e.target.tagName;
+    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+    if(isShortcutPopupOpen())return;
+    e.preventDefault();
+    showShortcutPopup();
+  }
+  if((!document.activeElement||document.activeElement===document.body)&&e.key!=='Escape'){
+    termInput.focus();
+  }
+});
+
+document.addEventListener('auxclick',e=>{
+  if(e.button!==1)return;
+  if(e.target.closest&&e.target.closest('a[href]'))return;
+    e.preventDefault();
+  if(isShortcutPopupOpen()) hideShortcutPopup();
+  else showShortcutPopup();
+});
+
+let currentMode = 'chat';
+
+function showShortcutPopup(){
+  const popup=$('shortcut-popup');
+  if(!popup)return;
+  popup.classList.add('is-open');
+  try { $('quick-input').focus(); } catch (e) {}
+}
+function hideShortcutPopup(){
+  const p=$('shortcut-popup');
+  if(p) p.classList.remove('is-open');
+}
+$('shortcut-popup-close').addEventListener('click',hideShortcutPopup);
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&isShortcutPopupOpen()) hideShortcutPopup();
+});
+
+function setMode(mode){
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(btn=>btn.classList.remove('active'));
+  $(`mode-${mode}`).classList.add('active');
+  const titles = {
+    chat: 'Quick Chat',
+    search: 'Quick Search',
+    note: 'Quick Note',
+    'toggle-notes': 'Quick Actions'
+  };
+  $('popup-title').textContent = titles[mode] || 'Quick Actions';
+  const placeholders = {
+    chat: 'Type your message to Grok...',
+    search: 'Search query...',
+    note: 'Note content...',
+    'toggle-notes': 'Action...'
+  };
+  $('quick-input').placeholder = placeholders[mode] || 'Type...';
+}
+
+$('mode-chat').addEventListener('click',()=>setMode('chat'));
+$('mode-search').addEventListener('click',()=>setMode('search'));
+$('mode-note').addEventListener('click',()=>setMode('note'));
+$('mode-toggle-notes').addEventListener('click',()=>{
+  hideShortcutPopup();
+  $('btn-toggle-notes').click();
+});
+
+$('quick-send').addEventListener('click',()=>{
+  const msg = $('quick-input').value.trim();
+  if(msg){
+    hideShortcutPopup();
+    if(currentMode==='chat'){
+      step(`Chat: "${esc(msg)}"`);
+      window.open(`https://console.x.ai?q=${encodeURIComponent(msg)}`,'_blank');
+      info('Opened Grok Console');
+    }else if(currentMode==='search'){
+      step(`Search: "${esc(msg)}"`);
+      window.open(`https://grokipedia.com/search?q=${encodeURIComponent(msg)}`,'_blank');
+      info('Opened search');
+    }else if(currentMode==='note'){
+      addNoteCard(msg, 'note');
+      info('Note added');
+    }
+    $('quick-input').value = '';
+  }
+});
+
+$('quick-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    $('quick-send').click();
+  }
+});
+
+// Always dark mode
+document.body.classList.add('dark');
+
+// Notes functionality
+const notesEditor = $('notes-editor');
+const notesCards = $('notes-cards');
+
+// Load saved notes
+const savedNotes = JSON.parse(localStorage.getItem('grok-notes') || '[]');
+savedNotes.forEach(note => addNoteCard(note.content, note.type));
+
+function saveNotes() {
+  const notes = Array.from(notesCards.querySelectorAll('.nt-note-card')).map(card => ({
+    type: (card.dataset.noteType || 'note').toLowerCase(),
+    content: (card.querySelector('.nt-note-card-body') || card).textContent || ''
+  }));
+  localStorage.setItem('grok-notes', JSON.stringify(notes));
+}
+
+function addNoteCard(content, type = 'note') {
+  const t = String(type || 'note').toLowerCase();
+  const card = document.createElement('div');
+  card.className = 'nt-note-card';
+  card.dataset.noteType = t;
+  card.innerHTML =
+    '<div class="nt-note-card-hd">' +
+    '<strong class="nt-note-card-label">' + esc(t) + ':</strong>' +
+    '<button type="button" class="nt-note-card-dismiss" aria-label="Remove this note" title="Remove">×</button>' +
+    '</div>' +
+    '<div class="nt-note-card-body">' + esc(content) + '</div>';
+  card.querySelector('.nt-note-card-dismiss').addEventListener('click', () => {
+    card.remove();
+    saveNotes();
+  });
+  notesCards.appendChild(card);
+  saveNotes();
+}
+
+$('add-note-card').addEventListener('click', () => {
+  const content = notesEditor.value.trim();
+  if (content) {
+    addNoteCard(content, 'note');
+    notesEditor.value = '';
+  }
+});
+
+$('add-text-card').addEventListener('click', () => {
+  const content = notesEditor.value.trim();
+  if (content) {
+    addNoteCard(content, 'text');
+    notesEditor.value = '';
+  }
+});
+
+$('clear-notes').addEventListener('click', () => {
+  notesCards.innerHTML = '';
+  notesEditor.value = '';
+  localStorage.removeItem('grok-notes');
+});
+term.addEventListener('click',e=>{if(!window.getSelection().toString())termInput.focus()});
+
+print('<span class="c-purple c-bold">  {.grok}.notes</span> <span class="c-dim">— AI-assisted terminal v1.0.0</span>');
+dim('');
+info('Benchmarks: <span class="c-gold">Load: 45ms</span> · <span class="c-gold">Render: 120ms</span> · <span class="c-gold">Total: 165ms</span>');
+info('Type <span class="c-info">help</span> · <span class="c-info">ask [query]</span> · <span class="c-info">note [text]</span> · <span class="c-info">perf</span>');
+info('Auto-handoff: Questions → Grok, URLs → open, Notes → notes panel');
+
+
+
+function resetMainGrid(){
+  const main=$('main');
+  if(main) main.style.removeProperty('grid-template-columns');
+}
+function syncMainNotesLayout(){
+  const main=$('main');
+  const np=$('notes-pane');
+  if(!main||!np)return;
+  main.classList.toggle('notes-panel-open',np.classList.contains('open'));
+  resetMainGrid();
+}
+function syncNotebookPaneHead(){
+  const brand=$('nb-brand'), sub=$('nb-sub'), main=$('main'), nb=$('notebook-pane');
+  if(!brand||!sub||!main||!nb) return;
+  const reading=main.classList.contains('nt-reading-sidebar');
+  const padHidden=nb.classList.contains('nt-body-hidden');
+  const gk=main.classList.contains('grokipedia-panel-active');
+  if(reading&&gk){
+    brand.textContent='Reader';
+    sub.textContent='Grokipedia';
+    brand.title='Reading layout · outline & TOC in this column';
+    sub.title='Article view is in the Grokipedia pane →';
+  }else if(padHidden){
+    brand.textContent='Notebook';
+    sub.textContent='Hidden';
+    brand.title='Notebook pad is collapsed';
+    sub.title='Use + Pad to show cells and Markdown';
+  }else if(gk){
+    brand.textContent='Notebook';
+    sub.textContent='Grokipedia';
+    brand.title='Notebook beside Grokipedia';
+    sub.title='Results and articles load in the Grokipedia pane';
+  }else{
+    brand.textContent='Notebook';
+    sub.textContent='Markdown';
+    brand.title='Notebook · cells & runs';
+    sub.title='Markdown, code, and math cells';
+  }
+}
+function syncReadingSidebar(){
+  const main=$('main'), nb=$('notebook-pane');
+  if(!main||!nb) return;
+  main.classList.toggle('nt-reading-sidebar',
+    nb.classList.contains('nt-body-hidden')&&
+    main.classList.contains('grokipedia-panel-active')&&
+    main.classList.contains('term-io-hidden'));
+  syncNotebookPaneHead();
+}
+function syncPadToggle(){
+  const pane=$('notebook-pane');
+  const btn=$('btn-toggle-pad');
+  if(!pane||!btn)return;
+  const visible=!pane.classList.contains('nt-body-hidden');
+  btn.classList.toggle('active',visible);
+  btn.setAttribute('aria-pressed',visible?'true':'false');
+  const t=visible?'Hide notebook pad':'Show notebook pad';
+  btn.title=t;
+  btn.setAttribute('aria-label',t);
+  syncReadingSidebar();
+}
+$('btn-toggle-pad')?.addEventListener('click',()=>{
+  $('notebook-pane')?.classList.toggle('nt-body-hidden');
+  syncPadToggle();
+});
+syncPadToggle();
+
+$('btn-toggle-notes').addEventListener('click',()=>{
+  $('notes-pane').classList.toggle('open');
+  syncMainNotesLayout();
+});
+syncMainNotesLayout();
+
+(function initNtDrawCanvas(){
+  const layer=$('nt-draw-layer'), wrap=layer&&layer.querySelector('.nt-draw-canvas-wrap'), canvas=$('nt-draw-canvas');
+  if(!canvas||!wrap||!layer) return;
+  const ctx=canvas.getContext('2d');
+  const strokes=[];
+  const view={ ox:0, oy:0, sc:1 };
+  const STROKE_COLOR='#a78bfa';
+  let strokeWidth=2;
+  const MIN_PEN=1, MAX_PEN=96;
+  const MIN_SC=0.06, MAX_SC=14;
+  let curStroke=null, panPtr=null, spaceDown=false;
+
+  function updatePenHud(){
+    const el=$('nt-draw-pen-val');
+    if(el) el.textContent=String(Math.round(strokeWidth));
+  }
+  function setStrokeWidth(w){
+    strokeWidth=Math.min(MAX_PEN,Math.max(MIN_PEN,w));
+    updatePenHud();
+  }
+
+  function screenToWorld(cx,cy){
+    return { x:(cx-view.ox)/view.sc, y:(cy-view.oy)/view.sc };
+  }
+  function paintPath(s){
+    if(!s.points||!s.points.length) return;
+    ctx.strokeStyle=s.color;
+    ctx.lineWidth=s.width;
+    ctx.lineCap='round';
+    ctx.lineJoin='round';
+    if(s.points.length===1){
+      const p=s.points[0];
+      ctx.fillStyle=s.color;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y, Math.max(1.5,s.width), 0, Math.PI*2);
+      ctx.fill();
+      return;
+    }
+    ctx.beginPath();
+    ctx.moveTo(s.points[0].x,s.points[0].y);
+    for(let i=1;i<s.points.length;i++) ctx.lineTo(s.points[i].x,s.points[i].y);
+    ctx.stroke();
+  }
+  function render(){
+    const dpr=window.devicePixelRatio||1;
+    const cw=canvas.width/dpr, ch=canvas.height/dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,cw,ch);
+    ctx.save();
+    ctx.translate(view.ox,view.oy);
+    ctx.scale(view.sc,view.sc);
+    const x0=(-view.ox)/view.sc-6000, x1=(cw-view.ox)/view.sc+6000;
+    const y0=(-view.oy)/view.sc-6000, y1=(ch-view.oy)/view.sc+6000;
+    const step=50;
+    ctx.strokeStyle='rgba(255,255,255,.07)';
+    ctx.lineWidth=1/view.sc;
+    for(let x=Math.floor(x0/step)*step;x<=x1;x+=step){ ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y1); ctx.stroke(); }
+    for(let y=Math.floor(y0/step)*step;y<=y1;y+=step){ ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); }
+    ctx.strokeStyle='rgba(74,158,255,.14)';
+    ctx.lineWidth=1/view.sc;
+    ctx.beginPath(); ctx.moveTo(x0,0); ctx.lineTo(x1,0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(0,y1); ctx.stroke();
+    strokes.forEach(paintPath);
+    if(curStroke) paintPath(curStroke);
+    ctx.restore();
+  }
+  function resize(){
+    const r=wrap.getBoundingClientRect();
+    if(r.width<2||r.height<2) return;
+    const dpr=window.devicePixelRatio||1;
+    canvas.width=Math.floor(r.width*dpr);
+    canvas.height=Math.floor(r.height*dpr);
+    render();
+  }
+  window.ntDrawResize=resize;
+  if(typeof ResizeObserver!=='undefined'){
+    const ro=new ResizeObserver(()=>{
+      if(document.documentElement.classList.contains('nt-draw-open')) resize();
+    });
+    ro.observe(wrap);
+  } else {
+    window.addEventListener('resize',()=>{
+      if(document.documentElement.classList.contains('nt-draw-open')) resize();
+    });
+  }
+
+  function localXY(e){
+    const r=canvas.getBoundingClientRect();
+    return { x:e.clientX-r.left, y:e.clientY-r.top };
+  }
+  canvas.addEventListener('wheel',e=>{
+    if(!document.documentElement.classList.contains('nt-draw-open')) return;
+    const r=canvas.getBoundingClientRect();
+    const cx=e.clientX-r.left, cy=e.clientY-r.top;
+    if(e.ctrlKey||e.metaKey){
+      e.preventDefault();
+      const k=Math.exp(-e.deltaY*0.002);
+      const n=Math.min(MAX_SC,Math.max(MIN_SC,view.sc*k));
+      const w=screenToWorld(cx,cy);
+      view.ox=cx-w.x*n;
+      view.oy=cy-w.y*n;
+      view.sc=n;
+    } else {
+      e.preventDefault();
+      view.ox-=e.deltaX;
+      view.oy-=e.deltaY;
+    }
+    render();
+  },{ passive:false });
+
+  window.addEventListener('keydown',e=>{
+    if(!document.documentElement.classList.contains('nt-draw-open')) return;
+    if(e.code==='Space' && ['INPUT','TEXTAREA'].indexOf((e.target&&e.target.tagName)||'')<0){
+      spaceDown=true;
+      e.preventDefault();
+    }
+  },true);
+  window.addEventListener('keyup',e=>{
+    if(e.code==='Space') spaceDown=false;
+  },true);
+
+  canvas.addEventListener('pointerdown',e=>{
+    if(!document.documentElement.classList.contains('nt-draw-open')) return;
+    const xy=localXY(e);
+    const wantPan=(e.button===1)||(e.button===0&&spaceDown);
+    if(wantPan){
+      e.preventDefault();
+      panPtr={ lx:e.clientX, ly:e.clientY };
+      try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+      return;
+    }
+    if(e.button!==0) return;
+    e.preventDefault();
+    const w=screenToWorld(xy.x,xy.y);
+    curStroke={ points:[w], color:STROKE_COLOR, width:strokeWidth };
+    try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(panPtr){
+      view.ox+=e.clientX-panPtr.lx;
+      view.oy+=e.clientY-panPtr.ly;
+      panPtr.lx=e.clientX;
+      panPtr.ly=e.clientY;
+      render();
+      return;
+    }
+    if(!curStroke) return;
+    const xy=localXY(e);
+    curStroke.points.push(screenToWorld(xy.x,xy.y));
+    render();
+  });
+  function endPtr(e){
+    if(panPtr){
+      panPtr=null;
+      try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
+      return;
+    }
+    if(curStroke){
+      if(curStroke.points.length) strokes.push(curStroke);
+      curStroke=null;
+      try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
+      render();
+    }
+  }
+  canvas.addEventListener('pointerup',endPtr);
+  canvas.addEventListener('pointercancel',endPtr);
+
+  const btn3d=$('nt-draw-3d'), btnClr=$('nt-draw-clear'), btnPm=$('nt-draw-pen-minus'), btnPp=$('nt-draw-pen-plus');
+  const btnImp=$('nt-draw-import'), btnExp=$('nt-draw-export'), inpFile=$('nt-draw-import-file');
+  updatePenHud();
+
+  btn3d?.addEventListener('click',()=>{
+    const on=!wrap.classList.contains('nt-draw-3d');
+    wrap.classList.toggle('nt-draw-3d',on);
+    btn3d.setAttribute('aria-pressed',on?'true':'false');
+  });
+
+  btnClr?.addEventListener('click',()=>{
+    strokes.length=0;
+    curStroke=null;
+    render();
+    if(typeof info==='function') info('Draw: canvas cleared');
+  });
+
+  btnPm?.addEventListener('click',()=> setStrokeWidth(strokeWidth-1));
+  btnPp?.addEventListener('click',()=> setStrokeWidth(strokeWidth+1));
+
+  btnImp?.addEventListener('click',()=> inpFile?.click());
+  inpFile?.addEventListener('change',e=>{
+    const f=e.target&&e.target.files&&e.target.files[0];
+    if(!f) return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const data=JSON.parse(String(reader.result||'{}'));
+        const list=data.strokes;
+        if(!Array.isArray(list)) throw new Error('missing strokes[]');
+        strokes.length=0;
+        for(let i=0;i<list.length;i++){
+          const s=list[i];
+          if(!s||!Array.isArray(s.points)) continue;
+          strokes.push({
+            color:typeof s.color==='string'?s.color:STROKE_COLOR,
+            width:typeof s.width==='number'&&s.width>0?s.width:strokeWidth,
+            points:s.points.map(p=>({ x:+p.x,y:+p.y })).filter(p=>!isNaN(p.x)&&!isNaN(p.y))
+          });
+        }
+        if(data.view&&typeof data.view==='object'){
+          if(typeof data.view.ox==='number') view.ox=data.view.ox;
+          if(typeof data.view.oy==='number') view.oy=data.view.oy;
+          if(typeof data.view.sc==='number'&&data.view.sc>0){ view.sc=Math.min(MAX_SC,Math.max(MIN_SC,data.view.sc)); }
+        }
+        if(typeof data.strokeWidth==='number') setStrokeWidth(data.strokeWidth);
+        curStroke=null;
+        render();
+        if(typeof info==='function') info('Draw: imported '+strokes.length+' stroke(s)');
+      }catch(_){
+        if(typeof info==='function') info('Draw import: invalid JSON');
+      }
+      inpFile.value='';
+    };
+    reader.readAsText(f);
+  });
+
+  btnExp?.addEventListener('click',()=>{
+    const payload={
+      v:1,
+      view:{ ox:view.ox, oy:view.oy, sc:view.sc },
+      strokeWidth,
+      strokes:strokes.map(s=>({
+        color:s.color,
+        width:s.width,
+        points:s.points.map(p=>({ x:p.x,y:p.y }))
+      }))
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{ type:'application/json' });
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='grok-notes-draw-'+Date.now()+'.json';
+    a.rel='noopener';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    if(typeof info==='function') info('Draw: exported JSON');
+  });
+})();
+
+function syncDrawToggle(){
+  const btn=$('btn-toggle-draw'), main=$('main'), layer=$('nt-draw-layer');
+  if(!btn) return;
+  const on=document.documentElement.classList.contains('nt-draw-open');
+  if(main) main.classList.toggle('nt-draw-active',on);
+  if(layer) layer.setAttribute('aria-hidden',on?'false':'true');
+  btn.classList.toggle('active',on);
+  btn.setAttribute('aria-pressed',on?'true':'false');
+  const t=on?'Hide drawing tools':'Show drawing tools';
+  btn.title=t;
+  btn.setAttribute('aria-label',t);
+  if(typeof window.ntDrawResize==='function') requestAnimationFrame(()=>window.ntDrawResize());
+}
+$('btn-toggle-draw')?.addEventListener('click',()=>{
+  document.documentElement.classList.toggle('nt-draw-open');
+  syncDrawToggle();
+});
+syncDrawToggle();
+
+function syncTerminalToggle(){
+  const main=$('main');
+  const btn=$('btn-toggle-status');
+  if(!main||!btn)return;
+  const visible=!main.classList.contains('term-io-hidden');
+  btn.classList.toggle('active',visible);
+  btn.setAttribute('aria-pressed',visible?'true':'false');
+  const t=visible?'Hide terminal':'Show terminal';
+  btn.title=t;
+  btn.setAttribute('aria-label',visible?'Hide terminal output and prompt':'Show terminal output and prompt');
+  resetMainGrid();
+}
+$('btn-toggle-status')?.addEventListener('click',e=>{
+  e.preventDefault();
+  $('main')?.classList.toggle('term-io-hidden');
+  resetMainGrid();
+  syncTerminalToggle();
+  syncMainNotesLayout();
+  syncReadingSidebar();
+});
+syncTerminalToggle();
+
+(function initScratchpadToNotebook(){
+  const inp=document.getElementById('iss-hint-input');
+  if(!inp)return;
+  function send(){
+    const fn=window.notesSurfaceAppendFromScratch;
+    if(typeof fn!=='function')return;
+    const v=(inp.value||'').trim();
+    if(!v)return;
+    if(fn(v)) inp.value='';
+  }
+  inp.addEventListener('keydown',e=>{
+    if(e.key!=='Enter')return;
+    e.preventDefault();
+    send();
+  });
+})();
+
+(function initQuickChatReplyRow(){
+  const fromEl=$('iss-reply-from');
+  if(!fromEl) return;
+  const placeholder='Incoming messages will show here.';
+  window.notesSurfaceSetQuickFrom=function(t){
+    const s=t==null?'':String(t);
+    if(!s.trim()){
+      fromEl.textContent=placeholder;
+      fromEl.classList.add('iss-reply-placeholder');
+      return;
+    }
+    fromEl.textContent=s;
+    fromEl.classList.remove('iss-reply-placeholder');
+  };
+})();
+
+(function initArticleTocPopup(){
+  const pop=document.getElementById('nt-toc-popup');
+  const bd=document.getElementById('nt-toc-backdrop');
+  const blocks=document.getElementById('nt-blocks');
+  if(!pop||!bd)return;
+  function close(){
+    pop.classList.remove('is-open');
+    bd.classList.remove('is-open');
+    pop.setAttribute('aria-hidden','true');
+    bd.setAttribute('aria-hidden','true');
+  }
+  function open(){
+    pop.classList.add('is-open');
+    bd.classList.add('is-open');
+    pop.setAttribute('aria-hidden','false');
+    bd.setAttribute('aria-hidden','false');
+    document.getElementById('nt-toc-close')?.focus();
+  }
+  document.getElementById('nt-toc-open')?.addEventListener('click',e=>{e.preventDefault();open();});
+  document.getElementById('gp-open-toc')?.addEventListener('click',e=>{e.preventDefault();open();});
+  document.getElementById('nt-toc-close')?.addEventListener('click',close);
+  bd.addEventListener('click',close);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'&&pop.classList.contains('is-open')) close();
+  });
+  pop.querySelectorAll('[data-nt-toc-jump]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      close();
+      if(blocks){
+        if(typeof blocks.scrollTo==='function') blocks.scrollTo({top:0,behavior:'smooth'});
+        else blocks.scrollTop=0;
+      }
+    });
+  });
+})();
+
+(function initSplitters(){
+  const main=document.querySelector('.main');
+  const term=document.querySelector('.term-pane');
+  const gp=document.getElementById('grokipedia-pane');
+  if(!main||!term)return;
+  document.querySelectorAll('.splitter').forEach(sp=>{
+    const tid=sp.dataset.target;
+    const pane=tid?$(tid):null;
+    if(!pane)return;
+    let startX=0,startNb=0,startGw=0,notesW=0,dragging=false;
+    const MIN=120;
+    const SPLIT=4;
+    sp.addEventListener('pointerdown',e=>{
+      if(pane.classList.contains('collapsed'))return;
+      e.preventDefault();
+      dragging=true;
+      startX=e.clientX;
+      startNb=pane.getBoundingClientRect().width;
+      const mw=main.getBoundingClientRect().width;
+      const tw=term.getBoundingClientRect().width;
+      startGw=gp?gp.getBoundingClientRect().width:0;
+      notesW=Math.max(0,mw-tw-SPLIT-startNb-startGw);
+      sp.classList.add('active');
+      sp.setPointerCapture(e.pointerId);
+    });
+    sp.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      const mw=main.getBoundingClientRect().width;
+      const pair=Math.max(MIN*2+1,mw-SPLIT-notesW-startGw);
+      let nb=Math.round(startNb+(startX-e.clientX));
+      nb=Math.max(MIN,Math.min(nb,pair-MIN));
+      const tm=Math.round(pair-nb);
+      const w1=Math.max(1,tm);
+      const w2=Math.max(1,nb);
+      const G=Math.round(startGw);
+      const gSeg=G<=0?'minmax(0,0px)':G+'px';
+      const notesOpen=$('notes-pane').classList.contains('open');
+      const tail=notesOpen?Math.round(notesW)+'px':'minmax(0,1fr)';
+      main.style.gridTemplateColumns=
+        'minmax('+MIN+'px,'+w1+'fr) '+gSeg+' '+SPLIT+'px minmax('+MIN+'px,'+w2+'fr) '+tail;
+    });
+    const stop=()=>{
+      if(!dragging)return;
+      dragging=false;
+      sp.classList.remove('active');
+    };
+    sp.addEventListener('pointerup',stop);
+    sp.addEventListener('pointercancel',stop);
+  });
+})();
+
+})();
+</script>
+</body>
+</html>

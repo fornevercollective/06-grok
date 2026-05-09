@@ -1,0 +1,27 @@
+Human: /Volumes/qbitOS/00.dev/00/unix-term-window benchmark and compare /Volumes/qbitOS/04.crush/mu /Volumes/qbitOS/04.crush/mu/03_platform /Volumes/qbitOS/04.crush/mu/03_platform/Mu.app
+
+Assistant: [bash command to get sizes and file counts]
+
+[output]
+
+Then analysis of directories, reading files, counting LOC, build attempts.
+
+Human: what has the best structure for linux scalability and speed .. headless mode in the rust core Mu app is fast..
+
+Assistant: [task delegation to explore Rust core]
+
+[task output]
+
+Then summary answer.
+
+Human: want to plan a /Volumes/qbitOS/03.models/06-grok make a new terminal version of MuGrok with superior strengths/speed/sleak/fast iteration and live curl/npm/uv install and direct link access to agents window/Volumes/qbitOS/03.models/06-grok/notes.html pulling out all the isomorphic code dev capabilities of the collases/dojo  plus+ the ability  for grok/x.ai/grokepedia/docs/console/api imntegration/ specifically catered to fill all those gaps
+
+Assistant: [task delegation to plan the project]
+
+[task output]
+
+Then read the plan.md and presented it.
+
+Human: save out the chat history in /Volumes/qbitOS/03.models/06-grok
+
+Assistant: Created directory, now writing this file.

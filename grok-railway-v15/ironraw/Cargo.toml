@@ -1,0 +1,11 @@
+[package]
+name = "ironraw"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+description = "IronRaw terminal core — library crate for Railway WebSocket server"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+glyphon = "0.11.0"

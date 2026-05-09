@@ -1,0 +1,281 @@
+/* beyondBINARY quantum-prefixed | uvspeed | {n, +1, -n, +0, 0, -1, +n, +2, -0, +3, 1} */
+/* Shared Quantum Theme — Light / Dark mode CSS custom properties + base styles */
+/* Used by all 20 uvspeed PWA apps via <link rel="stylesheet" href="quantum-theme.css"> */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Theme Variables — Dark (default)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --qp-bg:             #0d1117;
+  --qp-bg-secondary:   #161b22;
+  --qp-bg-tertiary:    #21262d;
+  --qp-bg-hover:       #292e36;
+  --qp-canvas-bg:      #0d1117;
+  --qp-card:           #161b22;
+  --qp-code-bg:        #161b22;
+  --qp-input-bg:       #0d1117;
+
+  /* Borders */
+  --qp-border:         #30363d;
+  --qp-border-muted:   #21262d;
+  --qp-card-border:    #21262d;
+
+  /* Text */
+  --qp-text:           #e6edf3;
+  --qp-text-secondary: #c9d1d9;
+  --qp-text-muted:     #8b949e;
+
+  /* Accent */
+  --qp-accent:         #58a6ff;
+  --qp-accent-subtle:  rgba(56, 139, 253, 0.15);
+  --qp-accent-hover:   #79c0ff;
+
+  /* Feedback */
+  --qp-success:        #3fb950;
+  --qp-warning:        #d29922;
+  --qp-danger:         #f85149;
+
+  /* Shadows */
+  --qp-shadow:         rgba(0, 0, 0, 0.3);
+  --qp-shadow-lg:      rgba(0, 0, 0, 0.5);
+
+  /* Scrollbar */
+  --qp-scrollbar:        #30363d;
+  --qp-scrollbar-track:  #0d1117;
+
+  /* Legacy compat — map old var names */
+  --cursor-bg:            var(--qp-bg);
+  --cursor-bg-secondary:  var(--qp-bg-secondary);
+  --cursor-bg-tertiary:   var(--qp-bg-tertiary);
+  --cursor-bg-hover:      var(--qp-bg-hover);
+  --cursor-border:        var(--qp-border);
+  --cursor-border-muted:  var(--qp-border-muted);
+  --cursor-text:          var(--qp-text);
+  --cursor-text-secondary:var(--qp-text-secondary);
+  --cursor-text-muted:    var(--qp-text-muted);
+  --cursor-accent:        var(--qp-accent);
+  --cursor-accent-subtle: var(--qp-accent-subtle);
+  --cursor-shadow:        var(--qp-shadow);
+  --bg:   var(--qp-bg);
+  --bg2:  var(--qp-bg-secondary);
+  --bg3:  var(--qp-bg-tertiary);
+  --border: var(--qp-border);
+  --text:   var(--qp-text);
+  --text-m: var(--qp-text-muted);
+  --muted:  var(--qp-text-muted);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Theme Variables — Light
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --qp-bg:             #ffffff;
+  --qp-bg-secondary:   #f6f8fa;
+  --qp-bg-tertiary:    #eaeef2;
+  --qp-bg-hover:       #e2e6ea;
+  --qp-canvas-bg:      #f6f8fa;
+  --qp-card:           #ffffff;
+  --qp-code-bg:        #f6f8fa;
+  --qp-input-bg:       #f6f8fa;
+
+  --qp-border:         #d0d7de;
+  --qp-border-muted:   #d8dee4;
+  --qp-card-border:    #d0d7de;
+
+  --qp-text:           #1f2328;
+  --qp-text-secondary: #424a53;
+  --qp-text-muted:     #656d76;
+
+  --qp-accent:         #0969da;
+  --qp-accent-subtle:  rgba(9, 105, 218, 0.1);
+  --qp-accent-hover:   #0550ae;
+
+  --qp-success:        #1a7f37;
+  --qp-warning:        #9a6700;
+  --qp-danger:         #cf222e;
+
+  --qp-shadow:         rgba(31, 35, 40, 0.12);
+  --qp-shadow-lg:      rgba(31, 35, 40, 0.2);
+
+  --qp-scrollbar:        #c1c8cd;
+  --qp-scrollbar-track:  #f6f8fa;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Quantum Prefix Colors — Always consistent across themes
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  --pfx-shebang:   #e2b714;
+  --pfx-comment:   #6a9955;
+  --pfx-import:    #c586c0;
+  --pfx-class:     #4ec9b0;
+  --pfx-function:  #569cd6;
+  --pfx-error:     #f44747;
+  --pfx-condition: #d7ba7d;
+  --pfx-loop:      #9cdcfe;
+  --pfx-return:    #c586c0;
+  --pfx-output:    #ce9178;
+  --pfx-variable:  #d4d4d4;
+  --pfx-decorator: #dcdcaa;
+  --pfx-default:   #808080;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Base Styles — Shared across all apps
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  background: var(--qp-bg);
+  color: var(--qp-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Code / monospace */
+code, pre, .mono, [data-cell-type="code"] textarea {
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code',
+    Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--qp-scrollbar-track); }
+::-webkit-scrollbar-thumb {
+  background: var(--qp-scrollbar);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--qp-text-muted); }
+
+/* Focus outlines */
+:focus-visible {
+  outline: 2px solid var(--qp-accent);
+  outline-offset: 2px;
+}
+
+/* Links */
+a {
+  color: var(--qp-accent);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+/* Cards */
+.qp-card {
+  background: var(--qp-card);
+  border: 1px solid var(--qp-card-border);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px var(--qp-shadow);
+}
+
+/* Buttons */
+.qp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--qp-bg-tertiary);
+  color: var(--qp-text);
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.qp-btn:hover {
+  background: var(--qp-bg-hover);
+  border-color: var(--qp-text-muted);
+}
+.qp-btn-primary {
+  background: var(--qp-accent);
+  color: #fff;
+  border-color: var(--qp-accent);
+}
+.qp-btn-primary:hover {
+  background: var(--qp-accent-hover);
+}
+
+/* Inputs */
+.qp-input {
+  background: var(--qp-input-bg);
+  color: var(--qp-text);
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+.qp-input:focus {
+  border-color: var(--qp-accent);
+  outline: none;
+}
+
+/* Prefix gutter line classes */
+.pfx-shebang   { color: var(--pfx-shebang); }
+.pfx-comment    { color: var(--pfx-comment); }
+.pfx-import     { color: var(--pfx-import); }
+.pfx-class      { color: var(--pfx-class); }
+.pfx-function   { color: var(--pfx-function); }
+.pfx-error      { color: var(--pfx-error); }
+.pfx-condition  { color: var(--pfx-condition); }
+.pfx-loop       { color: var(--pfx-loop); }
+.pfx-return     { color: var(--pfx-return); }
+.pfx-output     { color: var(--pfx-output); }
+.pfx-variable   { color: var(--pfx-variable); }
+.pfx-decorator  { color: var(--pfx-decorator); }
+.pfx-default    { color: var(--pfx-default); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Responsive Utilities
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (max-width: 600px) {
+  .qp-hide-mobile { display: none !important; }
+}
+@media (min-width: 601px) {
+  .qp-hide-desktop { display: none !important; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Animations — Shared across apps
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@keyframes qp-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes qp-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+@keyframes qp-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.qp-fade-in  { animation: qp-fade-in 0.3s ease-out; }
+.qp-pulse    { animation: qp-pulse 2s ease-in-out infinite; }
+.qp-spin     { animation: qp-spin 1s linear infinite; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Print Styles
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media print {
+  body { background: #fff; color: #000; }
+  .qp-card { box-shadow: none; border: 1px solid #ccc; }
+  #qp-theme-toggle { display: none !important; }
+}
+
+/* quantum-prefixes.js no longer injects #qp-theme-toggle; print rule above is harmless if absent. */

@@ -1,0 +1,58 @@
+{
+  "source_root": "/Volumes/qbitOS/03.models/06-grok",
+  "source_files": [
+    "grok-notes-ts/src/App.css",
+    "grok-notes-ts/src/quantum-theme.css"
+  ],
+  "font_types": [
+    {
+      "id": 0,
+      "key": "ui_sans",
+      "description": "Notes surface body / system UI (App.css body.notes-surface-page)",
+      "css_stack": "system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",
+      "cosmic_family": "SansSerif"
+    },
+    {
+      "id": 1,
+      "key": "mono_terminal",
+      "description": "Terminal I/O, prompts, notes editor (App.css --font-mono)",
+      "css_stack": "'SF Mono','JetBrains Mono','Fira Code',ui-monospace,monospace",
+      "cosmic_family": "Name:SF Mono"
+    },
+    {
+      "id": 2,
+      "key": "mono_code",
+      "description": "code, pre, .mono (quantum-theme.css)",
+      "css_stack": "'SF Mono','Fira Code','JetBrains Mono','Cascadia Code',Menlo,Monaco,Consolas,'Courier New',monospace",
+      "cosmic_family": "Name:SF Mono"
+    }
+  ],
+  "font_styles": [
+    {
+      "id": 0,
+      "key": "regular",
+      "description": "Default terminal / body text",
+      "weight": 400,
+      "style": "Normal"
+    },
+    {
+      "id": 1,
+      "key": "semibold",
+      "description": "Logo / badges (e.g. .nt-top .logo-btn weight 600)",
+      "weight": 600,
+      "style": "Normal"
+    },
+    {
+      "id": 2,
+      "key": "italic",
+      "description": "Italic emphasis where CSS uses italic",
+      "weight": 400,
+      "style": "Italic"
+    }
+  ],
+  "ironraw": {
+    "font_type_id": 1,
+    "font_style_id": 0,
+    "note": "IronRaw GPU terminal uses mono_terminal + regular to match Grok notes terminal."
+  }
+}

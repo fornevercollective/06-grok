@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • grok.com waypoint v2.3 codec • notes + orchestrator + isomorphic sync</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c12">
+<style>
+  :root {
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --border: #30363d;
+    --gutter: #0d1117;
+    --voice: #ff7b72;
+    --freya-cyan: #22d3ee;
+    --editor-line-bg: #1a1d24;
+    --editor-line-border: var(--accent);
+  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;
+    min-height:100dvh;height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  }
+  header {
+    background:var(--surface);
+    padding:max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left));
+    display:flex;flex-direction:column;align-items:stretch;gap:8px;
+    border-bottom:1px solid var(--border);font-size:13px;
+  }
+  .header-main { display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%; }
+  header button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;
+  }
+  header button:hover { background:#21262d;border-color:var(--accent); }
+  header button.voice { color:var(--voice);border-color:var(--voice); }
+  header button.voice:hover { background:#21262d;border-color:var(--voice); }
+  .logo { font-weight:500;letter-spacing:0.5px;color:var(--accent); }
+  .gutter {
+    flex-shrink:0;width:72px;background:var(--gutter);padding:16px 4px 16px 2px;text-align:left;font-size:15px;line-height:1.65;
+    border-right:1px solid var(--border);user-select:none;color:var(--text-secondary);box-sizing:border-box;
+  }
+  .gutter-row { border-left:3px solid #30363d;margin-bottom:0; }
+  .gutter-row-main {
+    display:flex;align-items:center;gap:2px;flex-wrap:wrap;font-size:15px;line-height:1.65;
+    min-height:24.75px;box-sizing:border-box;
+  }
+  .gutter-expand {
+    flex-shrink:0;width:18px;min-height:24px;padding:0;border:none;background:transparent;color:var(--accent);
+    cursor:pointer;font:inherit;line-height:1.65;border-radius:4px;
+  }
+  .gutter-expand:hover { background:rgba(88,166,255,.12); }
+  .gutter-sym { font-size:13px;min-width:1em;line-height:1.65; }
+  .gutter-gate { font-weight:600;font-size:14px;line-height:1.65; }
+  .gutter-row-detail {
+    display:none;padding:6px 2px 8px 4px;margin-top:2px;font-size:10px;line-height:1.45;color:var(--text-secondary);
+    border-top:1px solid var(--border);text-align:left;word-break:break-word;
+  }
+  .gutter-row.expanded .gutter-row-detail { display:block; }
+  .gutter-color-dot { display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:4px;border:1px solid var(--border); }
+  .gutter-block-link {
+    display:inline-flex;align-items:center;justify-content:center;min-width:22px;min-height:22px;margin-top:2px;
+    padding:0 4px;border-radius:4px;border:1px solid var(--border);background:#21262d;color:var(--accent);
+    cursor:pointer;font-size:10px;font-weight:600;text-decoration:none;
+  }
+  .gutter-block-link:hover { border-color:var(--accent);background:#30363d; }
+  #canvas-bottom-bar {
+    position:absolute;bottom:max(8px, env(safe-area-inset-bottom));left:12px;right:12px;display:flex;
+    align-items:center;justify-content:space-between;gap:10px;z-index:40;pointer-events:none;
+  }
+  #canvas-info { pointer-events:none; flex:1; min-width:0; }
+  #cli-spawn-block-btn { pointer-events:auto; flex-shrink:0; }
+  .block-line-pill {
+    font-size:9px;background:#21262d;color:#22d3ee;padding:1px 6px;border-radius:999px;border:1px solid #30363d;margin-left:4px;vertical-align:middle;
+  }
+  .editor-wrap {
+    flex:1;min-height:0;position:relative;overflow:auto;background:var(--bg);
+    display:flex;flex-direction:row;align-items:flex-start;
+    -webkit-overflow-scrolling:touch;
+  }
+  .editor-inner { flex:1;min-width:0;position:relative;min-height:100%;box-sizing:border-box; }
+  .editor-line-highlight {
+    position:absolute;left:0;right:0;pointer-events:none;z-index:0;display:none;
+    background:var(--editor-line-bg);
+    border-left:3px solid var(--editor-line-border);
+    border-radius:0 4px 4px 0;
+    box-sizing:border-box;
+  }
+  .editor {
+    position:relative;z-index:1;min-height:100%;box-sizing:border-box;
+    padding:16px;outline:none;font-size:15px;line-height:1.65;white-space:pre-wrap;
+    overflow:visible;background:transparent;caret-color:var(--accent);color:var(--text);
+  }
+
+  .main-area {
+    display:flex; flex:1; overflow:hidden; flex-direction:row; min-height:0;
+  }
+  .main-area-center { flex:1;display:flex;flex-direction:row;align-items:stretch;min-width:0;overflow:hidden; }
+  #orchestrator-panel {
+    overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    touch-action:pan-x pan-y;
+  }
+  .right-column-drawer {
+    width:min(320px,36vw); flex-shrink:0; display:flex; flex-direction:column;
+    border-left:1px solid var(--border); background:var(--surface); min-height:0; overflow:hidden;
+    transition:width .3s ease; position:relative;
+  }
+  .right-column-drawer.collapsed { width:48px; }
+
+  .right-drawer-body {
+    flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    display:flex; flex-direction:column;
+  }
+  .right-column-drawer > *:not(.right-drawer-body) { flex-shrink:0; }
+  .right-drawer-body > * { flex-shrink:0; }
+
+  #timeline-strip {
+    height:96px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);
+    position:relative;overflow:hidden;transition:height .3s;
+    padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);
+    box-sizing:border-box;
+  }
+  #timeline-strip.collapsed { height:32px; }
+  #timeline-canvas { position:absolute;left:0;top:0;display:block; }
+  #tl-fisheye {
+    align-self:center;margin:0 auto;position:static;transform:none;
+    background:rgba(34,211,238,.15);color:#22d3ee;border:1px solid #22d3ee;border-radius:9999px;
+    padding:3px 14px;font-size:11px;white-space:nowrap;pointer-events:none;z-index:20;transition:opacity .2s;
+  }
+  #tl-collapse-btn {
+    position:absolute;top:4px;right:max(12px, env(safe-area-inset-right));font-size:11px;color:#22d3ee;
+    cursor:pointer;z-index:30;padding:8px 4px;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;
+    touch-action:manipulation;
+  }
+
+  #canvas-panel { flex:1;position:relative;background:var(--bg); }
+  #block-canvas { position:absolute;inset:0; }
+  .block {
+    position:absolute;min-width:168px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:10;user-select:none;transition:box-shadow .15s;font-size:12.5px;
+    touch-action:none;
+  }
+  .block:hover { box-shadow:0 4px 20px rgba(88,166,255,.4); }
+  .block.selected { border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.3); }
+  .block-header { display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;background:rgba(88,166,255,0.08);border-radius:6px 6px 0 0; }
+  .block-header .cli-prompt { color:#34d399;margin-right:4px; }
+  .block-version {
+    font-size:10px;background:#21262d;color:#58a6ff;padding:1px 8px;border-radius:9999px;border:1px solid var(--border);white-space:nowrap;
+  }
+  .block-body { padding:8px 10px;font-size:12.5px;color:var(--text-secondary);max-height:110px;overflow:hidden;white-space:pre-wrap; }
+  .connector { width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--bg);position:absolute;cursor:crosshair;z-index:20; }
+  .connector.in { left:-6px;top:50%;transform:translateY(-50%); }
+  .connector.out { right:-6px;top:50%;transform:translateY(-50%); }
+  #block-svg { position:absolute;inset:0;pointer-events:none;z-index:5; }
+
+  #live-analysis-panel {
+    position:relative;width:100%;box-sizing:border-box;background:var(--surface);
+    border-bottom:1px solid var(--border);padding:12px;transition:all .3s;min-height:0;
+  }
+  #live-analysis-panel.collapsed { height:40px;overflow:hidden;padding:8px; }
+  #live-analysis-panel.collapsed #live-analysis-content { display:none; }
+  #live-analysis-header { display:flex;justify-content:space-between;align-items:center;cursor:pointer; }
+  #live-analysis-content { margin-top:8px; }
+  #cube-preview-drawer { margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px; }
+  .cube { width:48px;height:48px;margin:8px auto;background:linear-gradient(135deg,#58a6ff,#22d3ee);border-radius:8px;transition:transform .35s ease; }
+
+  #right-drawer-collapse {
+    position:absolute;top:12px;left:-12px;width:28px;height:28px;
+    background:var(--surface);border:1px solid var(--border);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    font-size:14px;color:#22d3ee;z-index:110;box-shadow:0 2px 8px rgba(0,0,0,.3);
+    touch-action:manipulation;
+  }
+
+  #right-column-drawer .sidebar {
+    flex:0 0 auto;
+    padding:12px; display:flex; flex-direction:column; gap:12px;
+    border-top:1px solid var(--border);
+  }
+  #kbatch-panel { min-height:120px;background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px; }
+
+  #cli-chat-bar {
+    height:auto; min-height:64px; background:var(--surface); border-top:1px solid var(--border);
+    display:flex; align-items:center;
+    padding:8px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    gap:8px; flex-shrink:0; flex-wrap:wrap;
+    box-shadow:0 -2px 12px rgba(0,0,0,.3);
+  }
+  #cli-mode-tabs {
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    background:transparent;padding:0;border-radius:0;
+  }
+  #cli-mode-tabs button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;touch-action:manipulation;
+  }
+  #cli-mode-tabs button:hover { background:#21262d;border-color:var(--accent); }
+  #cli-mode-tabs button.active { background:var(--accent);color:#0a0c12;border-color:var(--accent); }
+  #cli-prompt-input {
+    min-width:180px; flex:1 1 240px; background:#21262d;border:1px solid var(--border);color:var(--text);
+    padding:10px 16px;border-radius:9999px;font-family:inherit;font-size:14px;outline:none;
+  }
+  #cli-voice-btn { width:44px;height:44px;min-width:44px;background:var(--voice);color:#fff;border:none;border-radius:50%;cursor:pointer;touch-action:manipulation; }
+  #cli-send-btn { background:var(--accent);color:#0a0c12;border:1px solid var(--accent);padding:6px 12px;border-radius:6px;cursor:pointer;touch-action:manipulation;font-size:13px;font-weight:500;font-family:inherit; }
+  #cli-send-btn:hover { background:#79b8ff;border-color:#79b8ff; }
+
+  header button { touch-action:manipulation; }
+
+  .inspector-panel-head {
+    padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  }
+  .inspector-panel-head .panel-title { font-weight:600;color:var(--accent);margin:0 0 8px 0;padding:0;border:none; }
+  .inspector-toolbar { display:flex;flex-wrap:wrap;gap:6px;align-items:center; }
+  .inspector-toolbar button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 10px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;touch-action:manipulation;
+  }
+  .inspector-toolbar button:hover { background:#21262d;border-color:var(--accent); }
+
+  @media (max-width: 768px) {
+    .main-area { flex-direction:column; flex:1 1 auto; min-height:0; }
+    .main-area-center { min-height:0; flex:1 1 55%; }
+    .right-column-drawer {
+      width:100%; max-width:none; border-left:none; border-top:1px solid var(--border);
+      max-height:min(50vh, 420px); flex:1 1 40%;
+    }
+    .right-column-drawer.collapsed { max-height:48px; width:100%; }
+    header button, #cli-mode-tabs button, .inspector-toolbar button { min-height:40px; padding:8px 12px; }
+    #cli-prompt-input { font-size:16px; }
+    .gutter { width:64px; font-size:11px; padding-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div id="tl-fisheye">10⁰s • diopter focus</div>
+  <div class="header-main">
+    <div class="logo">qbit-notes • codec v3.0 / file v2.3</div>
+    <span style="flex:1"></span>
+    <button type="button" onclick="toggleMode()">notes ↔ orchestrator</button>
+    <button type="button" onclick="toggleScale()">freya-log ↔ history</button>
+    <button type="button" onclick="kbatchSuggest()">kbatch</button>
+    <button type="button" class="voice" onclick="startVoiceNotes()">jawta-voice • x.ai</button>
+    <button type="button" onclick="toggleGridLock()">grid lock</button>
+    <button type="button" onclick="toggleRightDrawer()">drawer</button>
+  </div>
+</header>
+
+<div id="timeline-strip">
+  <canvas id="timeline-canvas" width="1400" height="96"></canvas>
+  <div id="tl-collapse-btn" onclick="toggleTimelineCollapse()">▼ collapse timeline</div>
+</div>
+
+<div class="main-area">
+  <div class="main-area-center">
+    <div id="main-content" style="flex:1;display:flex;position:relative;background:var(--bg);min-height:0;min-width:0;">
+      <div id="notes-panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
+        <div id="editor-wrap" class="editor-wrap">
+          <div class="gutter" id="gutter"></div>
+          <div class="editor-inner" id="editor-inner">
+          <div id="editor-line-highlight" class="editor-line-highlight" aria-hidden="true"></div>
+          <div contenteditable="true" class="editor" id="editor" spellcheck="false">
+# v3.0 — Grid-aligned nodes + auto layout + version badges
+
+Nodes snap to a 20px grid; new blocks fill left→right, top→bottom. Each type gets v1, v2, v3… as you add variations.
+
+## Section 1 — Core Logic
+Paste or type here.
+
+## Section 2 — Node Flow
+Grok CLI style nodes with prompt-like headers.
+
+## Section 3 — Quantum Prefixes
+Live gutter updates instantly. Isomorphic link example: b-1
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="orchestrator-panel" style="flex:1;display:none;position:relative;background:var(--bg);min-height:0;">
+        <canvas id="block-canvas" width="1400" height="800"></canvas>
+        <svg id="block-svg" width="1400" height="800" style="position:absolute;inset:0;pointer-events:none;"></svg>
+        <div id="canvas-tools" style="position:absolute;top:12px;left:12px;display:flex;gap:4px;z-index:30;flex-wrap:wrap;">
+          <button type="button" onclick="addBlock('source')">+ Source</button>
+          <button type="button" onclick="addBlock('event')">+ Event</button>
+          <button type="button" onclick="addBlock('entity')">+ Entity</button>
+          <button type="button" onclick="addBlock('chapter')">+ Chapter</button>
+          <button type="button" onclick="toggleGridLock()">grid lock</button>
+          <button type="button" onclick="clearBlocks()">clear</button>
+        </div>
+        <div id="canvas-bottom-bar">
+          <div id="canvas-info" style="font-size:11px;color:#8b949e;font-family:IBM Plex Mono;">blocks: 0 | connections: 0 | 20px grid • version badges • grok-cli nodes</div>
+          <button type="button" id="cli-spawn-block-btn" class="gutter-block-link" onclick="cliSpawnBlockFromCodeCommand('event')" title="New block at code line (same as CLI +block)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="right-column-drawer" class="right-column-drawer" aria-label="Analysis and inspector">
+    <div id="right-drawer-collapse" onclick="toggleRightDrawer()">›</div>
+    <div class="right-drawer-body" id="right-drawer-body">
+      <div id="inspector-panel-head" class="inspector-panel-head">
+        <div class="panel-title">Inspector • Grok CLI Node</div>
+        <div class="inspector-toolbar" role="toolbar" aria-label="Steno and export">
+          <button type="button" onclick="toggleSteno()">stenoSTRIP</button>
+          <button type="button" onclick="runStenoReplace()">stenoReplace</button>
+          <button type="button" onclick="exportQbit()">export .qbit</button>
+          <button type="button" onclick="tumbleEncryptShare()">tumble share</button>
+        </div>
+      </div>
+      <div id="insp-content" style="background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px;min-height:80px;"></div>
+
+      <div id="live-analysis-panel">
+        <div id="live-analysis-header" onclick="toggleLiveAnalysis()">
+          <span style="font-weight:600;color:var(--accent);">Live Analysis</span>
+          <span id="live-analysis-toggle">▼</span>
+        </div>
+        <div id="live-analysis-content">
+          <div id="analysis" style="background:#21262d;padding:12px;border:1px solid var(--border);font-size:13px;line-height:1.6;min-height:140px;"></div>
+          <div id="cube-preview-drawer" style="margin-top:12px;">
+            <div class="panel-title" style="margin-bottom:6px;">Cube Preview</div>
+            <div id="cube" class="cube"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="panel-title">jawta-voice • x.ai realtime</div>
+        <div id="voice-wave" class="voice-wave" style="font-size:12px;color:var(--text-secondary);">click button to speak</div>
+        <div id="kbatch-panel"></div>
+        <div class="accreditation" style="font-size:11px;color:var(--text-secondary);line-height:1.5;">
+          Built by Grok (xAI)<br>
+          qbitOS research surface • codec v3.0 grid + badges<br>
+          auto logical placement • 20px snap • seamless drawer scroll + CLI bar
+        </div>
+        <div class="status" id="status">ready • grok-notes v2.3 • grid + versioned nodes</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="cli-chat-bar">
+  <div id="cli-mode-tabs">
+    <button type="button" class="active" onclick="switchCliMode(this,'agent')">Agent</button>
+    <button type="button" onclick="switchCliMode(this,'plan')">Plan</button>
+    <button type="button" onclick="switchCliMode(this,'research')">Research</button>
+    <button type="button" onclick="switchCliMode(this,'code')">Code</button>
+    <button type="button" onclick="switchCliMode(this,'ai')">AI</button>
+    <button type="button" onclick="switchCliMode(this,'quantum')">Quantum</button>
+  </div>
+  <input id="cli-prompt-input" type="text" placeholder="Ask Grok CLI (agent mode)..." onkeydown="if(event.key==='Enter') sendCliPrompt()">
+  <button id="cli-voice-btn" type="button" onclick="startVoiceCLI()">🎤</button>
+  <button id="cli-send-btn" type="button" onclick="sendCliPrompt()">Send</button>
+</div>
+
+<script>
+// ====================== QBITOS codec v3.0 • file v2.3 — grid placement + version badges + drawer scroll + orchestration sync ======================
+let currentMode = 'notes';
+let stenoActive = false;
+let currentContent = '';
+let voiceActive = false;
+let mediaRecorder = null;
+let gridLocked = true;
+let timelineCollapsed = false;
+let liveAnalysisCollapsed = false;
+let rightDrawerCollapsed = false;
+let currentCliMode = 'agent';
+
+let STATE = {
+  blocks: [],
+  connections: [],
+  selectedBlock: null,
+  nextId: 1,
+  tlScale: 'freya',
+  versionCounter: {},
+  gutterLineToBlock: {},
+  gutterExpanded: new Set(),
+  lastCaretLineIndex: 0
+};
+
+const GRID_SIZE = 20;
+const LAYOUT_COLS = 5;
+const CELL_W = 220;
+const CELL_H = 160;
+const GRID_ORIGIN_X = 80;
+const GRID_ORIGIN_Y = 80;
+
+function snapToGrid(v) { return Math.round(v / GRID_SIZE) * GRID_SIZE; }
+
+function nextLogicalGridSlot() {
+  const idx = STATE.blocks.length;
+  const col = idx % LAYOUT_COLS;
+  const row = Math.floor(idx / LAYOUT_COLS);
+  return {
+    x: snapToGrid(GRID_ORIGIN_X + col * CELL_W),
+    y: snapToGrid(GRID_ORIGIN_Y + row * CELL_H)
+  };
+}
+
+const BLOCK_TYPES = {
+  source:  { prefix: 'n:',   color: '#ef4444', label: 'SOURCE',   cli: '>' },
+  chapter: { prefix: '+1:',  color: '#3fb950', label: 'CHAPTER',  cli: '#' },
+  entity:  { prefix: '+0:',  color: '#f0883e', label: 'ENTITY',   cli: '@' },
+  event:   { prefix: '0:',   color: '#58a6ff', label: 'EVENT',    cli: '!' },
+  relation:{ prefix: '+n:',  color: '#d2a8ff', label: 'RELATION', cli: '→' },
+  analysis:{ prefix: '1:',   color: '#79c0ff', label: 'ANALYSIS', cli: '?' }
+};
+
+function classifyLine(line) {
+  if (!line || !line.trim()) return {sym:'0', gate:'I', color:'#8b949e'};
+  const l = line.toLowerCase().trim();
+  if (l.includes('import') || l.includes('script')) return {sym:'-n', gate:'M', color:'#58a6ff'};
+  if (l.includes('function') || l.includes('=>')) return {sym:'+1', gate:'H', color:'#58a6ff'};
+  if (l.includes('grok') || l.includes('canvas') || l.includes('block')) return {sym:'★', gate:'Q', color:'#ff7b72'};
+  if (l.includes('freya') || l.includes('log') || l.includes('unit')) return {sym:'⚛', gate:'F', color:'#22d3ee'};
+  return {sym:'0', gate:'I', color:'#8b949e'};
+}
+
+window.liveAnalyze = function(text) {
+  currentContent = text;
+  const lines = text.split('\n');
+  let gutterHTML = '';
+  let summary = `<b>${lines.length} lines • Quantum Gutter</b><br>`;
+
+  lines.forEach((line, i) => {
+    const c = classifyLine(line);
+    const expanded = STATE.gutterExpanded.has(i);
+    const linkedId = resolvedBlockIdForLine(line, i);
+    const linkBtn = linkedId
+      ? `<button type="button" class="gutter-block-link" data-block-id="${linkedId}" title="Open ${linkedId} in orchestrator">↗</button>`
+      : '';
+    gutterHTML += `
+      <div class="gutter-row ${expanded ? 'expanded' : ''}" data-line="${i}" style="border-left-color:${c.color}">
+        <div class="gutter-row-main">
+          <button type="button" class="gutter-expand" data-gutter-line="${i}" aria-expanded="${expanded}" title="Line ${i + 1}: expand">${expanded ? '−' : '+'}</button>
+          <span class="gutter-sym" style="color:${c.color}">${c.sym}</span>
+          <span class="gutter-gate" style="color:${c.color}">${c.gate}</span>
+          ${linkBtn}
+        </div>
+      </div>`;
+    if (i < 12) summary += `<span style="color:${c.color}">${c.sym}</span> ${line.substring(0, 42)}${line.length>42?'…':''}<br>`;
+  });
+
+  document.getElementById('gutter').innerHTML = gutterHTML;
+  document.getElementById('analysis').innerHTML = summary;
+
+  const cube = document.getElementById('cube');
+  const rot = (lines.length * 2.8) % 360;
+  cube.style.transform = `perspective(800px) rotateX(${rot}deg) rotateY(${text.length % 360}deg)`;
+};
+
+function resolvedBlockIdForLine(line, lineIndex) {
+  const fromText = extractBlockRefFromLine(line);
+  if (fromText) return fromText;
+  const manual = STATE.gutterLineToBlock[String(lineIndex)];
+  if (manual && blockExists(manual)) return manual;
+  const fromNode = blockIdByLinkedLine(lineIndex);
+  if (fromNode) return fromNode;
+  return null;
+}
+
+function blockExists(id) {
+  return STATE.blocks.some(b => b.id === id);
+}
+
+function extractBlockRefFromLine(line) {
+  let m = line.match(/\b(b-\d+)\b/i);
+  if (m && blockExists(m[1])) return m[1];
+  m = line.match(/@(?:block:)?(b-\d+)/i);
+  if (m && blockExists(m[1])) return m[1];
+  return null;
+}
+
+function blockIdByLinkedLine(lineIndex) {
+  const b = STATE.blocks.find(b => b.linkedLineIndex === lineIndex);
+  return b ? b.id : null;
+}
+
+function assignBlockToCodeLine(block, lineIndex) {
+  STATE.blocks.forEach(b => {
+    if (b.id !== block.id && b.linkedLineIndex === lineIndex) b.linkedLineIndex = null;
+  });
+  block.linkedLineIndex = lineIndex;
+  STATE.gutterLineToBlock[String(lineIndex)] = block.id;
+}
+
+function pruneGutterEntriesForBlockId(blockId) {
+  Object.keys(STATE.gutterLineToBlock).forEach(k => {
+    if (STATE.gutterLineToBlock[k] === blockId) delete STATE.gutterLineToBlock[k];
+  });
+}
+
+function canvasYForLineIndex(lineIndex) {
+  return snapToGrid(GRID_ORIGIN_Y + lineIndex * GRID_SIZE);
+}
+
+function findCanvasPosForLine(lineIndex, excludeBlockId = null) {
+  const y = canvasYForLineIndex(lineIndex);
+  const rowBlocks = STATE.blocks.filter(b =>
+    b.id !== excludeBlockId && snapToGrid(b.y) === y
+  );
+  const col = rowBlocks.length;
+  return {
+    x: snapToGrid(GRID_ORIGIN_X + (col % LAYOUT_COLS) * CELL_W),
+    y
+  };
+}
+
+function syncOrchestratorCanvasHeight(lineCount) {
+  const panel = document.getElementById('orchestrator-panel');
+  if (!panel) return;
+  const minH = Math.max(800, canvasYForLineIndex(Math.max(0, lineCount - 1)) + CELL_H + 120);
+  panel.style.minHeight = minH + 'px';
+}
+
+window.toggleMode = function() {
+  currentMode = currentMode === 'notes' ? 'orchestrator' : 'notes';
+  document.getElementById('notes-panel').style.display = currentMode === 'notes' ? 'flex' : 'none';
+  document.getElementById('orchestrator-panel').style.display = currentMode === 'orchestrator' ? 'flex' : 'none';
+  if (currentMode === 'orchestrator') drawConnections();
+};
+
+window.toggleScale = function() {
+  STATE.tlScale = STATE.tlScale === 'freya' ? 'history' : 'freya';
+  drawTimeline();
+};
+
+window.toggleGridLock = function() {
+  gridLocked = !gridLocked;
+  document.querySelectorAll('#canvas-tools button').forEach(b => {
+    if (b.textContent.includes('grid')) b.style.color = gridLocked ? '#22d3ee' : '';
+  });
+};
+
+window.toggleTimelineCollapse = function() {
+  timelineCollapsed = !timelineCollapsed;
+  const strip = document.getElementById('timeline-strip');
+  const btn = document.getElementById('tl-collapse-btn');
+  strip.classList.toggle('collapsed', timelineCollapsed);
+  btn.textContent = timelineCollapsed ? '▶ expand' : '▼ collapse timeline';
+  drawTimeline();
+};
+
+window.toggleLiveAnalysis = function() {
+  liveAnalysisCollapsed = !liveAnalysisCollapsed;
+  const panel = document.getElementById('live-analysis-panel');
+  const toggle = document.getElementById('live-analysis-toggle');
+  panel.classList.toggle('collapsed', liveAnalysisCollapsed);
+  toggle.textContent = liveAnalysisCollapsed ? '▶' : '▼';
+};
+
+window.toggleRightDrawer = function() {
+  rightDrawerCollapsed = !rightDrawerCollapsed;
+  const drawer = document.getElementById('right-column-drawer');
+  const btn = document.getElementById('right-drawer-collapse');
+  drawer.classList.toggle('collapsed', rightDrawerCollapsed);
+  btn.textContent = rightDrawerCollapsed ? '‹' : '›';
+};
+
+window.toggleSteno = function() {
+  stenoActive = !stenoActive;
+  document.getElementById('status').textContent = stenoActive ? 'stenoSTRIP on' : 'ready • grok-notes v2.3 • grid + versioned nodes';
+};
+
+window.runStenoReplace = function() {
+  const ed = document.getElementById('editor');
+  ed.innerText = ed.innerText.replace(/\bthe\b/gi, 'ðə');
+  liveAnalyze(ed.innerText);
+};
+
+window.exportQbit = function() {
+  const t = document.getElementById('editor').innerText;
+  const blob = new Blob([t], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'notes.qbit';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+window.tumbleEncryptShare = function() {
+  const t = document.getElementById('editor').innerText.slice(0, 4000);
+  prompt('tumble share (base64 preview)', btoa(unescape(encodeURIComponent(t))));
+};
+
+window.kbatchSuggest = function() {
+  const k = document.getElementById('kbatch-panel');
+  const d = document.createElement('div');
+  d.style.cssText = 'padding:8px;margin:4px 0;background:#21262d;border-radius:6px;font-size:12px;color:#8b949e;border-left:3px solid #58a6ff';
+  d.textContent = `kbatch: ${currentContent.split('\n').length} lines • ${currentCliMode} mode hint`;
+  k.appendChild(d);
+  k.scrollTop = k.scrollHeight;
+};
+
+window.startVoiceNotes = function() {
+  voiceActive = !voiceActive;
+  const w = document.getElementById('voice-wave');
+  w.textContent = voiceActive ? 'listening (simulated)…' : 'click button to speak';
+};
+
+function switchCliMode(btn, mode) {
+  document.querySelectorAll('#cli-mode-tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCliMode = mode;
+  document.getElementById('cli-prompt-input').placeholder = `Ask Grok CLI (${mode} mode)...`;
+}
+
+function sendCliPrompt() {
+  const input = document.getElementById('cli-prompt-input');
+  const prompt = input.value.trim();
+  if (!prompt) return;
+  const low = prompt.toLowerCase();
+  if (low === '+block' || low === '+node' || low === 'new block') {
+    cliSpawnBlockFromCodeCommand('event');
+    input.value = '';
+    return;
+  }
+  const quick = prompt.match(/^\+(source|event|entity|chapter|relation|analysis)\s*$/i);
+  if (quick) {
+    cliSpawnBlockFromCodeCommand(quick[1].toLowerCase());
+    input.value = '';
+    return;
+  }
+  const kbatch = document.getElementById('kbatch-panel');
+  const entry = document.createElement('div');
+  entry.style.cssText = 'margin:8px 0;padding:10px 14px;background:#21262d;border-radius:8px;border-left:4px solid #34d399;';
+  entry.innerHTML = `<div style="color:#34d399;">[${currentCliMode.toUpperCase()}] → ${prompt}</div><div style="margin-top:6px;color:#8b949e;">Grok CLI: processed via grok.com layer</div>`;
+  kbatch.appendChild(entry);
+  kbatch.scrollTop = kbatch.scrollHeight;
+  input.value = '';
+}
+
+window.startVoiceCLI = async function() {
+  const btn = document.getElementById('cli-voice-btn');
+  btn.textContent = '●';
+  setTimeout(() => {
+    document.getElementById('cli-prompt-input').value = 'Voice CLI — quantum analysis requested';
+    sendCliPrompt();
+    btn.textContent = '🎤';
+  }, 900);
+};
+
+function drawTimeline() {
+  const cv = document.getElementById('timeline-canvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0c12';
+  ctx.fillRect(0, 0, W, H);
+
+  const orders = 61;
+  for (let i = 0; i <= orders; i++) {
+    const x = (i / orders) * W;
+    ctx.strokeStyle = i % 10 === 0 ? (STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff') : '#30363d';
+    ctx.lineWidth = i % 10 === 0 ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(x, 20);
+    ctx.lineTo(x, H - 20);
+    ctx.stroke();
+    if (i % 5 === 0) {
+      ctx.fillStyle = STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.fillText(STATE.tlScale === 'freya' ? '10^' + (i - 30) : i + 's', x + 4, 14);
+    }
+  }
+
+  ctx.fillStyle = STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff';
+  ctx.font = 'bold 10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(STATE.tlScale === 'freya' ? 'FREYA UNITS LOG SCALE' : 'HISTORY TIMELINE SCALE', W / 2, H - 8);
+  ctx.textAlign = 'left';
+}
+
+function createBlock(type, title = '', content = '', opts = {}) {
+  const bt = BLOCK_TYPES[type] || BLOCK_TYPES.event;
+  const id = 'b-' + STATE.nextId++;
+  if (!STATE.versionCounter[type]) STATE.versionCounter[type] = 0;
+  const version = ++STATE.versionCounter[type];
+  let pos;
+  if (opts.x != null && opts.y != null) {
+    pos = { x: snapToGrid(opts.x), y: snapToGrid(opts.y) };
+  } else if (opts.linkedLineIndex != null && opts.linkedLineIndex >= 0) {
+    pos = findCanvasPosForLine(opts.linkedLineIndex);
+  } else {
+    pos = nextLogicalGridSlot();
+  }
+  const block = {
+    id,
+    type,
+    title: title || bt.label,
+    content: content || '',
+    x: pos.x,
+    y: pos.y,
+    version,
+    linkedLineIndex: opts.linkedLineIndex != null && opts.linkedLineIndex >= 0 ? opts.linkedLineIndex : null
+  };
+  if (block.linkedLineIndex != null) assignBlockToCodeLine(block, block.linkedLineIndex);
+  STATE.blocks.push(block);
+  renderBlock(block);
+  updateStats();
+  return block;
+}
+
+function renderBlock(block) {
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  const el = document.createElement('div');
+  el.className = 'block';
+  el.id = block.id;
+  el.style.left = block.x + 'px';
+  el.style.top = block.y + 'px';
+  el.style.borderLeft = `4px solid ${bt.color}`;
+  el.innerHTML = `
+    <div class="connector in" data-id="${block.id}"></div>
+    <div class="block-header">
+      <span class="cli-prompt">${bt.cli}</span>
+      <span class="prefix" style="color:${bt.color}">${bt.prefix}</span>
+      <span style="font-weight:600">${bt.label}</span>
+      <span style="flex:1"></span>
+      <span class="block-version" title="Variation for this node type">v${block.version}</span>
+      ${block.linkedLineIndex != null ? `<span class="block-line-pill" title="Isomorphic code line">L${block.linkedLineIndex + 1}</span>` : ''}
+      <span onclick="removeBlock('${block.id}');event.stopImmediatePropagation()" style="cursor:pointer;color:#8b949e">✕</span>
+    </div>
+    <div class="block-body">${block.title || ''}</div>
+    <div class="connector out" data-id="${block.id}"></div>
+  `;
+  document.getElementById('orchestrator-panel').appendChild(el);
+
+  let offsetX, offsetY, isDragging = false;
+  const startDrag = (clientX, clientY) => {
+    isDragging = true;
+    STATE.selectedBlock = block;
+    offsetX = clientX - block.x;
+    offsetY = clientY - block.y;
+    document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  };
+  const moveDrag = (clientX, clientY) => {
+    if (!isDragging || STATE.selectedBlock?.id !== block.id) return;
+    let nx = clientX - offsetX;
+    let ny = clientY - offsetY;
+    if (gridLocked) {
+      nx = snapToGrid(nx);
+      ny = snapToGrid(ny);
+    }
+    block.x = nx;
+    block.y = ny;
+    el.style.left = block.x + 'px';
+    el.style.top = block.y + 'px';
+    drawConnections();
+  };
+
+  el.addEventListener('mousedown', e => {
+    const t = e.target;
+    if (t.closest && (t.closest('span[onclick]') || t.classList.contains('block-version'))) return;
+    startDrag(e.clientX, e.clientY);
+  });
+  window.addEventListener('mousemove', e => { moveDrag(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', () => { isDragging = false; STATE.selectedBlock = null; });
+
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: false });
+  window.addEventListener('touchmove', e => { if (isDragging) moveDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  window.addEventListener('touchend', () => { isDragging = false; STATE.selectedBlock = null; });
+
+  el.addEventListener('click', () => { STATE.selectedBlock = block; updateInspector(); });
+}
+
+function removeBlock(id) {
+  pruneGutterEntriesForBlockId(id);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  STATE.blocks = STATE.blocks.filter(b => b.id !== id);
+  STATE.connections = STATE.connections.filter(c => c.from !== id && c.to !== id);
+  drawConnections();
+  updateStats();
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText || '');
+}
+
+function drawConnections() {
+  const svg = document.getElementById('block-svg');
+  svg.innerHTML = '';
+  STATE.connections.forEach(conn => {
+    const fromEl = document.getElementById(conn.from);
+    const toEl = document.getElementById(conn.to);
+    if (!fromEl || !toEl) return;
+    const panel = document.getElementById('orchestrator-panel').getBoundingClientRect();
+    const f = fromEl.getBoundingClientRect();
+    const t = toEl.getBoundingClientRect();
+    const x1 = f.right - panel.left;
+    const y1 = f.top + f.height / 2 - panel.top;
+    const x2 = t.left - panel.left;
+    const y2 = t.top + t.height / 2 - panel.top;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`);
+    path.setAttribute('stroke', '#58a6ff');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-dasharray', '3,2');
+    svg.appendChild(path);
+  });
+}
+
+function updateStats() {
+  const info = document.getElementById('canvas-info');
+  if (info) info.textContent = `blocks: ${STATE.blocks.length} | connections: ${STATE.connections.length} | ${GRID_SIZE}px grid ${gridLocked ? 'snap' : 'free'} • versioned • grok-cli nodes`;
+}
+
+function updateInspector() {
+  const block = STATE.selectedBlock;
+  const insp = document.getElementById('insp-content');
+  if (!block) {
+    insp.innerHTML = '<div style="color:#8b949e;font-size:12px;">select a grok-cli node</div>';
+    return;
+  }
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  insp.innerHTML = `
+    <div style="color:${bt.color};font-weight:600;">${bt.cli} ${bt.prefix} ${bt.label} <span class="block-version">v${block.version}</span></div>
+    <div style="margin-top:8px;font-size:13px;">${block.title}</div>
+    <div style="margin-top:12px;color:#8b949e;font-size:12px;">${block.content || 'no content'}</div>
+    <button type="button" onclick="openNotesAtLinkedLine()" style="margin-top:12px;width:100%;">Open notes at line</button>
+    <button type="button" onclick="linkCaretLineToSelectedBlock()" style="margin-top:12px;width:100%;">Link caret line → this block</button>
+    <button type="button" onclick="removeBlock('${block.id}')" style="margin-top:12px;width:100%;">Delete Node</button>
+  `;
+}
+
+function addBlock(type) { createBlock(type); }
+
+window.cliSpawnBlockFromCodeCommand = function(type = 'event') {
+  const t = BLOCK_TYPES[type] ? type : 'event';
+  const line = currentMode === 'notes' ? getCaretLineIndex() : STATE.lastCaretLineIndex;
+  const block = createBlock(t, '', '', { linkedLineIndex: line });
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText);
+  focusBlock(block.id);
+};
+
+function clearBlocks() {
+  STATE.blocks.forEach(b => { const el = document.getElementById(b.id); if (el) el.remove(); });
+  STATE.blocks = [];
+  STATE.connections = [];
+  STATE.versionCounter = {};
+  STATE.gutterLineToBlock = {};
+  drawConnections();
+  updateStats();
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText || '');
+}
+
+function getCaretLineIndex() {
+  const ed = document.getElementById('editor');
+  if (!ed) return 0;
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return 0;
+  const range = sel.getRangeAt(0).cloneRange();
+  if (!ed.contains(range.commonAncestorContainer)) return 0;
+  range.selectNodeContents(ed);
+  range.setEnd(sel.anchorNode, sel.anchorOffset);
+  const text = range.toString();
+  return (text.match(/\n/g) || []).length;
+}
+
+function focusBlock(id) {
+  const block = STATE.blocks.find(b => b.id === id);
+  if (!block) return;
+  setMode('orchestrator');
+  STATE.selectedBlock = block;
+  document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('selected');
+  updateInspector();
+  requestAnimationFrame(() => {
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  });
+}
+
+window.openNotesAtLinkedLine = function() {
+  const block = STATE.selectedBlock;
+  if (!block || block.linkedLineIndex == null) return;
+  setMode('notes');
+  scrollNotesToLine(block.linkedLineIndex);
+};
+
+function scrollNotesToLine(lineIndex) {
+  const ed = document.getElementById('editor');
+  const wrap = document.getElementById('editor-wrap');
+  if (!ed || !wrap) return;
+  ed.focus();
+  const cs = getComputedStyle(ed);
+  const lh = parseFloat(cs.lineHeight) || 24.75;
+  const pad = parseFloat(cs.paddingTop) || 16;
+  const targetTop = pad + lineIndex * lh;
+  wrap.scrollTop = Math.max(0, targetTop - wrap.clientHeight * 0.35);
+}
+
+window.linkCaretLineToSelectedBlock = function() {
+  const block = STATE.selectedBlock;
+  if (!block) return;
+  const line = currentMode === 'notes' ? getCaretLineIndex() : STATE.lastCaretLineIndex;
+  assignBlockToCodeLine(block, line);
+  const pos = findCanvasPosForLine(line, block.id);
+  block.x = pos.x;
+  block.y = pos.y;
+  const el = document.getElementById(block.id);
+  if (el) {
+    el.style.left = block.x + 'px';
+    el.style.top = block.y + 'px';
+  }
+  drawConnections();
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText);
+};
+
+setTimeout(() => {
+  createBlock('source', 'Voynich Manuscript', 'Beinecke MS 408');
+  createBlock('event', 'Planck Epoch', 'Freya Unit start');
+  createBlock('entity', 'CERN Proton Cage', '70 proton polarity inversion');
+  createBlock('chapter', 'Versioned grid test', 'Auto-placed row-major');
+  drawTimeline();
+  drawConnections();
+  const editor = document.getElementById('editor');
+  editor.focus();
+  liveAnalyze(editor.innerText || '');
+}, 80);
+</script>
+</body>
+</html>

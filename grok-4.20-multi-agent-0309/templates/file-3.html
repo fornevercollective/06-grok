@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-grok-console="1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GROK › TEAM CONSOLE v0.8 • ISOMORPHIC ORCHESTRATION</title>
+<style>
+:root {
+  --bg: #000000;
+  --panel: #0a0a0a;
+  --border: #1a1a1a;
+  --accent: #00ff9f;
+  --accent2: #00eaff;
+  --text: #00ddaa;
+  --muted: #555555;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+body {
+  margin:0; padding:0; background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; line-height:1.4; overflow:hidden;
+}
+header {
+  background:#050505; border-bottom:1px solid #222; padding:8px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100;
+}
+header h1 { margin:0; color:var(--accent); font-size:15px; letter-spacing:2px; }
+.terminal-header { color:#00ff9f; font-size:11px; opacity:0.7; }
+
+.git-traffic {
+  background:#050505; border-bottom:2px solid #00ff9f; padding:12px 16px; overflow-x:auto; white-space:nowrap;
+}
+.git-graph { height:110px; width:100%; min-width:1200px; position:relative; }
+
+.panel {
+  background:var(--panel); border:1px solid var(--border); border-radius:6px; margin:12px; padding:14px;
+}
+h2 { color:var(--accent2); margin:0 0 10px 0; font-size:13px; letter-spacing:1px; }
+
+.steno-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:2px; background:#111; border-radius:6px; overflow:hidden;
+}
+.steno-pane { background:#0a0a0a; padding:12px; }
+.steno-ta {
+  width:100%; height:210px; background:#000; border:1px solid #222; color:#00ffcc; font-family:var(--mono); font-size:12.5px; padding:12px; resize:none;
+}
+
+.console-log {
+  background:#000; border:1px solid #222; padding:12px; height:260px; overflow-y:auto; color:#00ff9f; font-size:12px; white-space:pre-wrap;
+}
+
+.controls {
+  display:flex; gap:8px; flex-wrap:wrap; margin:8px 0;
+}
+.btn {
+  background:#111; color:var(--accent); border:1px solid var(--accent); padding:6px 14px; font-family:var(--mono); font-size:11px; cursor:pointer; border-radius:3px;
+}
+.btn:hover { background:#00ff9f; color:#000; }
+.btn-danger { border-color:#ff3366; color:#ff6699; }
+
+#git-graph svg { width:100%; height:100%; }
+
+.user-pill {
+  display:inline-flex; align-items:center; gap:6px; background:#111; padding:4px 10px; border-radius:999px; font-size:11px; margin:2px; border:1px solid #333;
+}
+.status-dot { width:7px; height:7px; background:#00ff9f; border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 50% { opacity:0.3; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GROK › TEAM CONSOLE</h1>
+  <div class="terminal-header">ISOMORPHIC ORCHESTRATION ACTIVE • MAIN CHAIN INTEGRITY: 100% • 4 AGENTS + <span id="human-count">2</span> HUMANS IN FLOW</div>
+</header>
+
+<!-- GIT GRAPH TRAFFIC CONTROL -->
+<div class="git-traffic">
+  <div style="margin-bottom:6px;font-size:11px;color:#00ff9f;display:flex;justify-content:space-between">
+    <div><strong>MAIN PRODUCTION CHAIN</strong> — Persistent Isomorphic Loop</div>
+    <div>ON/OFF RAMPS ENABLED • MULTI-USER HACKATHON / OFFICE MODE</div>
+  </div>
+  <svg id="git-graph" viewBox="0 0 1280 110"></svg>
+  
+  <div class="controls">
+    <button class="btn" onclick="joinRamp('triage')">Join Triage Ramp</button>
+    <button class="btn" onclick="joinRamp('analysis')">Join Analysis Ramp</button>
+    <button class="btn" onclick="joinRamp('synthesis')">Join Synthesis Ramp</button>
+    <button class="btn" onclick="hopOff()">Hop Off Chain</button>
+    <button class="btn btn-danger" onclick="togglePause()">PAUSE MAIN CHAIN</button>
+    <button class="btn" onclick="forceMerge()">FORCE MERGE</button>
+    <button class="btn" onclick="advanceAll()">ADVANCE ALL</button>
+    <input type="range" id="concurrency" min="1" max="12" value="4" style="width:140px" oninput="updateConcurrency(this.value)">
+    <span id="concurrency-val" style="color:#00ff9f">4 concurrent</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:320px 1fr 380px;gap:8px;padding:8px;height:calc(100vh - 148px)">
+
+  <!-- LEFT: ORCHESTRATION + PROTOCOL -->
+  <div>
+    <div class="panel">
+      <h2>ISOMORPHIC PROTOCOL</h2>
+      <div id="protocol-status" style="font-size:11px;color:#00ff9f">DEPTH: 3 • BOUNDED CONCURRENCY: 4 • PHASE: ITERATING</div>
+      <div class="controls">
+        <button class="btn" onclick="setProtocolDepth(2)">Depth 2</button>
+        <button class="btn" onclick="setProtocolDepth(3)">Depth 3</button>
+        <button class="btn" onclick="setProtocolDepth(5)">Depth 5</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>ACTIVE TASKS</h2>
+      <table id="task-table" style="width:100%;font-size:11px;border-collapse:collapse"></table>
+    </div>
+  </div>
+
+  <!-- CENTER: DUAL CHANNEL STENO + LIVE CANVASES -->
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div class="panel" style="flex:1">
+      <h2>CHANNEL A → B • REAL-TIME STENO</h2>
+      <div class="steno-grid">
+        <div class="steno-pane">
+          <div style="color:#00eaff;margin-bottom:4px">INPUT / RAW CORPUS</div>
+          <textarea id="channel-a" class="steno-ta" placeholder="Paste query, dataset, URLs..."></textarea>
+        </div>
+        <div class="steno-pane">
+          <div style="color:#00ff9f;margin-bottom:4px">TEAM SYNTHESIS • ITERATED OUTPUT</div>
+          <div id="channel-b" style="height:210px;overflow:auto;background:#000;padding:12px;font-size:12px;color:#00ffcc;white-space:pre-wrap"></div>
+        </div>
+      </div>
+      <button onclick="sendToOrchestration()" class="btn" style="margin-top:8px;width:100%">SEND TO ISOMORPHIC ORCHESTRATION</button>
+    </div>
+
+    <div class="panel" style="flex:1">
+      <h2>LIVE SKYVIEW • FLOCK + PITCH</h2>
+      <div style="display:flex;gap:8px;height:240px">
+        <canvas id="flock-canvas" width="380" height="240" style="background:#000;border:1px solid #222"></canvas>
+        <canvas id="pitch-canvas" width="260" height="240" style="background:#000;border:1px solid #222"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: TERMINAL + PRESENCE -->
+  <div>
+    <div class="panel">
+      <h2>LIVE TERMINAL FEED</h2>
+      <pre id="console-log" class="console-log">14:32:11.442 [ORCH] Isomorphic orchestration layer v0.8 online
+14:32:12.118 [OPP] Main chain integrity confirmed
+14:32:13.291 [LEO] Analysis ramp engaged — decomposing query...</pre>
+    </div>
+
+    <div class="panel">
+      <h2>PRESENCE • IN FLOW</h2>
+      <div id="presence" style="line-height:1.8"></div>
+    </div>
+
+    <div class="panel">
+      <h2>ORCHESTRATION GRAPH (ANIMATED)</h2>
+      <svg id="orch-svg" width="100%" height="180" viewBox="0 0 760 180"></svg>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== STATE ======================
+let isPaused = false;
+let concurrency = 4;
+let protocolDepth = 3;
+let tasks = [];
+const stages = ["POLL", "ANALYSIS", "CONVERT", "COLLAB", "ITERATE", "LOOP"];
+let usersInFlow = [
+  {name:"Oppie", color:"#00ff9f", role:"ORCH"},
+  {name:"Leo", color:"#00eaff", role:"ANALYSIS"},
+  {name:"Enrico", color:"#ff00cc", role:"CONVERT"},
+  {name:"Hans", color:"#ccff00", role:"SYNTH"}
+];
+
+// ====================== TERMINAL LOG ======================
+function log(msg) {
+  const el = document.getElementById("console-log");
+  const ts = new Date().toLocaleTimeString('en-US',{hour12:false,hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  el.textContent += `${ts} ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// ====================== GIT GRAPH WITH ANIMATION ======================
+function renderGitGraph() {
+  const svg = document.getElementById("git-graph");
+  svg.innerHTML = `
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#00ff9f"/>
+      </marker>
+    </defs>
+    <!-- Main Chain -->
+    <path d="M60 55 L1220 55" stroke="#00ff9f" stroke-width="6" fill="none" marker-end="url(#arrow)"/>
+    <text x="20" y="62" fill="#00ff9f" font-size="13" font-family="monospace">MAIN</text>
+    
+    <!-- Ramps -->
+    <path d="M220 55 Q280 15 360 15" stroke="#00eaff" stroke-width="3.5" fill="none" stroke-dasharray="4,3"/>
+    <text x="270" y="28" fill="#00eaff" font-size="10">TRIAGE</text>
+    
+    <path d="M520 55 Q580 15 670 15" stroke="#ff00cc" stroke-width="3.5" fill="none" stroke-dasharray="4,3"/>
+    <text x="570" y="28" fill="#ff00cc" font-size="10">ANALYSIS</text>
+    
+    <path d="M820 55 Q880 95 970 95" stroke="#ccff00" stroke-width="3.5" fill="none" stroke-dasharray="4,3"/>
+    <text x="870" y="112" fill="#ccff00" font-size="10">SYNTHESIS</text>
+    
+    <!-- Flowing dots -->
+    <circle id="flow-dot1" cx="100" cy="55" r="5" fill="#00ff9f"/>
+    <circle id="flow-dot2" cx="400" cy="15" r="5" fill="#00eaff"/>
+    <circle id="flow-dot3" cx="750" cy="55" r="5" fill="#ff00cc"/>
+  `;
+  
+  // Animate dots
+  let pos = 100;
+  setInterval(() => {
+    pos = (pos + 6) % 1180;
+    document.getElementById("flow-dot1").setAttribute("cx", pos);
+    document.getElementById("flow-dot2").setAttribute("cx", 300 + (pos % 500));
+    document.getElementById("flow-dot3").setAttribute("cx", 700 + (pos % 400));
+  }, 40);
+}
+
+// ====================== RAMP CONTROLS ======================
+window.joinRamp = function(type) {
+  const name = prompt("Enter handle:", "User" + Math.floor(Math.random()*999));
+  if (!name) return;
+  usersInFlow.push({name, color:"#ffffff", role:type.toUpperCase()});
+  renderPresence();
+  log(`[${name}] joined ${type.toUpperCase()} ramp → merged into main chain`);
+};
+
+window.hopOff = function() {
+  if (usersInFlow.length > 4) {
+    const leaver = usersInFlow.pop();
+    log(`[${leaver.name}] hopped off cleanly • main chain integrity preserved`);
+    renderPresence();
+  }
+};
+
+function renderPresence() {
+  document.getElementById("presence").innerHTML = usersInFlow.map(u => 
+    `<div class="user-pill"><span class="status-dot"></span> ${u.name} <span style="color:${u.color};font-size:10px">(${u.role})</span></div>`
+  ).join('');
+  document.getElementById("human-count").textContent = usersInFlow.length - 4;
+};
+
+// ====================== ORCHESTRATION ======================
+function createTask(prompt) {
+  const id = "T" + String(10000 + Math.floor(Math.random()*89999));
+  const task = { id, title: prompt.substring(0,42)+"…", stage: stages[0], status:"RUNNING", participants:["Oppie","Leo"] };
+  tasks.unshift(task);
+  renderTasks();
+  
+  let i = 0;
+  const int = setInterval(() => {
+    if (isPaused) return;
+    i++;
+    if (i < stages.length) {
+      task.stage = stages[i];
+      if (i === 3) task.participants.push("Enrico");
+      renderTasks();
+    } else {
+      task.status = "MERGED";
+      renderTasks();
+      clearInterval(int);
+      log(`[${id}] completed full isomorphic loop`);
+    }
+  }, 1100);
+}
+
+function renderTasks() {
+  let html = `<tr style="color:#555"><th>ID</th><th>TITLE</th><th>STAGE</th><th>PARTICIPANTS</th><th>STATUS</th></tr>`;
+  tasks.forEach(t => {
+    html += `<tr style="border-top:1px solid #222">
+      <td style="color:#00ff9f">${t.id}</td>
+      <td>${t.title}</td>
+      <td style="color:#00eaff">${t.stage}</td>
+      <td>${t.participants.join(", ")}</td>
+      <td style="color:${t.status==='MERGED'?'#00ff9f':'#ffaa00'}">${t.status}</td>
+    </tr>`;
+  });
+  document.getElementById("task-table").innerHTML = html;
+}
+
+window.sendToOrchestration = function() {
+  const input = document.getElementById("channel-a").value.trim() || "New multi-agent research synthesis";
+  document.getElementById("channel-b").textContent += `\n[${new Date().toLocaleTimeString()}] ${input}\n\n`;
+  createTask(input);
+  log("[ORCH] New task enqueued on main chain");
+};
+
+window.togglePause = function() {
+  isPaused = !isPaused;
+  log(isPaused ? "[SYSTEM] MAIN CHAIN PAUSED" : "[SYSTEM] MAIN CHAIN RESUMED");
+};
+
+window.forceMerge = function() {
+  log("[HITL] Force merge executed — all pending tasks merged into main chain");
+  tasks.forEach(t => { t.status = "MERGED"; });
+  renderTasks();
+};
+
+window.advanceAll = function() {
+  log("[ORCH] Advancing all tasks one stage");
+  tasks.forEach(t => {
+    const idx = stages.indexOf(t.stage);
+    if (idx < stages.length-1) t.stage = stages[idx+1];
+  });
+  renderTasks();
+};
+
+window.setProtocolDepth = function(d) {
+  protocolDepth = d;
+  document.getElementById("protocol-status").textContent = `DEPTH: ${d} • BOUNDED CONCURRENCY: ${concurrency} • PHASE: ITERATING`;
+  log(`[PROTOCOL] Isomorphic depth changed to ${d}`);
+};
+
+function updateConcurrency(v) {
+  concurrency = parseInt(v);
+  document.getElementById("concurrency-val").textContent = `${concurrency} concurrent`;
+}
+
+// ====================== LIVE CANVASES (SIMPLIFIED) ======================
+function initCanvases() {
+  const flock = document.getElementById("flock-canvas");
+  const ctx = flock.getContext("2d");
+  let x = 50;
+  setInterval(() => {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0,0,380,240);
+    ctx.fillStyle = "#00ff9f";
+    ctx.fillRect(x, 80, 18, 80);
+    x = (x + 3) % 360;
+    ctx.font = "10px monospace";
+    ctx.fillText("FLOCK", 20, 30);
+  }, 50);
+
+  const pitch = document.getElementById("pitch-canvas");
+  const pctx = pitch.getContext("2d");
+  let bar = 0;
+  setInterval(() => {
+    pctx.fillStyle = "#000";
+    pctx.fillRect(0,0,260,240);
+    pctx.fillStyle = "#00eaff";
+    for (let i=0; i<8; i++) {
+      const h = 30 + Math.sin(bar+i)*40;
+      pctx.fillRect(i*28+20, 240-h, 18, h);
+    }
+    bar += 0.2;
+    pctx.fillStyle = "#ff00cc";
+    pctx.fillText("PITCH", 20, 30);
+  }, 80);
+}
+
+// ====================== BOOT ======================
+renderGitGraph();
+renderPresence();
+initCanvases();
+log("[SYSTEM] Grok Team Console v0.8 initialized — darker terminal-first mode");
+log("[INFO] On/Off ramps active. Multiple users can join/leave without disrupting main production chain.");
+
+setTimeout(() => { createTask("Comparative study of isomorphic multi-agent orchestration patterns"); }, 600);
+setTimeout(() => { createTask("Real-time collaborative analysis of quantum-inspired coordination"); }, 1400);
+</script>
+</body>
+</html>

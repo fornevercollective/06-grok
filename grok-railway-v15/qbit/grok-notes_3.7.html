@@ -1,0 +1,243 @@
+<!-- Extracted from qbit/v01 (Grok codec canvas bundle). Do not edit v01 by hand for single-file fixes — edit this file. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • grok.com waypoint v3.7 codec • CSS Custom Properties Guide</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c12">
+<style>
+  :root {
+    /* ====================== CORE CSS CUSTOM PROPERTIES ====================== */
+    /* Background & Surface */
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --surface-2: #21262d;
+    --gutter: #0d1117;
+
+    /* Text */
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+
+    /* Accents & Borders */
+    --accent: #58a6ff;
+    --accent-hover: #79b8ff;
+    --accent-active: #3b8aed;
+    --border: #30363d;
+    --border-strong: #3a424f;
+
+    /* Cards (Enhanced) */
+    --card-bg: #1f252e;
+    --card-border: #3a424f;
+    --card-accent: #58a6ff;
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    --card-hover-shadow: 0 6px 20px rgba(88,166,255,0.25);
+
+    /* Special */
+    --voice: #ff7b72;
+    --freya-cyan: #22d3ee;
+    --editor-line-bg: #1a1d24;
+    --editor-line-border: var(--accent);
+
+    /* Grid */
+    --grid-size: 20px;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    min-height:100dvh;height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  }
+
+  header {
+    background:var(--surface);
+    padding:max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left));
+    border-bottom:1px solid var(--border);font-size:13px;
+  }
+  .header-main { display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%; }
+  header button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;
+  }
+  header button:hover { background:var(--surface-2);border-color:var(--accent); }
+  .logo { font-weight:500;letter-spacing:0.5px;color:var(--accent); }
+
+  /* ====================== ENHANCED CARD STYLING ====================== */
+  .editor .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    box-shadow: var(--card-shadow);
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .editor .card:hover {
+    border-left-color: var(--accent-hover);
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+  }
+  .editor h1, .editor h2, .editor h3 {
+    border-left: 5px solid var(--accent);
+    padding-left: 16px;
+    margin: 28px 0 16px 0;
+    color: var(--accent);
+  }
+  .editor h2 { border-left-color: #3fb950; }
+
+  /* Gutter & Editor */
+  .gutter {
+    flex-shrink:0;width:72px;background:var(--gutter);padding:16px 4px 16px 2px;
+    border-right:1px solid var(--border);color:var(--text-secondary);
+  }
+  .editor {
+    position:relative;z-index:1;min-height:100%;box-sizing:border-box;
+    padding:16px;outline:none;font-size:15px;line-height:1.65;
+    background:transparent;caret-color:var(--accent);color:var(--text);
+  }
+
+  /* Block Nodes (Nuke Style) */
+  .block {
+    position:absolute;min-width:168px;background:var(--surface);border:1px solid var(--border);
+    border-radius:6px;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:10;
+    font-size:12.5px;transition:box-shadow .15s;
+  }
+  .block:hover { box-shadow:0 4px 20px rgba(88,166,255,.4); }
+  .block.selected { border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.3); }
+
+  /* SVG Connections */
+  #block-svg path {
+    stroke: var(--accent);
+    stroke-width: 3;
+    fill: none;
+  }
+
+  /* Other UI */
+  .right-column-drawer { background:var(--surface); border-left:1px solid var(--border); }
+  #live-analysis-panel { background:var(--surface); border-bottom:1px solid var(--border); }
+  #cli-chat-bar { background:var(--surface); border-top:1px solid var(--border); }
+
+  /* Status & Accreditation */
+  .accreditation { font-size:11px;color:var(--text-muted);line-height:1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-main">
+    <div class="logo">qbit-notes • codec v3.7 • CSS Custom Properties Guide</div>
+    <span style="flex:1"></span>
+    <button onclick="toggleMode()">notes ↔ orchestrator</button>
+    <button onclick="toggleScale()">freya-log ↔ history</button>
+    <button onclick="loadPreset('nuke-keying')">Nuke Keying Template</button>
+    <button onclick="autoRouteAll()">Auto-Route All</button>
+    <button onclick="toggleGridLock()">grid lock</button>
+  </div>
+</header>
+
+<div style="flex:1;display:flex;overflow:hidden;">
+  <div id="notes-panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="gutter" id="gutter"></div>
+    <div contenteditable="true" class="editor" id="editor" spellcheck="false">
+# v3.7 — CSS Custom Properties Guide
+
+This file demonstrates how all colors, spacing, and visual elements are controlled through CSS custom properties (`--var`).
+
+## Core Theme Variables
+```css
+:root {
+  --bg: #0a0c12;           /* Main background */
+  --surface: #161b22;       /* Panels, headers */
+  --surface-2: #21262d;     /* Cards, buttons */
+  --accent: #58a6ff;        /* Primary highlight */
+  --border: #30363d;        /* Subtle dividers */
+  --text: #e6edf3;          /* Primary text */
+  --text-secondary: #8b949e;/* Secondary text */
+}
+Enhanced Card Styling (Live Example)
+
+  Card Title
+
+  This card uses:
+
+  • --card-bg
+
+  • --card-border
+
+  • --card-accent (left bar)
+
+  • --card-shadow + hover lift
+
+Section 2 — Core Key
+IBK Stacked or Keylight → Despill.
+Section 3 — Edge & Detail
+Edge extend / despill mix → Hair restore.
+Why Use CSS Custom Properties?
+
+Single source of truth for theming
+Easy dark/light mode switching
+Live updates via JS (try the buttons below)
+Consistent across editor, nodes, cards, and UI
+  <canvas id="block-canvas" width="1400" height="800"></canvas>
+  
+
+
+
+
+  <button onclick="changeThemeColor(&#x27;--accent&#x27;, &#x27;#ff7b72&#x27;)">Accent → Red</button>
+  <button onclick="changeThemeColor(&#x27;--accent&#x27;, &#x27;#58a6ff&#x27;)">Accent → Blue</button>
+  <button onclick="changeThemeColor(&#x27;--card-bg&#x27;, &#x27;#2d333b&#x27;)">Card Darker</button>
+  <button onclick="changeThemeColor(&#x27;--card-bg&#x27;, &#x27;#1f252e&#x27;)">Card Default</button>
+  <button onclick="document.documentElement.style.setProperty(&#x27;--card-accent&#x27;, &#x27;#3fb950&#x27;)">Card Accent Green</button>
+  <button onclick="resetTheme()">Reset Theme</button>
+
+<script>
+// ====================== QBITOS codec v3.7 • CSS Custom Properties Guide ======================
+let currentMode = 'notes';
+
+function toggleMode() {
+currentMode = currentMode === 'notes' ? 'orchestrator' : 'notes';
+document.getElementById('notes-panel').style.display = currentMode === 'notes' ? 'flex' : 'none';
+document.getElementById('orchestrator-panel').style.display = currentMode === 'orchestrator' ? 'flex' : 'none';
+}
+
+function toggleScale() {
+alert('Freya log / history scale toggle ready (CSS var --tl-scale can be added)');
+}
+
+function loadPreset(name) {
+alert(`Preset ${name} would load Nuke nodes here. Grid + card styling preserved.`);
+}
+
+function autoRouteAll() {
+alert('Auto-routing active via CSS var --accent for connection color');
+}
+
+function toggleGridLock() {
+alert('20px grid lock controlled via --grid-size custom property');
+}
+
+function changeThemeColor(varName, newValue) {
+document.documentElement.style.setProperty(varName, newValue);
+const ed = document.getElementById('editor');
+ed.focus();
+}
+
+function resetTheme() {
+document.documentElement.style.cssText = '';
+alert('All CSS custom properties reset to defaults');
+}
+
+// Live card demo already in editor content
+setTimeout(() => {
+const editor = document.getElementById('editor');
+editor.focus();
+}, 100);
+</script>
+</body>
+</html>

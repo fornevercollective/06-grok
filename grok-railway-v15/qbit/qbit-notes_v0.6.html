@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • grok.com waypoint v1.4 codec</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --accent-muted: #1f6feb;
+    --border: #30363d;
+    --gutter: #0d1117;
+    --voice: #ff7b72;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+  body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; height: 100vh; display: flex;
+    flex-direction: column; overflow: hidden;
+  }
+  header {
+    background: var(--surface); padding: 12px 20px; display: flex; align-items: center;
+    gap: 16px; border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap;
+  }
+  .logo {
+    font-weight: 500; letter-spacing: 0.5px; color: var(--accent);
+  }
+  .gutter {
+    width: 54px; background: var(--gutter); padding: 10px 6px;
+    text-align: center; font-size: 13px; line-height: 1.6; overflow-y: auto;
+    border-right: 1px solid var(--border); user-select: none; color: var(--text-secondary);
+  }
+  .editor {
+    flex: 1; padding: 24px; outline: none; font-size: 15.5px; line-height: 1.7;
+    white-space: pre-wrap; overflow: auto; background: var(--bg);
+    caret-color: var(--accent); color: var(--text);
+  }
+  .sidebar {
+    width: 290px; background: var(--surface); border-left: 1px solid var(--border);
+    padding: 16px; display: flex; flex-direction: column; gap: 16px;
+    font-size: 13px; overflow: auto;
+  }
+  button {
+    background: var(--surface); color: var(--accent); border: 1px solid var(--border);
+    padding: 8px 16px; border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+  }
+  button:hover {
+    background: #21262d; border-color: var(--accent);
+  }
+  button.voice {
+    color: var(--voice); border-color: var(--voice);
+  }
+  button.voice:hover {
+    background: #2d1f24; border-color: #ff7b72;
+  }
+  .status {
+    font-size: 12px; opacity: 0.85; padding: 6px 12px;
+    background: #21262d; border-radius: 6px; border: 1px solid var(--border);
+  }
+  .cube {
+    width: 100%; height: 148px; background: var(--surface);
+    border: 1px solid var(--accent); border-radius: 8px;
+    position: relative; overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+  }
+  .cube::after {
+    content: '◼︎'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotate(45deg); font-size: 72px;
+    color: var(--accent); opacity: 0.15;
+  }
+  .voice-wave {
+    height: 68px; background: var(--surface); border: 1px solid var(--voice);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--voice); font-weight: 500;
+  }
+  .panel-title {
+    font-weight: 500; color: var(--text); margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">qbit-notes • grok.com</div>
+  <span style="flex:1"></span>
+  <button onclick="toggleSteno()">stenoSTRIP</button>
+  <button onclick="runStenoReplace()">stenoReplace</button>
+  <button onclick="exportQbit()">export .qbit</button>
+  <button onclick="tumbleEncryptShare()">tumble share</button>
+  <button onclick="kbatchSuggest()">kbatch</button>
+  <button class="voice" onclick="startVoiceNotes()">jawta-voice • x.ai</button>
+</header>
+
+<div style="display:flex;flex:1;overflow:hidden">
+  <!-- Quantum Gutter -->
+  <div class="gutter" id="gutter"></div>
+ 
+  <!-- Main editor -->
+  <div contenteditable="true" class="editor" id="editor" spellcheck="false"
+       oninput="liveAnalyze(this.innerText)">
+// ================================================
+// QBIT-NOTES.LAUNCH IN GROK STUDIO v1.4 codec
+// MODE: codec | ITER: grok-studio-deploy | SESSION: 2026-04-18
+// TARGET: grok.com styling + quantum-prefixes.js integration
+// ASSET: Clean grok.com-themed waypoint with live Quantum Gutter
+// STATUS: codec • grok.com dark surface • quantum-prefixes active
+// ================================================
+
+This waypoint now matches grok.com visual language:
+• Dark #0a0c12 background
+• #161b22 surface panels
+• #58a6ff accent (Grok blue)
+• IBM Plex Mono + clean monospace feel
+• Subtle borders and hover states
+
+quantum-prefixes.js is hotwired in the classifier (★ Q, ⚛ P, etc.).
+Paste any code — live gutter shows quantum symbols + gates.
+  </div>
+ 
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="panel-title">Live Analysis</div>
+    <div id="analysis" style="background:var(--surface);padding:12px;border:1px solid var(--border);min-height:148px;font-size:13px;line-height:1.6"></div>
+   
+    <div class="panel-title">Cube Preview</div>
+    <div id="cube" class="cube"></div>
+
+    <div class="panel-title">jawta-voice • x.ai realtime</div>
+    <div id="voice-wave" class="voice-wave">click button above to start voice notes</div>
+   
+    <div id="kbatch-panel" style="flex:1;background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px;overflow:auto"></div>
+   
+    <div class="status" id="status">ready • grok.com codec mode • quantum-prefixes.js injected</div>
+  </div>
+</div>
+
+<script>
+// ====================== QBITOS HOTWIRED CORE v1.4 grok.com + quantum-prefixes ======================
+let stenoActive = false;
+let currentContent = '';
+let voiceActive = false;
+let mediaRecorder = null;
+
+// quantum-prefixes.js style classifier (hotwired)
+function classifyLine(line) {
+  if (!line || !line.trim()) return {sym:'0', gate:'I', color:'#8b949e'};
+  const l = line.toLowerCase().trim();
+  if (l.startsWith('import') || l.startsWith('from') || l.includes('script')) return {sym:'-n', gate:'M', color:'#58a6ff'};
+  if (l.includes('function') || l.includes('def ') || l.includes('=>') || l.includes('window.')) return {sym:'+1', gate:'H', color:'#58a6ff'};
+  if (l.includes('if ') || l.includes('for ') || l.includes('while') || l.includes('addEventListener')) return {sym:'1', gate:'CNOT', color:'#58a6ff'};
+  if (l.includes('canvas') || l.includes('context') || l.includes('draw') || l.includes('grok')) return {sym:'★', gate:'Q', color:'#ff7b72'};
+  if (l.includes('steno') || l.includes('quantum') || l.includes('dac') || l.includes('prefix')) return {sym:'⚛', gate:'P', color:'#58a6ff'};
+  return {sym:'0', gate:'I', color:'#8b949e'};
+}
+
+window.liveAnalyze = function(text) {
+  currentContent = text;
+  const lines = text.split('\n');
+  let gutter = '';
+  let summary = `<b>${lines.length} lines • Quantum Gutter</b><br>`;
+
+  lines.forEach((line, i) => {
+    const c = classifyLine(line);
+    gutter += `<div style="color:${c.color}">${c.sym} ${c.gate}</div>`;
+    if (i < 14) summary += `<span style="color:${c.color}">${c.sym}</span> ${line.substring(0,48)}${line.length>48?'…':''}<br>`;
+  });
+
+  document.getElementById('gutter').innerHTML = gutter;
+  document.getElementById('analysis').innerHTML = summary;
+
+  const cube = document.getElementById('cube');
+  const rotX = (lines.length * 2.4) % 360;
+  const rotY = (text.length * 1.9) % 360;
+  cube.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+};
+
+window.toggleSteno = function() {
+  stenoActive = !stenoActive;
+  const status = document.getElementById('status');
+  status.textContent = stenoActive
+    ? 'stenoSTRIP active • grok.com codec'
+    : 'ready • grok.com codec mode';
+  liveAnalyze(currentContent);
+};
+
+window.runStenoReplace = function() {
+  const status = document.getElementById('status');
+  status.textContent = 'stenoReplace running → Tensor upgrade...';
+  setTimeout(() => {
+    status.textContent = 'stenoReplace complete • quantum-prefixes locked';
+    liveAnalyze(currentContent + '\n// ↑ stenoReplace upgraded on grok.com surface');
+  }, 420);
+};
+
+window.exportQbit = function() {
+  const blob = new Blob([currentContent], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'note.qbit';
+  a.click();
+  document.getElementById('status').textContent = '.qbit exported • grok.com style';
+};
+
+window.tumbleEncryptShare = function() {
+  const status = document.getElementById('status');
+  status.textContent = 'tumbling AES-GCM...';
+  const key = crypto.getRandomValues(new Uint8Array(32));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder().encode(currentContent);
+  crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt'])
+    .then(k => crypto.subtle.encrypt({name:'AES-GCM', iv}, k, enc))
+    .then(encrypted => {
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+      const iv64 = btoa(String.fromCharCode(...iv));
+      const link = `https://fornevercollective.github.io/qbit-notes.html#data=${b64}&iv=${iv64}`;
+      navigator.clipboard.writeText(link);
+      status.textContent = 'encrypted share copied • grok.com secure';
+    })
+    .catch(() => status.textContent = 'crypto fallback');
+};
+
+window.kbatchSuggest = function() {
+  const panel = document.getElementById('kbatch-panel');
+  const caps = ['quantum-prefixes.js', 'grok.com-surface', 'stenoSTRIP', 'jawta-voice', 'dac-tracks', 'canvas-viz', 'tumble-encrypt'];
+  panel.innerHTML = '<b>kbatch capsules • grok.com:</b><br>' +
+    caps.map(c => `<div style="padding:8px 12px;background:#21262d;margin:4px 0;border:1px solid var(--border);border-radius:6px">${c}</div>`).join('');
+  document.getElementById('status').textContent = 'kbatch hotwired • grok.com style';
+};
+
+// jawta-voice demo
+window.startVoiceNotes = async function() {
+  const wave = document.getElementById('voice-wave');
+  const status = document.getElementById('status');
+  
+  if (voiceActive) {
+    if (mediaRecorder) mediaRecorder.stop();
+    voiceActive = false;
+    wave.textContent = 'voice stopped';
+    status.textContent = 'jawta-voice stopped';
+    return;
+  }
+
+  voiceActive = true;
+  wave.textContent = '🎤 listening • speak now';
+  status.textContent = 'jawta-voice active • x.ai realtime';
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    let audioChunks = [];
+
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const fakeTranscript = `// voice note @ ${new Date().toLocaleTimeString()} • grok.com\n// quantum-prefixes.js active. grok.com dark surface applied. stenoSTRIP ready.`;
+      const editor = document.getElementById('editor');
+      editor.innerHTML += `<br>${fakeTranscript}`;
+      liveAnalyze(editor.innerText);
+      wave.textContent = '✓ transcribed • inserted';
+      status.textContent = 'voice transcribed • grok.com codec';
+      audioChunks = [];
+      voiceActive = false;
+    };
+
+    mediaRecorder.start();
+    setTimeout(() => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+    }, 7500);
+
+  } catch (err) {
+    wave.textContent = 'mic access denied';
+    status.textContent = 'voice failed';
+    voiceActive = false;
+  }
+};
+
+// Boot
+setTimeout(() => {
+  const editor = document.getElementById('editor');
+  editor.focus();
+  liveAnalyze(editor.innerText);
+}, 100);
+</script>
+</body>
+</html>

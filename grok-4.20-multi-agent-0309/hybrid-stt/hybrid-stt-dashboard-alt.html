@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<title>Grok Railway v15 • Hybrid STT Dashboard</title>
+<style>
+:root{--bg:#000;--panel:#0a0a0a;--accent:#00ff9f;--accent2:#00eaff;--text:#00ddaa;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:ui-monospace,monospace;font-size:13px;overflow:hidden;height:100vh;}
+header{background:#050505;border-bottom:3px solid var(--accent);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;}
+.panel{background:var(--panel);border:1px solid #222;border-radius:6px;padding:12px;margin:8px;}
+.terminal{flex:1;background:#000;border:1px solid #222;padding:12px;overflow:auto;white-space:pre-wrap;font-size:12.5px;line-height:1.45;}
+.btn{background:#111;color:var(--accent);border:1px solid var(--accent);padding:8px 16px;cursor:pointer;border-radius:6px;}
+.btn:hover{background:var(--accent);color:#000;}
+.mic-btn.recording{background:#00ff9f;color:#000;animation:pulse 1.2s infinite;}
+@keyframes pulse{50%{opacity:0.4;}}
+.status{display:flex;gap:12px;font-size:12px;align-items:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Grok Railway v15 • Hybrid STT</h1>
+  <div class="status">
+    <span id="ws-status">WS: disconnected</span>
+    <button onclick="toggleVoice()" id="mic-btn" class="btn mic-btn">🎤 Hybrid Voice (Browser → Whisper fallback)</button>
+  </div>
+</header>
+
+<div style="display:grid;grid-template-columns:280px 1fr 340px;gap:8px;height:calc(100vh-68px);padding:8px">
+  <!-- Left: Controls -->
+  <div>
+    <div class="panel">
+      <h2>Server</h2>
+      <input id="server-url" value="ws://localhost:8080/ws" style="width:100%;background:#111;color:#0f0;border:1px solid #333;padding:6px;font-family:monospace;">
+      <button onclick="connectWebSocket()" class="btn" style="width:100%;margin-top:8px">Connect to Rust Server</button>
+    </div>
+
+    <div class="panel">
+      <h2>Staging Area</h2>
+      <div id="staging-area" style="min-height:160px;background:#111;padding:10px;font-size:12px;overflow:auto">— Highlight any text on page to stage —</div>
+      <button onclick="clearStaging()" class="btn" style="width:100%;margin-top:8px">Clear Staging</button>
+    </div>
+  </div>
+
+  <!-- Center: Terminal -->
+  <div class="panel" style="display:flex;flex-direction:column">
+    <h2>IronRaw Terminal • Live</h2>
+    <pre id="terminal-output" class="terminal">Waiting for connection...\nSpeak or type commands.\nHybrid STT active.</pre>
+  </div>
+
+  <!-- Right: Status -->
+  <div>
+    <div class="panel">
+      <h2>Status</h2>
+      <div id="status-panel" style="font-size:12px;line-height:1.6"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Last Voice Intent</h2>
+      <div id="last-intent" style="background:#111;padding:12px;font-size:14px;color:#ff00cc;min-height:60px">—</div>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Commands</h2>
+      <button onclick="exportRailway('steno')" class="btn" style="width:100%;margin-bottom:6px">Export .steno</button>
+      <button onclick="forceMerge()" class="btn" style="width:100%">Force Merge</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== STATE ======================
+let ws = null;
+let lastIntent = "—";
+let isBrowserSTT = true;
+let mediaRecorder = null;
+let audioChunks = [];
+let confidenceThreshold = 0.75;
+
+// ====================== LOG ======================
+function log(msg) {
+  const el = document.getElementById("terminal-output");
+  const ts = new Date().toLocaleTimeString('en-US',{hour12:false});
+  el.textContent += `${ts} ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// ====================== WEBSOCKET ======================
+function connectWebSocket() {
+  const url = document.getElementById("server-url").value;
+  ws = new WebSocket(url);
+
+  ws.onopen = () => {
+    document.getElementById("ws-status").innerHTML = `<span style="color:#00ff9f">● LIVE (Hybrid STT)</span>`;
+    log("Connected to Rust server — Hybrid STT ready");
+    ws.send(JSON.stringify({type:"join", role:"dashboard"}));
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "stt_result") {
+        log(`[Server Whisper] ${msg.text} (confidence: ${msg.confidence})`);
+        document.getElementById("last-intent").textContent = msg.text;
+      } else if (msg.type === "log") {
+        log(msg.text);
+      }
+    } catch(err) {}
+  };
+
+  ws.onclose = () => {
+    document.getElementById("ws-status").innerHTML = `<span style="color:#f66">● OFF</span>`;
+  };
+}
+
+// ====================== HYBRID SPEECH-TO-TEXT ======================
+window.toggleVoice = function() {
+  if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+    log("[ERROR] Browser SpeechRecognition not supported. Using server fallback only.");
+    startServerSideRecording();
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SpeechRecognition();
+  rec.continuous = false;
+  rec.interimResults = false;
+  rec.lang = "en-US";
+
+  rec.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const confidence = event.results[0][0].confidence || 0.8;
+
+    log(`[Browser STT] "${transcript}" (confidence: ${(confidence*100).toFixed(0)}%)`);
+
+    if (confidence >= confidenceThreshold) {
+      document.getElementById("last-intent").textContent = transcript;
+      if (ws) ws.send(JSON.stringify({type:"voice_command", text:transcript}));
+    } else {
+      log("[LOW CONFIDENCE] Falling back to server-side Whisper...");
+      startServerSideRecording();
+    }
+  };
+
+  rec.onerror = (e) => {
+    log(`[Browser STT Error] ${e.error} — falling back to Whisper`);
+    startServerSideRecording();
+  };
+
+  rec.start();
+  document.getElementById("mic-btn").classList.add("recording");
+  log("🎤 Listening with Browser STT (fallback to Whisper if confidence low)");
+};
+
+// Record raw audio for server-side Whisper fallback
+function startServerSideRecording() {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      sendAudioToServer(audioBlob);
+    };
+
+    mediaRecorder.start();
+    setTimeout(() => { 
+      if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop(); 
+    }, 4500); // Record for ~4.5 seconds
+  }).catch(err => log("[MIC ERROR] " + err));
+}
+
+function sendAudioToServer(blob) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    log("[ERROR] WebSocket not connected. Cannot send audio to Whisper.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const arrayBuffer = reader.result;
+    ws.send(arrayBuffer); // Send raw audio bytes
+    log("[AUDIO] Sent to server for Whisper processing...");
+  };
+  reader.readAsArrayBuffer(blob);
+}
+
+// ====================== UTILITIES ======================
+window.clearStaging = function() {
+  log("[STAGING] Cleared");
+};
+
+window.exportRailway = function(fmt) {
+  if (ws) ws.send(JSON.stringify({type:"export", format:fmt}));
+  log(`[EXPORT] Requested ${fmt}`);
+};
+
+window.forceMerge = function() {
+  if (ws) ws.send(JSON.stringify({type:"forceMerge"}));
+  log("[HITL] Force merge sent");
+};
+
+// Boot
+log("Grok Railway v15 • Hybrid STT Dashboard Loaded");
+log("Primary: Browser SpeechRecognition | Fallback: Server-side Whisper");
+connectWebSocket();
+</script>
+</body>
+</html>

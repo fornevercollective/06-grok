@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- Point at your uvspeed `web/` folder (trailing slash) so +Live ugrad / Games iframes load ugrad-r0.html etc.:
+     <html lang="en" data-uvspeed-web="http://127.0.0.1:5500/">  or  file:///…/uvspeed/web/  -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grok Notes — dev (Vite)</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- Do not load notes-surface.js here: it targets body.notes-surface-page + fights React (clicks, state). Use /notes.html for the full script. -->
+  </body>
+</html>

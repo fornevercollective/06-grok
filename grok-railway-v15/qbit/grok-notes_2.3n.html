@@ -1,0 +1,3084 @@
+<!DOCTYPE html>
+<!-- qbit-notes v2.3n — best-of: 2.3 shell + 3.x wires + v3.6–v3.9 notes CSS + v4.4 gutter + v4.5 git + v4.6–v4.9 RAG staging + IBM Think RAG graph + framework comparison notes. Line↔node linking: owner-first + optional b-N. grok-notes_2.3.html = stable Cursor↔Grok jump-off. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • codec v2.3n + v4.4–v4.9 • IBM RAG + framework comparisons + unified grid</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5, user-scalable=yes">
+<meta name="theme-color" content="#0a0c12">
+<style>
+  :root {
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --surface-2: #21262d;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent: #58a6ff;
+    --accent-hover: #79b8ff;
+    --accent-active: #3b8aed;
+    --border: #30363d;
+    --border-strong: #3a424f;
+    --gutter: #0d1117;
+    --voice: #ff7b72;
+    --freya-cyan: #22d3ee;
+    --editor-line-bg: #1a1d24;
+    --editor-line-border: var(--accent);
+    --card-bg: #1f252e;
+    --card-border: #3a424f;
+    --card-accent: #58a6ff;
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    --card-hover-shadow: 0 6px 20px rgba(88,166,255,0.25);
+    --grid-size: 20px;
+    --grid-gap: 20px;
+    --gutter-rail: #0d1117;
+    --gutter-edge: rgba(88, 166, 255, 0.14);
+    --gutter-row-zebra: rgba(255, 255, 255, 0.028);
+    --gutter-row-hover: rgba(88, 166, 255, 0.09);
+    --gutter-row-linked: rgba(34, 211, 238, 0.14);
+    --gutter-row-caret: rgba(88, 166, 255, 0.18);
+    --gutter-detail-bg: rgba(22, 27, 34, 0.95);
+    --git-green: #3fb950;
+    --git-purple: #d2a8ff;
+    /* Notebook gutter: section-title rail (never covered by throughline) + code/orchestration rail */
+    --gutter-sec-rail: 38px;
+    --gutter-buffer-lines: 2;
+    --gutter-line-lh: 24.75px;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;
+    min-height:100dvh;height:100vh;display:flex;flex-direction:column;overflow:hidden;
+    overflow-x:hidden;
+  }
+  header {
+    background:var(--surface);
+    padding:max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left));
+    display:flex;flex-direction:column;align-items:stretch;gap:8px;
+    border-bottom:1px solid var(--border);font-size:13px;
+  }
+  .header-main { display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%; }
+  header button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;
+  }
+  header button:hover { background:var(--surface-2);border-color:var(--accent); }
+  header button.voice { color:var(--voice);border-color:var(--voice); }
+  header button.voice:hover { background:#21262d;border-color:var(--voice); }
+  .logo { font-weight:500;letter-spacing:0.5px;color:var(--accent); }
+  .header-nav {
+    display:flex;flex-direction:column;gap:0;width:100%;
+  }
+  .header-nav-head {
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:2px 0 8px 0;border-bottom:1px solid rgba(230,237,243,0.12);
+  }
+  .header-nav-head-trigger {
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    flex:1;min-width:0;
+    cursor:pointer;user-select:none;font-size:12px;font-weight:600;color:var(--freya-cyan);
+  }
+  .header-nav-head-trigger:hover { color:var(--accent-hover); }
+  .header-nav-title { display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0; }
+  .header-nav-meta { font-weight:500;color:var(--text-secondary);font-size:11px; }
+  .header-nav-chev { font-size:12px;opacity:0.95;flex-shrink:0; }
+  #tl-collapse-btn {
+    flex-shrink:0;margin:0;padding:4px 10px;min-height:32px;
+    font-size:11px;font-family:inherit;font-weight:500;
+    color:#22d3ee;background:var(--surface-2);
+    border:1px solid rgba(34,211,238,0.4);border-radius:6px;
+    cursor:pointer;white-space:nowrap;touch-action:manipulation;
+  }
+  #tl-collapse-btn:hover { background:#21262d;border-color:#22d3ee; }
+  .header-nav--collapsed .header-nav-body { display:none; }
+  .header-nav:not(.header-nav--collapsed) .header-nav-head { margin-bottom:4px; }
+  /* Quantum gutter — rail gradient, zebra rows, linked + caret sync (matches v3.x polish) */
+  #gutter.gutter {
+    flex-shrink:0;width:92px;position:relative;z-index:8;box-sizing:border-box;
+    padding:12px 5px 16px 4px;text-align:left;font-size:15px;line-height:1.65;user-select:none;
+    color:var(--text-secondary);
+    background:linear-gradient(165deg, #0f1620 0%, var(--gutter-rail) 22%, #070a0e 100%);
+    border-right:1px solid var(--border-strong);
+    box-shadow:inset -1px 0 0 var(--gutter-edge), 4px 0 24px rgba(0,0,0,0.35);
+    align-self:stretch;display:flex;flex-direction:column;min-height:min-content;
+  }
+  /* Out of flow so the first gutter row can align to editor line 0 (JS syncs padding-top) */
+  #gutter.gutter::before {
+    content:'⌁ NK';
+    position:absolute;left:4px;right:4px;top:6px;
+    display:block;text-align:center;font-size:9px;font-weight:600;letter-spacing:0.12em;
+    color:var(--freya-cyan);opacity:0.85;padding-bottom:6px;margin:0;
+    border-bottom:1px solid var(--border);text-shadow:0 0 12px rgba(34,211,238,0.35);
+    pointer-events:none;z-index:1;
+  }
+  /* 4px rail matches v3.6 Nuke gutter screenshot (per-line codec color) */
+  .gutter-row {
+    border-left:4px solid var(--border);
+    margin:0 0 3px 0;padding:2px 3px 2px 4px;border-radius:2px;
+    background:transparent;cursor:pointer;
+    transition:background .15s ease, box-shadow .15s ease, border-left-color .15s ease;
+  }
+  .gutter-row:nth-child(even) { background:var(--gutter-row-zebra); }
+  .gutter-row:hover { background:var(--gutter-row-hover); }
+  .gutter-row.expanded {
+    background:rgba(88,166,255,0.07);
+    box-shadow:0 1px 0 rgba(88,166,255,0.12);
+  }
+  .gutter-row.gutter-row--linked {
+    background:var(--gutter-row-linked);
+    box-shadow:inset 0 0 0 1px rgba(34,211,238,0.22);
+  }
+  .gutter-row.gutter-row--caret {
+    background:var(--gutter-row-caret);
+    box-shadow:inset 3px 0 0 var(--accent), 0 0 0 1px rgba(88,166,255,0.25);
+  }
+  .gutter-row.gutter-row--caret.gutter-row--linked {
+    background:linear-gradient(90deg, var(--gutter-row-caret), var(--gutter-row-linked));
+  }
+  /* First line inside an open section (maps to ## in editor) */
+  .gutter-line-stack .gutter-row:first-child .gutter-row-main {
+    font-weight:600;
+    border-bottom:1px solid rgba(230,237,243,0.08);
+    padding-bottom:1px;margin-bottom:1px;
+  }
+  /* Gutter = notebook cells: sticky section-title rail + code rail (isomorphic line / orchestration) */
+  #gutter > .analysis-section:first-child {
+    border-top:none;margin-top:0;padding-top:0;
+  }
+  #gutter .analysis-section.gutter-nb-cell {
+    margin-top:10px;padding-top:4px;
+    border-top:1px solid rgba(230,237,243,0.18);
+  }
+  #gutter .gutter-nb-split {
+    display:flex;flex-direction:row;align-items:flex-start;gap:3px;
+  }
+  #gutter .gutter-sec-rail {
+    width:var(--gutter-sec-rail);flex-shrink:0;position:relative;z-index:15;
+    align-self:stretch;
+    background:rgba(10,14,20,0.92);
+    border-radius:2px;border:1px solid rgba(230,237,243,0.12);
+    box-sizing:border-box;
+  }
+  #gutter .gutter-code-rail {
+    flex:1;min-width:0;
+    border-left:2px solid rgba(88,166,255,0.35);
+    border-radius:0 2px 2px 0;
+    padding-left:2px;
+    background:rgba(7,10,14,0.35);
+  }
+  #gutter .gutter-line-buffer {
+    min-height:calc(var(--gutter-line-lh) * var(--gutter-buffer-lines));
+    pointer-events:none;
+    opacity:0.35;
+    background:repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--gutter-line-lh) - 1px),
+      rgba(139,148,158,0.12) calc(var(--gutter-line-lh) - 1px),
+      rgba(139,148,158,0.12) var(--gutter-line-lh)
+    );
+  }
+  #gutter .gutter-line-buffer--pre { margin-bottom:2px;border-radius:2px 2px 0 0; }
+  #gutter .gutter-line-buffer--post { margin-top:2px;border-radius:0 0 2px 2px; }
+  #gutter .gutter-sec-rail .analysis-section-head {
+    flex-direction:column;align-items:stretch;justify-content:flex-start;
+    font-size:9px;font-weight:600;
+    padding:5px 3px 6px 3px;margin:0;
+    gap:4px;line-height:1.25;
+    border-bottom:none;
+    cursor:pointer;user-select:none;color:var(--freya-cyan);
+  }
+  #gutter .gutter-sec-rail .analysis-section-head:hover { color:var(--accent-hover); }
+  #gutter .gutter-sec-title {
+    overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;line-clamp:5;-webkit-box-orient:vertical;
+    word-break:break-word;hyphens:auto;
+    min-height:0;opacity:0.95;
+  }
+  #gutter .gutter-sec-rail .analysis-section-chev {
+    font-size:10px;opacity:0.95;align-self:flex-end;
+  }
+  #gutter .analysis-section-body {
+    font-size:12px;line-height:1.45;color:var(--text-secondary);
+    padding-top:0;
+  }
+  #gutter .analysis-section--collapsed .gutter-code-rail {
+    display:none;
+  }
+  #gutter .analysis-section--collapsed .gutter-row-detail {
+    display:none !important;
+  }
+  /* Match .editor line box: 15px × 1.65 = 24.75px — isomorphic with canvas row (GRID_SIZE) */
+  .gutter-row-main {
+    display:flex;align-items:center;gap:3px;flex-wrap:wrap;font-size:15px;line-height:1.65;
+    min-height:24.75px;box-sizing:border-box;
+  }
+  .gutter-sym {
+    font-size:13px;min-width:1em;line-height:1.65;
+    text-shadow:0 1px 2px rgba(0,0,0,0.5);
+  }
+  .gutter-gate { font-weight:700;font-size:13px;line-height:1.65;letter-spacing:0.02em; }
+  .gutter-row-detail {
+    display:none;margin-top:4px;padding:8px 6px 10px 8px;font-size:10px;line-height:1.45;color:var(--text-secondary);
+    text-align:left;word-break:break-word;
+    background:var(--gutter-detail-bg);
+    border:1px solid var(--border);
+    border-radius:3px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.45);
+  }
+  .gutter-row.expanded .gutter-row-detail { display:block; }
+  .gutter-color-dot { display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:4px;border:1px solid var(--border-strong); }
+  .gutter-block-link {
+    display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:22px;margin-top:1px;
+    padding:0 5px;border-radius:5px;border:1px solid var(--accent);
+    background:linear-gradient(180deg, var(--surface-2), #161b22);
+    color:var(--accent-hover);cursor:pointer;font-size:10px;font-weight:700;text-decoration:none;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  .gutter-block-link:hover {
+    border-color:var(--accent-hover);background:var(--surface-2);color:#c8e1ff;
+    box-shadow:0 0 0 1px rgba(88,166,255,0.35);
+  }
+  #canvas-bottom-bar {
+    position:absolute;bottom:max(8px, env(safe-area-inset-bottom));left:12px;right:12px;display:flex;
+    align-items:center;justify-content:space-between;gap:10px;z-index:40;pointer-events:none;
+  }
+  #canvas-info { pointer-events:none; flex:1; min-width:0; }
+  #cli-spawn-block-btn { pointer-events:auto; flex-shrink:0; }
+  .block-line-pill {
+    font-size:9px;background:#21262d;color:#22d3ee;padding:1px 6px;border-radius:999px;border:1px solid #30363d;margin-left:4px;vertical-align:middle;
+  }
+  /* Notes editor: scroll on wrap; ticker + gutter + editor share one scroll */
+  .editor-wrap {
+    flex:1;min-height:0;position:relative;overflow:auto;background:var(--bg);
+    display:flex;flex-direction:row;align-items:stretch;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* Camera-style scroll index (sticky viewport rail + needle = scroll position) */
+  .gutter-scroll-ticker {
+    flex-shrink:0;width:14px;position:sticky;top:0;align-self:stretch;
+    z-index:8;background:#07090d;border-right:1px solid var(--border);
+    box-sizing:border-box;cursor:ns-resize;user-select:none;
+  }
+  .gutter-scroll-ticker-inner {
+    position:relative;width:100%;min-height:48px;
+  }
+  .gutter-scroll-ticker-rail {
+    position:absolute;inset:0;
+    background:
+      repeating-linear-gradient(to bottom, transparent 0, transparent 22px, rgba(139,148,158,0.12) 22px, rgba(139,148,158,0.12) 23px),
+      repeating-linear-gradient(to bottom, transparent 0, transparent 114px, rgba(88,166,255,0.2) 114px, rgba(88,166,255,0.2) 116px);
+  }
+  .gutter-scroll-ticker-needle {
+    position:absolute;left:0;right:0;height:3px;margin-top:-1px;
+    background:#e6edf3;box-shadow:0 0 8px rgba(230,237,243,0.45);border-radius:1px;
+    pointer-events:none;z-index:2;top:0;transition:top 0.06s linear;
+  }
+  .editor-inner { flex:1;min-width:0;position:relative;min-height:100%;box-sizing:border-box;z-index:2;align-self:stretch;display:flex;flex-direction:column; }
+  /* Full-bleed section dividers + editor-side frame (aligned to ## sections) — above editor text, pointer-events:none */
+  .section-chrome-layer {
+    position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:5;
+    overflow:visible;
+  }
+  /* Full-bleed rules above ticker + gutter + editor (last paint in wrap) */
+  .section-chrome-hrules {
+    position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:6;
+    overflow:visible;
+  }
+  .section-chrome-hrule {
+    position:absolute;left:0;right:0;height:1px;background:rgba(230,237,243,0.42);
+    box-shadow:0 0 12px rgba(230,237,243,0.12);
+  }
+  /* Throughline starts after ticker + section-title rail so it never covers section names */
+  .section-chrome-hrule.section-chrome-hrule--throughline {
+    box-shadow:0 0 10px rgba(88,166,255,0.15);
+  }
+  .section-chrome-editorframe {
+    position:absolute;border:1px solid rgba(230,237,243,0.28);
+    border-radius:0;box-sizing:border-box;pointer-events:none;
+    background:rgba(10,12,18,0.12);
+  }
+  .editor-line-highlight {
+    position:absolute;left:0;right:0;pointer-events:none;z-index:3;display:none;
+    background:var(--editor-line-bg);
+    border-left:3px solid var(--editor-line-border);
+    border-radius:0 4px 4px 0;
+    box-sizing:border-box;
+  }
+  /* Plain ## blocks (seed) — keeps section lines visible in innerText for gutter / chrome */
+  .notes-section-md {
+    white-space:pre-wrap;
+    margin:0 0 16px 0;
+    padding:12px 14px;
+    border:1px solid rgba(88,166,255,0.35);
+    border-radius:8px;
+    background:rgba(88,166,255,0.06);
+    font-size:15px;
+    line-height:1.65;
+    color:var(--text);
+  }
+  .editor {
+    position:relative;z-index:1;min-height:100%;flex:1;box-sizing:border-box;
+    padding:16px;outline:none;font-size:15px;line-height:1.65;white-space:pre-wrap;
+    overflow:visible;background:transparent;caret-color:var(--accent);color:var(--text);
+  }
+  .editor .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    box-shadow: var(--card-shadow);
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .editor .card:hover {
+    border-left-color: var(--accent-hover);
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+  }
+  .editor h1, .editor h2, .editor h3 {
+    border-left: 5px solid var(--accent);
+    padding-left: 16px;
+    margin: 28px 0 16px 0;
+    color: var(--accent);
+  }
+  .editor h2 { border-left-color: #3fb950; }
+
+  /* v4.5 — Git branching explorer (preset notes HTML) */
+  .editor .strategy-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 6px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 16px 0;
+    box-shadow: var(--card-shadow);
+  }
+  .editor .strategy-card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    padding: 0;
+    border: none;
+    color: var(--accent);
+  }
+  .editor .strategy-card p { margin: 8px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+  .editor .branch-diagram {
+    background: var(--surface-2);
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+    border: 1px dashed var(--git-green);
+    margin: 12px 0;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--text);
+  }
+  .editor .git-explorer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .editor .git-explorer-table th,
+  .editor .git-explorer-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .editor .git-explorer-table th { background: var(--surface); color: var(--accent); }
+
+  /* v4.8–v4.9 — framework comparison tables (notes preset) */
+  .editor .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .editor .comparison-table th,
+  .editor .comparison-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.45;
+  }
+  .editor .comparison-table th { background: var(--surface); color: var(--accent); font-weight: 600; }
+  .editor .comparison-table tr:hover { background: rgba(88, 166, 255, 0.06); }
+  .editor .ibm-cell { color: #3b8aed; }
+  .editor .langchain-cell { color: #3fb950; }
+  .editor .llamaindex-cell { color: #ff7b00; }
+
+  /* v4.6 — RAG / LLM staging cards (main-note feel; paste-safe inside contenteditable) */
+  .editor .rag-section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 6px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 18px;
+    margin: 16px 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+  .editor .rag-header {
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0 0 12px 0;
+    font-size: 15px;
+  }
+  .editor .rag-section p { margin: 8px 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55; }
+  .editor .template-block {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    color: var(--text);
+  }
+  .editor .template-staging {
+    background: var(--surface-2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 12px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .editor .template-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 6px;
+    padding: 12px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+  }
+  .editor .template-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(88, 166, 255, 0.3);
+    border-left-color: var(--accent-hover);
+    color: var(--text);
+  }
+  .editor .template-card strong { color: var(--text); display: block; margin-bottom: 6px; }
+
+  /* ----- v3.8 / v3.9 — CSS Grid in notes (paste HTML blocks; utilities work inside these containers) ----- */
+  .editor .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--grid-size);
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+  .editor .demo-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.25s ease;
+  }
+  .editor .demo-card:hover {
+    border-left-color: var(--accent-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(88,166,255,0.3);
+  }
+  .editor .explicit-grid {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "sidebar main"
+      "footer footer";
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-height: 420px;
+    margin: 20px 0;
+  }
+  .editor .explicit-grid .grid-header { grid-area: header; background: var(--surface); padding: 12px; border-radius: 6px; }
+  .editor .explicit-grid .grid-sidebar { grid-area: sidebar; background: var(--card-bg); padding: 16px; border-radius: 8px; border-left: 5px solid #3fb950; }
+  .editor .explicit-grid .grid-main { grid-area: main; background: var(--card-bg); padding: 16px; border-radius: 8px; }
+  .editor .explicit-grid .grid-footer { grid-area: footer; background: var(--surface); padding: 12px; border-radius: 6px; text-align: center; }
+
+  .editor .node-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--grid-size);
+    padding: 20px;
+    background: rgba(10,12,18,0.6);
+    border: 1px dashed var(--accent);
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .editor .advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-auto-rows: minmax(120px, auto);
+    gap: var(--grid-gap);
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+  .editor .grid-item {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 6px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .editor .grid-item:hover {
+    border-left-color: var(--accent-hover);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(88,166,255,0.35);
+  }
+  .editor .grid-item span {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .editor .dense-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 80px;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface-2);
+    border: 1px dashed var(--accent);
+    border-radius: 8px;
+    min-height: 280px;
+    margin: 20px 0;
+  }
+  .editor .dense-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    text-align: center;
+  }
+  .editor .span-2 { grid-column: span 2; }
+  .editor .span-3 { grid-column: span 3; }
+  .editor .span-4 { grid-column: span 4; }
+  .editor .span-6 { grid-column: span 6; }
+  .editor .tall { grid-row: span 2; }
+
+  .editor .masonry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--grid-gap);
+    padding: 20px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .editor .nuke-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-auto-rows: 110px;
+    gap: var(--grid-size);
+    padding: 24px;
+    background: rgba(16,20,28,0.7);
+    border: 2px dashed var(--accent);
+    border-radius: 8px;
+    position: relative;
+    margin: 20px 0;
+  }
+  .editor .nuke-node {
+    background: var(--surface-2);
+    border: 2px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+
+  #block-svg path {
+    stroke: var(--accent);
+    stroke-width: 2.8;
+    fill: none;
+  }
+
+  .main-area {
+    display:flex; flex:1; overflow:hidden; flex-direction:row; min-height:0;
+  }
+  .main-area-center { flex:1;display:flex;flex-direction:row;align-items:stretch;min-width:0;overflow:hidden; }
+  #orchestrator-panel {
+    overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    touch-action:pan-x pan-y;
+  }
+  .right-column-drawer {
+    width:min(320px,36vw); flex-shrink:0; display:flex; flex-direction:column;
+    border-left:1px solid var(--border); background:var(--surface); min-height:0; overflow:hidden;
+    transition:width .3s ease; position:relative;
+  }
+  .right-column-drawer.collapsed { width:48px; }
+
+  /* Single scroll column: inspector + live analysis + sidebar */
+  .right-drawer-body {
+    flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    display:flex; flex-direction:column;
+  }
+  .right-column-drawer > *:not(.right-drawer-body) { flex-shrink:0; }
+  .right-drawer-body > * { flex-shrink:0; }
+
+  #timeline-strip {
+    height:96px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);
+    position:relative;overflow:hidden;transition:height .3s;
+    padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);
+    box-sizing:border-box;
+  }
+  #timeline-strip.collapsed { height:32px; }
+  #timeline-canvas { position:absolute;left:0;top:0;display:block; }
+  /* Lens focus label — centered in header (updated by drawTimeline) */
+  #tl-fisheye {
+    align-self:center;margin:0 auto;position:static;transform:none;
+    background:rgba(34,211,238,.15);color:#22d3ee;border:1px solid #22d3ee;border-radius:9999px;
+    padding:3px 14px;font-size:11px;white-space:nowrap;pointer-events:none;z-index:20;transition:opacity .2s;
+  }
+  #canvas-panel { flex:1;position:relative;background:var(--bg); }
+  #block-canvas { position:absolute;inset:0; }
+  .block {
+    position:absolute;min-width:168px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:10;user-select:none;transition:box-shadow .15s;font-size:12.5px;
+    touch-action:none;
+  }
+  .block:hover { box-shadow:0 4px 20px rgba(88,166,255,.4); }
+  .block.selected { border-color:var(--accent);box-shadow:0 0 0 3px rgba(88,166,255,.3); }
+  .block-header { display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;background:rgba(88,166,255,0.08);border-radius:6px 6px 0 0; }
+  .block-header .cli-prompt { color:#34d399;margin-right:4px; }
+  .block-version {
+    font-size:10px;background:#21262d;color:#58a6ff;padding:1px 8px;border-radius:9999px;border:1px solid var(--border);white-space:nowrap;
+  }
+  .block-body { padding:8px 10px;font-size:12.5px;color:var(--text-secondary);max-height:110px;overflow:hidden;white-space:pre-wrap; }
+  .block-body[contenteditable="true"] { max-height:none;min-height:2.6em;overflow:visible;color:var(--text);outline:none;user-select:text;cursor:text; }
+  .connector { width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--bg);position:absolute;cursor:crosshair;z-index:20; }
+  .connector.in { left:-6px;top:50%;transform:translateY(-50%); }
+  .connector.out { right:-6px;top:50%;transform:translateY(-50%); }
+  #block-svg { position:absolute;inset:0;pointer-events:none;z-index:5; }
+
+  #live-analysis-panel {
+    position:relative;width:100%;box-sizing:border-box;background:var(--surface);
+    border-bottom:1px solid var(--border);padding:12px;transition:all .3s;min-height:0;
+  }
+  #live-analysis-panel.collapsed { height:40px;overflow:hidden;padding:8px; }
+  #live-analysis-panel.collapsed #live-analysis-content { display:none; }
+  #live-analysis-header { display:flex;justify-content:space-between;align-items:center;cursor:pointer; }
+  #live-analysis-content { margin-top:8px; }
+
+  #xai-api-panel {
+    position:relative;width:100%;box-sizing:border-box;background:var(--surface);
+    border-bottom:1px solid var(--border);padding:12px;transition:all .3s;min-height:0;
+  }
+  #xai-api-panel.collapsed { padding:8px; }
+  #xai-api-panel.collapsed #xai-api-content { display:none; }
+  #xai-api-header { display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;gap:8px; }
+  #xai-api-header-meta { font-size:10px;color:var(--text-muted);font-weight:400;flex:1;text-align:right; }
+  #xai-api-content { margin-top:8px; }
+  .xai-api-status { font-size:11px;color:var(--text-secondary);line-height:1.45;margin:0 0 10px 0; }
+  .xai-api-label { display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;margin-top:8px; }
+  .xai-api-label:first-of-type { margin-top:0; }
+  .xai-api-input {
+    width:100%;box-sizing:border-box;background:#21262d;border:1px solid var(--border);border-radius:6px;
+    padding:8px 10px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text);outline:none;
+  }
+  .xai-api-input:focus { border-color:var(--accent); }
+  .xai-api-actions { display:flex;gap:8px;margin-top:12px;flex-wrap:wrap; }
+  .xai-api-actions button {
+    background:var(--surface-2);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;
+  }
+  .xai-api-actions button:hover { background:#21262d;border-color:var(--accent); }
+  .xai-api-hint { font-size:10px;color:var(--text-muted);margin:10px 0 0;line-height:1.45; }
+  .analysis-section {
+    margin-top:10px;padding-top:8px;
+    border-top:1px solid rgba(230,237,243,0.28);
+  }
+  .analysis-intro + .analysis-section { border-top:none;margin-top:0;padding-top:0; }
+  .analysis-section-head {
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    cursor:pointer;user-select:none;font-size:12px;font-weight:600;color:var(--freya-cyan);
+    padding:4px 0 6px 0;border-bottom:1px solid rgba(230,237,243,0.12);
+    margin-bottom:6px;
+  }
+  .analysis-section-head:hover { color:var(--accent-hover); }
+  .analysis-section--collapsed .analysis-section-body { display:none; }
+  .analysis-section-body { font-size:12px;line-height:1.55;color:var(--text-secondary); }
+  #cube-preview-drawer { margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px; }
+  .cube { width:48px;height:48px;margin:8px auto;background:linear-gradient(135deg,#58a6ff,#22d3ee);border-radius:8px;transition:transform .35s ease; }
+
+  #right-drawer-collapse {
+    position:absolute;top:12px;left:-12px;width:28px;height:28px;
+    background:var(--surface);border:1px solid var(--border);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    font-size:14px;color:#22d3ee;z-index:110;box-shadow:0 2px 8px rgba(0,0,0,.3);
+    touch-action:manipulation;
+  }
+
+  #right-column-drawer .sidebar {
+    flex:0 0 auto;
+    padding:12px; display:flex; flex-direction:column; gap:12px;
+    border-top:1px solid var(--border);
+  }
+  #kbatch-panel { min-height:120px;background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px; }
+
+  #cli-chat-bar {
+    height:auto; min-height:64px; background:var(--surface); border-top:1px solid var(--border);
+    display:flex; align-items:center;
+    padding:8px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    gap:8px; flex-shrink:0; flex-wrap:wrap;
+    box-shadow:0 -2px 12px rgba(0,0,0,.3);
+  }
+  /* Match header button chrome (Agent / Plan / …) */
+  #cli-mode-tabs {
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    background:transparent;padding:0;border-radius:0;
+  }
+  #cli-mode-tabs button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 12px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;touch-action:manipulation;
+  }
+  #cli-mode-tabs button:hover { background:var(--surface-2);border-color:var(--accent); }
+  #cli-mode-tabs button.active { background:var(--accent);color:#0a0c12;border-color:var(--accent); }
+  #cli-prompt-input {
+    min-width:180px; flex:1 1 240px; background:#21262d;border:1px solid var(--border);color:var(--text);
+    padding:10px 16px;border-radius:9999px;font-family:inherit;font-size:14px;outline:none;
+  }
+  #cli-voice-btn { width:44px;height:44px;min-width:44px;background:var(--voice);color:#fff;border:none;border-radius:50%;cursor:pointer;touch-action:manipulation; }
+  #cli-send-btn { background:var(--accent);color:#0a0c12;border:1px solid var(--accent);padding:6px 12px;border-radius:6px;cursor:pointer;touch-action:manipulation;font-size:13px;font-weight:500;font-family:inherit; }
+  #cli-send-btn:hover { background:#79b8ff;border-color:#79b8ff; }
+
+  header button { touch-action:manipulation; }
+
+  .inspector-panel-head {
+    padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;
+  }
+  .inspector-panel-head .panel-title { font-weight:600;color:var(--accent);margin:0 0 8px 0;padding:0;border:none; }
+  .inspector-toolbar { display:flex;flex-wrap:wrap;gap:6px;align-items:center; }
+  .inspector-toolbar button {
+    background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:6px 10px;border-radius:6px;
+    cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;touch-action:manipulation;
+  }
+  .inspector-toolbar button:hover { background:var(--surface-2);border-color:var(--accent); }
+
+  .accreditation { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  @media (max-width: 768px) {
+    .main-area { flex-direction:column; flex:1 1 auto; min-height:0; }
+    .main-area-center { min-height:0; flex:1 1 55%; }
+    .right-column-drawer {
+      width:100%; max-width:none; border-left:none; border-top:1px solid var(--border);
+      max-height:min(50vh, 420px); flex:1 1 40%;
+    }
+    .right-column-drawer.collapsed { max-height:48px; width:100%; }
+    header button, #cli-mode-tabs button, .inspector-toolbar button { min-height:40px; padding:8px 12px; }
+    #cli-prompt-input { font-size:16px; }
+    :root { --gutter-sec-rail: 28px; --gutter-buffer-lines: 1; }
+    #gutter.gutter { width:78px; font-size:11px; padding-left:0; }
+    #gutter.gutter::before { font-size:8px; padding-bottom:6px; margin-bottom:6px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div id="tl-fisheye">10⁰s • diopter focus</div>
+  <div class="header-nav header-nav--collapsed" id="header-nav">
+    <div class="header-nav-head" id="header-nav-head">
+      <div class="header-nav-head-trigger" id="header-nav-head-trigger" role="button" tabindex="0" aria-expanded="false" aria-controls="header-nav-body"
+        onclick="toggleHeaderNav()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHeaderNav();}">
+        <span class="header-nav-title">
+          <span class="logo">qbit-notes</span>
+          <span class="header-nav-meta">v2.3n · codec v4.4–v4.9 · IBM RAG + grid</span>
+        </span>
+        <span class="header-nav-chev" id="header-nav-chev" aria-hidden="true">▶</span>
+      </div>
+      <button type="button" id="tl-collapse-btn" onclick="toggleTimelineCollapse()" title="Show or hide the timeline strip">▼ timeline</button>
+    </div>
+    <div class="header-nav-body" id="header-nav-body">
+      <div class="header-main">
+        <button type="button" onclick="toggleMode()" title="Switch notes / orchestrator view">Notes↔Orch</button>
+        <button type="button" onclick="toggleScale()" title="Timeline: freya-log vs history">Log↔Hist</button>
+        <button type="button" onclick="kbatchSuggest()">kbatch</button>
+        <button type="button" class="voice" onclick="startVoiceNotes()" title="jawta-voice · x.ai">Voice</button>
+        <button type="button" onclick="toggleGridLock()">Grid</button>
+        <button type="button" onclick="toggleRightDrawer()">Drawer</button>
+      </div>
+      <div class="header-presets" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;">
+        <span style="color:var(--text-secondary);font-size:12px;">presets</span>
+        <button type="button" onclick="loadPreset('rag')">RAG</button>
+        <button type="button" onclick="loadPreset('llm')">LLM</button>
+        <button type="button" onclick="loadPreset('cdn')">CDN</button>
+        <button type="button" onclick="loadPreset('nuke-keying')">Nuke</button>
+        <button type="button" onclick="loadPreset('git-v4.5')" title="Git branching strategies (notes)">Git 4.5</button>
+        <button type="button" onclick="loadPreset('codec-notes-v46')" title="v4.6+v4.7 RAG / LLM staging">Codec 4.6+</button>
+        <button type="button" onclick="loadPreset('rag-llm-orchestration')" title="Corpus → embed → retriever → LLM">RAG+LLM</button>
+        <button type="button" onclick="loadPreset('ibm-rag')" title="IBM Think GenAI RAG pattern">IBM RAG</button>
+        <span style="color:var(--text-secondary);font-size:12px;margin-left:8px;">wires</span>
+        <button type="button" onclick="setTension(0.35)">soft</button>
+        <button type="button" onclick="setTension(0.5)">mid</button>
+        <button type="button" onclick="setTension(0.65)">tight</button>
+        <button type="button" onclick="autoRouteAll()">re-wire</button>
+        <button type="button" id="wire-color-btn" onclick="toggleWireColor()" title="Blue vs magenta wires">wires: blue</button>
+        <button type="button" onclick="loadPreset('dense-25')" title="25 nodes + grid wiring">Dense 25</button>
+        <span style="color:var(--text-secondary);font-size:12px;margin-left:8px;">gutter</span>
+        <button type="button" onclick="applyGutterRules()" title="v4.4 rule engine; optional {…} parse">Rules</button>
+        <button type="button" onclick="clearGutterRules()" title="Heuristic Nuke/classify only">Heuristic</button>
+        <span style="color:var(--text-secondary);font-size:12px;margin-left:8px;">notes</span>
+        <button type="button" onclick="insertMarkdownSection()" title="Insert ## section at caret (gutter + Live Analysis)">+##</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="timeline-strip">
+  <canvas id="timeline-canvas" width="1400" height="96"></canvas>
+</div>
+
+<div class="main-area">
+  <div class="main-area-center">
+    <div id="main-content" style="flex:1;display:flex;position:relative;background:var(--bg);min-height:0;min-width:0;">
+      <div id="notes-panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
+        <div id="editor-wrap" class="editor-wrap">
+          <div id="section-chrome-layer" class="section-chrome-layer" aria-hidden="true"></div>
+          <div id="gutter-scroll-ticker" class="gutter-scroll-ticker" aria-hidden="true" title="Scroll index — click to jump">
+            <div class="gutter-scroll-ticker-inner">
+              <div class="gutter-scroll-ticker-rail"></div>
+              <div class="gutter-scroll-ticker-needle" id="gutter-scroll-ticker-needle"></div>
+            </div>
+          </div>
+          <div class="gutter" id="gutter"></div>
+          <div class="editor-inner" id="editor-inner">
+          <div id="editor-line-highlight" class="editor-line-highlight" aria-hidden="true"></div>
+          <div contenteditable="true" class="editor" id="editor" spellcheck="false"></div>
+          </div>
+          <div id="section-chrome-hrules" class="section-chrome-hrules" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div id="orchestrator-panel" style="flex:1;display:none;position:relative;background:var(--bg);min-height:0;">
+        <canvas id="block-canvas" width="1400" height="800"></canvas>
+        <svg id="block-svg" width="1400" height="800" style="position:absolute;inset:0;pointer-events:none;"></svg>
+        <div id="canvas-tools" style="position:absolute;top:12px;left:12px;display:flex;gap:4px;z-index:30;flex-wrap:wrap;">
+          <button type="button" onclick="addBlock('source')">+ Source</button>
+          <button type="button" onclick="addBlock('event')">+ Event</button>
+          <button type="button" onclick="addBlock('entity')">+ Entity</button>
+          <button type="button" onclick="addBlock('chapter')">+ Chapter</button>
+          <button type="button" onclick="toggleGridLock()">grid lock</button>
+          <button type="button" onclick="clearBlocks()">clear</button>
+          <button type="button" onclick="exportCanvasGraph()" title="Copy blocks + connections JSON to clipboard">export graph</button>
+        </div>
+        <div id="canvas-bottom-bar">
+          <div id="canvas-info" style="font-size:11px;color:#8b949e;font-family:IBM Plex Mono;">blocks: 0 | connections: 0 | v2.3n • Nuke elbows + Catmull • tension 0.5</div>
+          <button type="button" id="cli-spawn-block-btn" class="gutter-block-link" onclick="cliSpawnBlockFromCodeCommand('event')" title="New block at code line (same as CLI +block)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside id="right-column-drawer" class="right-column-drawer" aria-label="Analysis and inspector">
+    <div id="right-drawer-collapse" onclick="toggleRightDrawer()">›</div>
+    <div class="right-drawer-body" id="right-drawer-body">
+      <div id="inspector-panel-head" class="inspector-panel-head">
+        <div class="panel-title">Inspector • Grok CLI Node</div>
+        <div class="inspector-toolbar" role="toolbar" aria-label="Steno and export">
+          <button type="button" onclick="toggleSteno()">stenoSTRIP</button>
+          <button type="button" onclick="runStenoReplace()">stenoReplace</button>
+          <button type="button" onclick="exportQbit()">export .qbit</button>
+          <button type="button" onclick="tumbleEncryptShare()">tumble share</button>
+        </div>
+      </div>
+      <div id="insp-content" style="background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px;min-height:80px;"></div>
+
+      <div id="xai-api-panel" class="xai-api-panel">
+        <div id="xai-api-header" class="xai-api-header" onclick="toggleXaiApiPanel()" title="Show or hide xAI API fields">
+          <span style="font-weight:600;color:var(--accent);">xAI API</span>
+          <span id="xai-api-header-meta"></span>
+          <span id="xai-api-toggle">▼</span>
+        </div>
+        <div id="xai-api-content">
+          <p id="xai-api-status" class="xai-api-status"></p>
+          <label class="xai-api-label" for="xai-api-key-input">API key</label>
+          <input type="password" id="xai-api-key-input" class="xai-api-input" autocomplete="off" spellcheck="false" placeholder="Paste key, then Save — stored only in this browser" onkeydown="if(event.key==='Enter'){event.preventDefault();saveXaiApiFromPanel();}">
+          <label class="xai-api-label" for="xai-model-input">Model <span style="opacity:.75">(optional)</span></label>
+          <input type="text" id="xai-model-input" class="xai-api-input" autocomplete="off" spellcheck="false" placeholder="grok-2-latest" onkeydown="if(event.key==='Enter'){event.preventDefault();saveXaiApiFromPanel();}">
+          <div class="xai-api-actions">
+            <button type="button" onclick="saveXaiApiFromPanel()">Save</button>
+            <button type="button" onclick="clearXaiApiFromPanel()">Clear</button>
+          </div>
+          <p class="xai-api-hint">CLI → <strong>AI</strong> streams into the main notes. The key is only sent to <code>api.x.ai</code> from this page.</p>
+        </div>
+      </div>
+
+      <div id="live-analysis-panel">
+        <div id="live-analysis-header" onclick="toggleLiveAnalysis()">
+          <span style="font-weight:600;color:var(--accent);">Live Analysis</span>
+          <span id="live-analysis-toggle">▼</span>
+        </div>
+        <div id="live-analysis-content">
+          <div id="analysis" style="background:#21262d;padding:12px;border:1px solid var(--border);font-size:13px;line-height:1.6;min-height:140px;"></div>
+          <div id="cube-preview-drawer" style="margin-top:12px;">
+            <div class="panel-title" style="margin-bottom:6px;">Cube Preview</div>
+            <div id="cube" class="cube"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="panel-title">jawta-voice • x.ai realtime</div>
+        <div id="voice-wave" class="voice-wave" style="font-size:12px;color:var(--text-secondary);">click button to speak</div>
+        <div id="kbatch-panel"></div>
+        <div class="accreditation" style="font-size:11px;color:var(--text-secondary);line-height:1.5;">
+          Built by Grok (xAI)<br>
+          qbitOS research surface • codec v2.3n (unified)<br>
+          Shared canvas thread: <a href="https://grok.com/share/bGVnYWN5LWNvcHk_6d42930c-e0a6-4aff-81fc-74fff9935d55" style="color:var(--accent);" target="_blank" rel="noopener noreferrer">qbitOS Codec Canvas Editor</a>
+        </div>
+        <div class="status" id="status">ready • grok-notes v2.3n • Nuke-style routing + isomorphic notes</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="cli-chat-bar">
+  <div id="cli-mode-tabs">
+    <button type="button" class="active" onclick="switchCliMode(this,'agent')">Agent</button>
+    <button type="button" onclick="switchCliMode(this,'plan')">Plan</button>
+    <button type="button" onclick="switchCliMode(this,'research')">Research</button>
+    <button type="button" onclick="switchCliMode(this,'code')">Code</button>
+    <button type="button" onclick="switchCliMode(this,'ai')">AI</button>
+    <button type="button" onclick="switchCliMode(this,'quantum')">Quantum</button>
+  </div>
+  <input id="cli-prompt-input" type="text" placeholder="Ask Grok CLI (agent mode)..." onkeydown="onCliPromptKeydown(event)">
+  <button id="cli-voice-btn" type="button" onclick="startVoiceCLI()">🎤</button>
+  <button id="cli-send-btn" type="button" onclick="sendCliPrompt()">Send</button>
+</div>
+
+<script>
+// ====================== QBITOS codec v2.3n — 2.3 shell + 3.x routing + bidirectional sync ======================
+let currentMode = 'notes';
+let stenoActive = false;
+let currentContent = '';
+let voiceActive = false;
+let mediaRecorder = null;
+let gridLocked = true;
+let timelineCollapsed = false;
+let liveAnalysisCollapsed = false;
+let rightDrawerCollapsed = false;
+let currentCliMode = 'agent';
+let catmullTension = 0.5;
+/** Nuke wire stroke: accent (default) vs magenta (screenshot / v4.7 style) */
+let wireColorMode = 'accent';
+try {
+  const _w = localStorage.getItem('qbit-notes-wire');
+  if (_w === 'magenta' || _w === 'accent') wireColorMode = _w;
+} catch (e) {}
+
+function getWireStroke() {
+  return wireColorMode === 'magenta' ? '#e879f9' : '#58a6ff';
+}
+
+window.toggleWireColor = function() {
+  wireColorMode = wireColorMode === 'magenta' ? 'accent' : 'magenta';
+  try { localStorage.setItem('qbit-notes-wire', wireColorMode); } catch (e) {}
+  const btn = document.getElementById('wire-color-btn');
+  if (btn) btn.textContent = wireColorMode === 'magenta' ? 'wires: magenta' : 'wires: blue';
+  drawConnections();
+  updateStats();
+};
+
+function updateWireColorButton() {
+  const btn = document.getElementById('wire-color-btn');
+  if (btn) btn.textContent = wireColorMode === 'magenta' ? 'wires: magenta' : 'wires: blue';
+}
+
+let STATE = {
+  blocks: [],
+  connections: [],
+  selectedBlock: null,
+  nextId: 1,
+  tlScale: 'freya',
+  versionCounter: {},
+  /** line index (string "0"…) → block id — isomorphic manual link; text refs `b-1` / `@b-2` override when valid */
+  gutterLineToBlock: {},
+  /** which gutter rows show expanded detail */
+  gutterExpanded: new Set(),
+  /** ##-section keys — collapsed hides gutter “production” detail + Live Analysis body for that section */
+  sectionCollapsed: new Set(),
+  /** last known caret line in notes (used when + is pressed from orchestrator) */
+  lastCaretLineIndex: 0,
+  /** v4.4 Gutter Rule Engine: line i uses GUTTER_USER_RULES[i] when true (else classifyLine) */
+  gutterRuleEngine: false
+};
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function blockExists(id) {
+  return STATE.blocks.some(b => b.id === id);
+}
+
+/** First valid block id on this line: `b-12`, `@b-3`, `@block:b-1` */
+function extractBlockRefFromLine(line) {
+  let m = line.match(/\b(b-\d+)\b/i);
+  if (m && blockExists(m[1])) return m[1];
+  m = line.match(/@(?:block:)?(b-\d+)/i);
+  if (m && blockExists(m[1])) return m[1];
+  return null;
+}
+
+function blockIdByLinkedLine(lineIndex) {
+  const b = STATE.blocks.find(x => x.linkedLineIndex === lineIndex);
+  return b ? b.id : null;
+}
+
+/** Trailing @b-N or b-N on a line (v3.6-style); used to keep card title separate from ref. */
+const LINK_LINE_REF_TAIL = /\s+(@?)(b-\d+)\s*$/i;
+
+let _linkPushFromNode = false;
+
+function stripTrailingBlockRef(line, blockId) {
+  if (line == null || blockId == null) return line;
+  const m = String(line).match(LINK_LINE_REF_TAIL);
+  if (!m) return String(line);
+  if (m[2].toLowerCase() !== String(blockId).toLowerCase()) return String(line);
+  return String(line).slice(0, m.index).trimEnd();
+}
+
+function mergeTitleIntoLinkedLine(blockId, title, previousFullLine) {
+  const t = (title != null ? String(title) : '').trim();
+  const prev = previousFullLine != null ? String(previousFullLine) : '';
+  const m = prev.match(LINK_LINE_REF_TAIL);
+  if (m && m[2].toLowerCase() === String(blockId).toLowerCase()) {
+    return t ? `${t} ${m[2]}` : m[2];
+  }
+  return t;
+}
+
+/**
+ * Which block does this notes line “mean”? Inspector/canvas link (owner) wins over a stray b-N in text
+ * so gutter ↗ and focus stay aligned with linkedLineIndex (fixes v3.6 wonk).
+ */
+function resolvedBlockIdForLine(line, lineIndex) {
+  const fromNode = blockIdByLinkedLine(lineIndex);
+  if (fromNode) return fromNode;
+  const fromText = extractBlockRefFromLine(line);
+  if (fromText) return fromText;
+  const manual = STATE.gutterLineToBlock[String(lineIndex)];
+  if (manual && blockExists(manual)) return manual;
+  return null;
+}
+
+function syncNodeToNotes(block) {
+  if (block.linkedLineIndex == null) return;
+  const ed = document.getElementById('editor');
+  if (!ed) return;
+  const lines = ed.innerText.split('\n');
+  const i = block.linkedLineIndex;
+  if (i >= lines.length) return;
+  const merged = mergeTitleIntoLinkedLine(block.id, block.title, lines[i]);
+  if (merged === lines[i]) return;
+  _linkPushFromNode = true;
+  lines[i] = merged;
+  ed.innerText = lines.join('\n');
+  liveAnalyze(ed.innerText);
+  requestAnimationFrame(() => { _linkPushFromNode = false; });
+}
+
+/** When notes line i edits, push to the block that owns that line (linkedLineIndex === i). */
+function syncNotesLineToLinkedBlocks() {
+  if (_linkPushFromNode) return;
+  const ed = document.getElementById('editor');
+  if (!ed) return;
+  const lines = ed.innerText.split('\n');
+  let changed = false;
+  lines.forEach((line, i) => {
+    const block = STATE.blocks.find(b => b.linkedLineIndex === i);
+    if (!block) return;
+    const nextTitle = stripTrailingBlockRef(line, block.id);
+    if (block.title === nextTitle) return;
+    block.title = nextTitle;
+    const el = document.getElementById(block.id);
+    if (el) {
+      const body = el.querySelector('.block-body');
+      if (body && body.innerText !== nextTitle) body.innerText = nextTitle;
+    }
+    changed = true;
+  });
+  if (changed) drawConnections();
+}
+
+function initBidirectionalSync() {
+  const ed = document.getElementById('editor');
+  if (!ed) return;
+  ed.addEventListener('input', syncNotesLineToLinkedBlocks);
+}
+
+/** Canvas Y row isomorphic to editor line index: line 0 → GRID_ORIGIN_Y, step = GRID_SIZE (20px). */
+function canvasYForLineIndex(lineIndex) {
+  return snapToGrid(GRID_ORIGIN_Y + lineIndex * GRID_SIZE);
+}
+
+function findCanvasPosForLine(lineIndex, excludeBlockId = null) {
+  const y = canvasYForLineIndex(lineIndex);
+  const rowBlocks = STATE.blocks.filter(b =>
+    b.id !== excludeBlockId && snapToGrid(b.y) === y
+  );
+  const col = rowBlocks.length;
+  return {
+    x: snapToGrid(GRID_ORIGIN_X + (col % LAYOUT_COLS) * CELL_W),
+    y
+  };
+}
+
+function syncOrchestratorCanvasHeight(lineCount) {
+  const panel = document.getElementById('orchestrator-panel');
+  if (!panel) return;
+  const minH = Math.max(800, canvasYForLineIndex(Math.max(0, lineCount - 1)) + CELL_H + 120);
+  panel.style.minHeight = minH + 'px';
+}
+
+/** Presets may place nodes by explicit x/y below the notes-derived min height — keep panel scrollable. */
+function bumpOrchestratorHeightForBlocks() {
+  const panel = document.getElementById('orchestrator-panel');
+  if (!panel) return;
+  let maxY = 0;
+  STATE.blocks.forEach(b => { maxY = Math.max(maxY, b.y + CELL_H + 48); });
+  const cur = parseFloat(panel.style.minHeight) || 800;
+  panel.style.minHeight = Math.max(cur, Math.max(800, maxY)) + 'px';
+}
+
+function assignBlockToCodeLine(block, lineIndex) {
+  STATE.blocks.forEach(b => {
+    if (b.id !== block.id && b.linkedLineIndex === lineIndex) b.linkedLineIndex = null;
+  });
+  block.linkedLineIndex = lineIndex;
+  STATE.gutterLineToBlock[String(lineIndex)] = block.id;
+}
+
+function pruneGutterEntriesForBlockId(blockId) {
+  Object.keys(STATE.gutterLineToBlock).forEach(k => {
+    if (STATE.gutterLineToBlock[k] === blockId) delete STATE.gutterLineToBlock[k];
+  });
+}
+
+function scrollNotesToLine(lineIndex) {
+  const ed = document.getElementById('editor');
+  const wrap = document.getElementById('editor-wrap');
+  if (!ed || !wrap) return;
+  ed.focus();
+  const targetTop = lineTopInWrap(ed, wrap, lineIndex);
+  wrap.scrollTop = Math.max(0, targetTop - wrap.clientHeight * 0.35);
+  requestAnimationFrame(() => window.updateEditorLineHighlight());
+}
+
+window.openNotesAtLinkedLine = function() {
+  const block = STATE.selectedBlock;
+  if (!block || block.linkedLineIndex == null) return;
+  setMode('notes');
+  scrollNotesToLine(block.linkedLineIndex);
+};
+
+function pruneGutterState(lineCount) {
+  STATE.gutterExpanded = new Set([...STATE.gutterExpanded].filter(i => i < lineCount));
+  Object.keys(STATE.gutterLineToBlock).forEach(k => {
+    if (parseInt(k, 10) >= lineCount) delete STATE.gutterLineToBlock[k];
+  });
+  STATE.blocks.forEach(b => {
+    if (b.linkedLineIndex != null && b.linkedLineIndex >= lineCount) {
+      b.linkedLineIndex = null;
+      const el = document.getElementById(b.id);
+      if (el) {
+        const pill = el.querySelector('.block-line-pill');
+        if (pill) pill.remove();
+      }
+    }
+  });
+}
+
+function getCaretLineIndex() {
+  const ed = document.getElementById('editor');
+  if (!ed) return 0;
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return 0;
+  const range = sel.getRangeAt(0).cloneRange();
+  if (!ed.contains(range.commonAncestorContainer)) return 0;
+  range.selectNodeContents(ed);
+  range.setEnd(sel.anchorNode, sel.anchorOffset);
+  const text = range.toString();
+  return (text.match(/\n/g) || []).length;
+}
+
+function setMode(next) {
+  if (next !== 'notes' && next !== 'orchestrator') return;
+  currentMode = next;
+  document.getElementById('notes-panel').style.display = currentMode === 'notes' ? 'flex' : 'none';
+  document.getElementById('orchestrator-panel').style.display = currentMode === 'orchestrator' ? 'flex' : 'none';
+  if (currentMode === 'orchestrator') {
+    drawConnections();
+    clearGutterCaretRow();
+  }
+  if (currentMode === 'notes') requestAnimationFrame(() => window.updateEditorLineHighlight());
+}
+
+window.focusBlock = function(id) {
+  const block = STATE.blocks.find(b => b.id === id);
+  if (!block) return;
+  setMode('orchestrator');
+  STATE.selectedBlock = block;
+  document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('selected');
+  updateInspector();
+  requestAnimationFrame(() => {
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  });
+};
+
+window.linkCaretLineToSelectedBlock = function() {
+  const block = STATE.selectedBlock;
+  if (!block) return;
+  const line = currentMode === 'notes' ? getCaretLineIndex() : STATE.lastCaretLineIndex;
+  assignBlockToCodeLine(block, line);
+  const ed = document.getElementById('editor');
+  if (ed) {
+    const lines = ed.innerText.split('\n');
+    let raw = lines[line] != null ? lines[line] : '';
+    const idRe = new RegExp(`\\b${block.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    if (!String(raw).trim()) {
+      lines[line] = block.id;
+      ed.innerText = lines.join('\n');
+      raw = lines[line];
+    } else if (!idRe.test(raw)) {
+      const base = raw.trim();
+      lines[line] = base ? `${base} ${block.id}` : block.id;
+      ed.innerText = lines.join('\n');
+      raw = lines[line];
+    }
+    block.title = stripTrailingBlockRef(raw, block.id) || block.title;
+    const body = document.getElementById(block.id)?.querySelector('.block-body');
+    if (body) body.innerText = block.title;
+  }
+  const pos = findCanvasPosForLine(line, block.id);
+  block.x = pos.x;
+  block.y = pos.y;
+  const el = document.getElementById(block.id);
+  if (el) {
+    el.style.left = block.x + 'px';
+    el.style.top = block.y + 'px';
+  }
+  drawConnections();
+  if (ed) liveAnalyze(ed.innerText);
+};
+
+function updateGutterScrollTicker() {
+  const wrap = document.getElementById('editor-wrap');
+  const ticker = document.getElementById('gutter-scroll-ticker');
+  const inner = ticker?.querySelector('.gutter-scroll-ticker-inner');
+  const needle = document.getElementById('gutter-scroll-ticker-needle');
+  if (!wrap || !ticker || !inner || !needle) return;
+  const ch = wrap.clientHeight;
+  inner.style.height = `${Math.max(48, ch)}px`;
+  const sh = wrap.scrollHeight;
+  const st = wrap.scrollTop;
+  const maxScroll = Math.max(0, sh - ch);
+  const frac = maxScroll <= 0 ? 0 : st / maxScroll;
+  const innerH = inner.getBoundingClientRect().height || ch;
+  const travel = Math.max(0, innerH - 3);
+  needle.style.top = `${frac * travel}px`;
+}
+
+function initGutterScrollTickerClick() {
+  const wrap = document.getElementById('editor-wrap');
+  const ticker = document.getElementById('gutter-scroll-ticker');
+  const inner = ticker?.querySelector('.gutter-scroll-ticker-inner');
+  if (!wrap || !ticker || !inner || ticker.dataset.seekBound === '1') return;
+  ticker.dataset.seekBound = '1';
+  ticker.addEventListener('click', function(e) {
+    const rect = inner.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const ch = wrap.clientHeight;
+    const sh = wrap.scrollHeight;
+    const maxScroll = Math.max(0, sh - ch);
+    const h = rect.height || ch;
+    const frac = h <= 0 ? 0 : Math.max(0, Math.min(1, y / h));
+    wrap.scrollTop = frac * maxScroll;
+    requestAnimationFrame(updateGutterScrollTicker);
+  });
+}
+
+function initGutterClickDelegation() {
+  const wrap = document.getElementById('editor-wrap');
+  if (!wrap || wrap.dataset.gutterDelegation === '1') return;
+  wrap.dataset.gutterDelegation = '1';
+  wrap.addEventListener('click', function(e) {
+    const link = e.target.closest('.gutter-block-link');
+    if (link && link.dataset.blockId) {
+      e.preventDefault();
+      window.focusBlock(link.dataset.blockId);
+      return;
+    }
+    const gSecHead = e.target.closest('#gutter .analysis-section-head');
+    if (gSecHead) {
+      const gs = gSecHead.closest('.analysis-section[data-section-key]');
+      const key = gs && gs.dataset.sectionKey;
+      if (key) {
+        e.preventDefault();
+        toggleSectionCollapse(key);
+        return;
+      }
+    }
+    const row = e.target.closest('.gutter-row');
+    if (!row) return;
+    const line = parseInt(row.getAttribute('data-line'), 10);
+    if (Number.isNaN(line)) return;
+    e.preventDefault();
+    if (STATE.gutterExpanded.has(line)) STATE.gutterExpanded.delete(line);
+    else STATE.gutterExpanded.add(line);
+    const ed = document.getElementById('editor');
+    if (ed) liveAnalyze(ed.innerText);
+  });
+}
+
+function initAnalysisSectionDelegation() {
+  const el = document.getElementById('analysis');
+  if (!el || el.dataset.sectionDeleg === '1') return;
+  el.dataset.sectionDeleg = '1';
+  el.addEventListener('click', (e) => {
+    const h = e.target.closest('.analysis-section-head');
+    if (!h) return;
+    const sec = h.closest('.analysis-section');
+    const key = sec && sec.dataset.sectionKey;
+    if (!key) return;
+    e.preventDefault();
+    toggleSectionCollapse(key);
+  });
+}
+
+const GRID_SIZE = 20;
+const LAYOUT_COLS = 5;
+const CELL_W = 220;
+const CELL_H = 160;
+const GRID_ORIGIN_X = 80;
+const GRID_ORIGIN_Y = 80;
+
+function snapToGrid(v) {
+  return Math.round(v / GRID_SIZE) * GRID_SIZE;
+}
+
+function nextLogicalGridSlot() {
+  const idx = STATE.blocks.length;
+  const col = idx % LAYOUT_COLS;
+  const row = Math.floor(idx / LAYOUT_COLS);
+  return {
+    x: snapToGrid(GRID_ORIGIN_X + col * CELL_W),
+    y: snapToGrid(GRID_ORIGIN_Y + row * CELL_H)
+  };
+}
+
+const BLOCK_TYPES = {
+  source:  { prefix: 'n:',   color: '#ef4444', label: 'SOURCE',   cli: '>' },
+  chapter: { prefix: '+1:',  color: '#3fb950', label: 'CHAPTER',  cli: '#' },
+  entity:  { prefix: '+0:',  color: '#f0883e', label: 'ENTITY',   cli: '@' },
+  event:   { prefix: '0:',   color: '#58a6ff', label: 'EVENT',    cli: '!' },
+  relation:{ prefix: '+n:',  color: '#d2a8ff', label: 'RELATION', cli: '→' },
+  analysis:{ prefix: '1:',   color: '#79c0ff', label: 'ANALYSIS', cli: '?' }
+};
+
+/**
+ * Nuke keying gutter (grok-notes_3.6 / shared canvas) — ▶R ■B ●G ↓M ✂K + 0I idle.
+ * Run before legacy 2.3 “quantum” cues so ## Section / IBK / Merge classify like the reference UI.
+ */
+function classifyLine(line) {
+  if (!line || !line.trim()) return { sym: '0', gate: 'I', color: '#8b949e' };
+  const l = line.toLowerCase().trim();
+
+  if (l.includes('read') || l.includes('plate')) return { sym: '▶', gate: 'R', color: '#ef4444' };
+  if (l.includes('merge') || l.includes('over') || l.includes('b-spine')) return { sym: '↓', gate: 'M', color: '#58a6ff' };
+  if (l.includes('grade') || l.includes('despill')) return { sym: '●', gate: 'G', color: '#f0883e' };
+  if (l.includes('ibk') || l.includes('keylight') || l.includes('primatte')) return { sym: '✂', gate: 'K', color: '#79c0ff' };
+  if (l.includes('backdrop') || l.includes('group') || l.includes('section')) return { sym: '■', gate: 'B', color: '#3fb950' };
+
+  if (l.includes('import') || l.includes('script')) return { sym: '-n', gate: 'M', color: '#58a6ff' };
+  if (l.includes('function') || l.includes('=>')) return { sym: '+1', gate: 'H', color: '#58a6ff' };
+  if (l.includes('grok') || l.includes('canvas') || l.includes('block')) return { sym: '★', gate: 'Q', color: '#ff7b72' };
+  if (l.includes('freya') || l.includes('log') || l.includes('unit')) return { sym: '⚛', gate: 'F', color: '#22d3ee' };
+  return { sym: '0', gate: 'I', color: '#8b949e' };
+}
+
+/** v4.4 — extensible token → gutter meta (add entries to grow the engine) */
+const GUTTER_RULE_SYMBOL_MAP = {
+  '+0I': { sym: '0', gate: 'I', color: '#8b949e', label: 'Idle' },
+  '+↓M': { sym: '↓', gate: 'M', color: '#58a6ff', label: 'Merge' },
+  '+□B': { sym: '□', gate: 'B', color: '#3fb950', label: 'Backdrop' },
+  '+▶R': { sym: '▶', gate: 'R', color: '#ef4444', label: 'Read' },
+  '+●G': { sym: '●', gate: 'G', color: '#f0883e', label: 'Grade' }
+};
+
+/** Your deployed 21-line sequence (line index → token); Apply can replace from editor `{…}` block */
+const DEFAULT_GUTTER_USER_RULES = [
+  '+0I', '+0I', '+0I', '+0I', '+0I',
+  '+↓M', '+0I', '+□B', '+0I', '+▶R',
+  '+0I', '+0I', '+□B', '+●G', '+0I',
+  '+□B', '+●G', '+0I', '+□B', '+↓M', '+0I'
+];
+
+let GUTTER_USER_RULES = DEFAULT_GUTTER_USER_RULES.slice();
+
+function parseGutterRulesFromEditor(text) {
+  const i0 = text.indexOf('{');
+  const i1 = text.indexOf('}', i0 + 1);
+  if (i0 === -1 || i1 === -1 || i1 <= i0) return null;
+  const inner = text.slice(i0 + 1, i1);
+  const lines = inner.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  return lines.length ? lines : null;
+}
+
+function resolveGutterMeta(line, lineIndex) {
+  if (STATE.gutterRuleEngine && lineIndex >= 0 && lineIndex < GUTTER_USER_RULES.length) {
+    const token = GUTTER_USER_RULES[lineIndex];
+    const base = GUTTER_RULE_SYMBOL_MAP[token] || GUTTER_RULE_SYMBOL_MAP['+0I'];
+    return {
+      sym: base.sym,
+      gate: base.gate,
+      color: base.color,
+      label: base.label,
+      rule: token,
+      fromEngine: true
+    };
+  }
+  const cl = classifyLine(line);
+  return {
+    sym: cl.sym,
+    gate: cl.gate,
+    color: cl.color,
+    label: null,
+    rule: null,
+    fromEngine: false
+  };
+}
+
+window.applyGutterRules = function() {
+  const ed = document.getElementById('editor');
+  if (!ed) return;
+  const parsed = parseGutterRulesFromEditor(ed.innerText);
+  if (parsed && parsed.length) {
+    GUTTER_USER_RULES = parsed.map(t => (GUTTER_RULE_SYMBOL_MAP[t] ? t : '+0I'));
+  } else {
+    GUTTER_USER_RULES = DEFAULT_GUTTER_USER_RULES.slice();
+  }
+  STATE.gutterRuleEngine = true;
+  liveAnalyze(ed.innerText);
+};
+
+window.clearGutterRules = function() {
+  STATE.gutterRuleEngine = false;
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText);
+};
+
+function computeH2Sections(lines) {
+  const headers = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (/^##\s/.test(lines[i])) headers.push(i);
+  }
+  const out = [];
+  if (!headers.length) {
+    return [{ key: 'sec-0', startLine: 0, endLine: lines.length, title: 'Notes', isHead: false }];
+  }
+  if (headers[0] > 0) {
+    out.push({ key: 'sec-pre', startLine: 0, endLine: headers[0], title: 'Preamble', isHead: false });
+  }
+  for (let j = 0; j < headers.length; j++) {
+    const start = headers[j];
+    const end = j + 1 < headers.length ? headers[j + 1] : lines.length;
+    const title = lines[start].replace(/^##\s+/, '').trim() || `Section ${j + 1}`;
+    out.push({ key: `sec-${start}`, startLine: start, endLine: end, title, isHead: true });
+  }
+  return out;
+}
+
+function pruneSectionCollapsedKeys(sections) {
+  const valid = new Set(sections.map(s => s.key));
+  STATE.sectionCollapsed = new Set([...STATE.sectionCollapsed].filter(k => valid.has(k)));
+}
+
+function toggleSectionCollapse(key) {
+  if (STATE.sectionCollapsed.has(key)) STATE.sectionCollapsed.delete(key);
+  else STATE.sectionCollapsed.add(key);
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText);
+}
+window.toggleSectionCollapse = toggleSectionCollapse;
+
+function getXaiApiKey() {
+  try {
+    return localStorage.getItem('qbit_xai_api_key') || localStorage.getItem('XAI_API_KEY') || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+let xaiApiPanelCollapsed = false;
+
+function refreshXaiApiPanelStatus() {
+  const status = document.getElementById('xai-api-status');
+  const meta = document.getElementById('xai-api-header-meta');
+  const key = getXaiApiKey();
+  if (status) {
+    status.textContent = key
+      ? 'Key saved in this browser — paste a new key and Save to replace, or Clear to remove.'
+      : 'Paste your key from the xAI console (API keys), then Save. Nothing leaves this tab except HTTPS calls to api.x.ai when you use CLI → AI.';
+  }
+  if (meta) {
+    meta.textContent = key ? '● ready' : '○ not set';
+    meta.style.color = key ? 'var(--git-green)' : 'var(--text-muted)';
+  }
+}
+
+window.toggleXaiApiPanel = function() {
+  const p = document.getElementById('xai-api-panel');
+  const t = document.getElementById('xai-api-toggle');
+  if (!p) return;
+  xaiApiPanelCollapsed = !xaiApiPanelCollapsed;
+  p.classList.toggle('collapsed', xaiApiPanelCollapsed);
+  if (t) t.textContent = xaiApiPanelCollapsed ? '▶' : '▼';
+  try {
+    sessionStorage.setItem('qbit_xai_panel_collapsed', xaiApiPanelCollapsed ? '1' : '0');
+  } catch (e) {}
+};
+
+window.saveXaiApiFromPanel = function() {
+  const inp = document.getElementById('xai-api-key-input');
+  const modelInp = document.getElementById('xai-model-input');
+  const v = inp && inp.value.trim();
+  if (v) {
+    try {
+      localStorage.setItem('qbit_xai_api_key', v);
+    } catch (e) {
+      alert('Could not save key (storage disabled or full).');
+      return;
+    }
+  }
+  if (modelInp) {
+    const m = modelInp.value.trim();
+    try {
+      if (m) localStorage.setItem('qbit_xai_model', m);
+      else localStorage.removeItem('qbit_xai_model');
+    } catch (e) {}
+  }
+  if (inp) inp.value = '';
+  refreshXaiApiPanelStatus();
+  const st = document.getElementById('status');
+  if (st) st.textContent = 'xAI key saved in this browser — CLI → AI streams into notes';
+};
+
+window.clearXaiApiFromPanel = function() {
+  try {
+    localStorage.removeItem('qbit_xai_api_key');
+    localStorage.removeItem('XAI_API_KEY');
+    localStorage.removeItem('qbit_xai_model');
+  } catch (e) {}
+  const inp = document.getElementById('xai-api-key-input');
+  const modelInp = document.getElementById('xai-model-input');
+  if (inp) inp.value = '';
+  if (modelInp) modelInp.value = '';
+  refreshXaiApiPanelStatus();
+  const st = document.getElementById('status');
+  if (st) st.textContent = 'xAI key cleared from this browser';
+};
+
+function initXaiApiPanel() {
+  try {
+    const c = sessionStorage.getItem('qbit_xai_panel_collapsed');
+    const p = document.getElementById('xai-api-panel');
+    const t = document.getElementById('xai-api-toggle');
+    if (c === '1' && p) {
+      xaiApiPanelCollapsed = true;
+      p.classList.add('collapsed');
+      if (t) t.textContent = '▶';
+    }
+  } catch (e) {}
+  const modelInp = document.getElementById('xai-model-input');
+  if (modelInp) {
+    try {
+      modelInp.value = localStorage.getItem('qbit_xai_model') || '';
+    } catch (e) {}
+  }
+  refreshXaiApiPanelStatus();
+}
+
+let _streamLiveAnalyzeRaf = null;
+function scheduleStreamLiveAnalyze() {
+  if (_streamLiveAnalyzeRaf) return;
+  _streamLiveAnalyzeRaf = requestAnimationFrame(() => {
+    _streamLiveAnalyzeRaf = null;
+    const ed = document.getElementById('editor');
+    if (!ed) return;
+    liveAnalyze(ed.innerText || '');
+    window.updateEditorLineHighlight();
+  });
+}
+
+/**
+ * Streams Grok (xAI) chat completion into the notes editor at the current caret.
+ * Set localStorage qbit_xai_api_key to your xAI API key; optional qbit_xai_model (default grok-2-latest).
+ */
+async function streamGrokIntoNotesAtCaret(userPrompt) {
+  const ed = document.getElementById('editor');
+  if (!ed) return;
+  setMode('notes');
+  ed.focus();
+  const sel = window.getSelection();
+  let range;
+  if (sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    range = sel.getRangeAt(0).cloneRange();
+  } else {
+    range = document.createRange();
+    range.selectNodeContents(ed);
+    range.collapse(false);
+  }
+  const tn = document.createTextNode('');
+  range.insertNode(tn);
+  range.setStart(tn, 0);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  const append = (s) => {
+    tn.nodeValue += s;
+    const r2 = document.createRange();
+    r2.setStart(tn, tn.nodeValue.length);
+    r2.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(r2);
+    ed.focus();
+    scheduleStreamLiveAnalyze();
+  };
+
+  const key = getXaiApiKey();
+  const st = document.getElementById('status');
+  const prevStatus = st ? st.textContent : '';
+
+  if (!key) {
+    if (st) st.textContent = 'AI demo (set localStorage qbit_xai_api_key for live Grok)';
+    const demo = '\n\n' + userPrompt + '\n\n— Offline demo: add your xAI API key as localStorage `qbit_xai_api_key`, then use AI mode again for streaming Grok.\n';
+    for (let i = 0; i < demo.length; i++) {
+      append(demo[i]);
+      await new Promise(r => setTimeout(r, 4));
+    }
+    if (st) st.textContent = prevStatus;
+    liveAnalyze(ed.innerText || '');
+    requestAnimationFrame(() => {
+      updateSectionChrome();
+      window.updateEditorLineHighlight();
+    });
+    return;
+  }
+
+  if (st) st.textContent = 'Grok streaming…';
+  let model = 'grok-2-latest';
+  try {
+    model = localStorage.getItem('qbit_xai_model') || model;
+  } catch (e) {}
+
+  let res;
+  try {
+    res = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You write into the user\'s notes: clear, concise, markdown-friendly. Match their tone. No meta preamble unless asked.'
+          },
+          { role: 'user', content: userPrompt }
+        ],
+        stream: true
+      })
+    });
+  } catch (e) {
+    append('\n[network error: ' + String(e.message || e) + ']\n');
+    if (st) st.textContent = prevStatus;
+    liveAnalyze(ed.innerText || '');
+    return;
+  }
+
+  if (!res.ok) {
+    const errBody = await res.text();
+    append('\n[xAI ' + res.status + '] ' + errBody.slice(0, 800) + '\n');
+    if (st) st.textContent = prevStatus;
+    liveAnalyze(ed.innerText || '');
+    return;
+  }
+
+  const reader = res.body && res.body.getReader();
+  if (!reader) {
+    append('\n[no response stream]\n');
+    if (st) st.textContent = prevStatus;
+    liveAnalyze(ed.innerText || '');
+    return;
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n');
+      buffer = parts.pop() || '';
+      for (const line of parts) {
+        const s = line.trim();
+        if (!s.startsWith('data:')) continue;
+        const data = s.slice(5).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const j = JSON.parse(data);
+          const d = j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content;
+          if (d) append(d);
+        } catch (e) {}
+      }
+    }
+    if (buffer.trim()) {
+      const s = buffer.trim();
+      if (s.startsWith('data:')) {
+        const data = s.slice(5).trim();
+        if (data && data !== '[DONE]') {
+          try {
+            const j = JSON.parse(data);
+            const d = j.choices && j.choices[0] && j.choices[0].delta && j.choices[0].delta.content;
+            if (d) append(d);
+          } catch (e) {}
+        }
+      }
+    }
+  } catch (e) {
+    append('\n[stream error: ' + String(e.message || e) + ']\n');
+  }
+
+  if (st) st.textContent = prevStatus;
+  liveAnalyze(ed.innerText || '');
+  requestAnimationFrame(() => {
+    updateSectionChrome();
+    window.updateEditorLineHighlight();
+  });
+}
+
+window.insertMarkdownSection = function() {
+  const ed = document.getElementById('editor');
+  if (!ed) return;
+  setMode('notes');
+  ed.focus();
+  const chunk = '\n## New section\n';
+  const sel = window.getSelection();
+  if (sel.rangeCount && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+    const r = sel.getRangeAt(0);
+    r.deleteContents();
+    const tn = document.createTextNode(chunk);
+    r.insertNode(tn);
+    r.setStart(tn, tn.nodeValue.length);
+    r.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(r);
+  } else {
+    ed.appendChild(document.createTextNode(chunk));
+    const r = document.createRange();
+    r.selectNodeContents(ed);
+    r.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(r);
+  }
+  liveAnalyze(ed.innerText || '');
+  requestAnimationFrame(() => {
+    updateSectionChrome();
+    window.updateEditorLineHighlight();
+  });
+};
+
+window.onCliPromptKeydown = function(ev) {
+  if (ev.key !== 'Enter' || ev.shiftKey) return;
+  ev.preventDefault();
+  sendCliPrompt();
+};
+
+/** Fallback Y when DOM measurement fails (uniform line-height assumption) */
+function lineTopRelativeToWrapFallback(wrap, editor, lineIndex) {
+  const lines = editor.innerText.split('\n');
+  const n = lines.length;
+  const cs = getComputedStyle(editor);
+  const lh = parseFloat(cs.lineHeight) || 24.75;
+  const padT = parseFloat(cs.paddingTop) || 16;
+  const er = editor.getBoundingClientRect();
+  const wr = wrap.getBoundingClientRect();
+  const base = er.top - wr.top + wrap.scrollTop;
+  if (lineIndex <= 0) return base + padT;
+  if (lineIndex >= n) return base + padT + n * lh;
+  return base + padT + lineIndex * lh;
+}
+
+/**
+ * Top edge of logical line `lineIndex` in editor-wrap coordinates (includes scroll),
+ * using real layout: single text-node offsets, or one block child per line, else fallback.
+ */
+function lineTopInWrap(editor, wrap, lineIndex) {
+  const lines = editor.innerText.split('\n');
+  const n = lines.length;
+  const wr = wrap.getBoundingClientRect();
+  const st = wrap.scrollTop;
+  const topInWrap = (el) => {
+    if (!el) return NaN;
+    const r = el.getBoundingClientRect();
+    return r.top - wr.top + st;
+  };
+
+  if (n === 0) {
+    const padT = parseFloat(getComputedStyle(editor).paddingTop) || 16;
+    return topInWrap(editor) + padT;
+  }
+  if (lineIndex < 0) lineIndex = 0;
+  if (lineIndex >= n) {
+    const inner = document.getElementById('editor-inner');
+    if (inner) return inner.getBoundingClientRect().bottom - wr.top + st;
+    return lineTopRelativeToWrapFallback(wrap, editor, n);
+  }
+
+  if (editor.childNodes.length === 1 && editor.firstChild.nodeType === Node.TEXT_NODE) {
+    const tn = editor.firstChild;
+    const full = tn.nodeValue;
+    let off = 0;
+    for (let i = 0; i < lineIndex; i++) {
+      const j = full.indexOf('\n', off);
+      if (j === -1) {
+        off = full.length;
+        break;
+      }
+      off = j + 1;
+    }
+    off = Math.min(off, full.length);
+    const range = document.createRange();
+    range.setStart(tn, off);
+    range.collapse(true);
+    let r = range.getBoundingClientRect();
+    if ((r.width === 0 || r.height === 0) && range.getClientRects().length) {
+      r = range.getClientRects()[0];
+    }
+    if (r.top) return r.top - wr.top + st;
+  }
+
+  const kids = editor.children;
+  if (kids && kids.length >= n) {
+    const el = kids[lineIndex];
+    if (el) return topInWrap(el);
+  }
+
+  return lineTopRelativeToWrapFallback(wrap, editor, lineIndex);
+}
+
+/** Align first gutter row to first editor line (⌁ NK is position:absolute; padding-top is adjusted). */
+function syncGutterVerticalAlign(editor, wrap) {
+  const g = document.getElementById('gutter');
+  const row = g?.querySelector('.gutter-row');
+  if (!g || !row || !editor) return;
+  const yt = lineTopInWrap(editor, wrap, 0);
+  const yr = row.getBoundingClientRect().top - wrap.getBoundingClientRect().top + wrap.scrollTop;
+  if (!Number.isFinite(yt) || !Number.isFinite(yr)) return;
+  const diff = yt - yr;
+  const floor = 28;
+  g.style.paddingTop = `${Math.max(floor, 12 + diff)}px`;
+}
+
+function updateSectionChrome() {
+  const layer = document.getElementById('section-chrome-layer');
+  const hrules = document.getElementById('section-chrome-hrules');
+  const wrap = document.getElementById('editor-wrap');
+  const editor = document.getElementById('editor');
+  const ticker = document.getElementById('gutter-scroll-ticker');
+  const gutter = document.getElementById('gutter');
+  if (!layer || !wrap || !editor) return;
+  const sections = window._lastH2Sections;
+  if (!sections || !sections.length) {
+    layer.innerHTML = '';
+    if (hrules) hrules.innerHTML = '';
+    return;
+  }
+  const tw = ticker ? ticker.offsetWidth : 14;
+  const gw = gutter ? gutter.offsetWidth : 92;
+  const leftFrame = tw + gw;
+  const secRailStr = getComputedStyle(document.documentElement).getPropertyValue('--gutter-sec-rail').trim();
+  const secRailPx = Number.isFinite(parseFloat(secRailStr)) ? parseFloat(secRailStr) : 38;
+  const leftThroughline = tw + secRailPx;
+
+  let frames = '';
+  let hrs = '';
+  sections.forEach((sec, idx) => {
+    const t0 = lineTopInWrap(editor, wrap, sec.startLine);
+    if (idx > 0 || sec.startLine > 0) {
+      hrs += `<div class="section-chrome-hrule section-chrome-hrule--throughline" style="top:${t0}px;left:${leftThroughline}px"></div>`;
+    }
+    const t1 = lineTopInWrap(editor, wrap, sec.endLine);
+    const h = Math.max(24.75, t1 - t0);
+    frames += `<div class="section-chrome-editorframe" style="left:${leftFrame}px;right:0;top:${t0}px;height:${h}px"></div>`;
+  });
+  layer.innerHTML = frames;
+  if (hrules) hrules.innerHTML = hrs;
+  syncGutterVerticalAlign(editor, wrap);
+  requestAnimationFrame(() => syncGutterVerticalAlign(editor, wrap));
+}
+
+function buildAnalysisSectionBody(lines, sec, maxLines) {
+  const cap = maxLines || 80;
+  let body = '';
+  let count = 0;
+  for (let i = sec.startLine; i < sec.endLine && count < cap; i++, count++) {
+    const line = lines[i];
+    const c = resolveGutterMeta(line, i);
+    body += `<span style="color:${c.color}">${escapeHtml(c.sym)}</span> ${escapeHtml(line.substring(0, 52))}${line.length > 52 ? '…' : ''}<br>`;
+  }
+  if (sec.endLine - sec.startLine > cap) {
+    body += '<span style="opacity:.65;font-size:11px;">… truncated</span>';
+  }
+  return body;
+}
+
+window.liveAnalyze = function(text) {
+  currentContent = text;
+  const lines = text.split('\n');
+  pruneGutterState(lines.length);
+  const sections = computeH2Sections(lines);
+  pruneSectionCollapsedKeys(sections);
+  window._lastH2Sections = sections;
+
+  let gutterHTML = '';
+  sections.forEach(sec => {
+    const secCollapsed = STATE.sectionCollapsed.has(sec.key);
+    const gChev = secCollapsed ? '▶' : '▼';
+    gutterHTML += `<div class="analysis-section gutter-nb-cell${secCollapsed ? ' analysis-section--collapsed' : ''}" data-section-key="${sec.key}">
+    <div class="gutter-nb-split">
+    <div class="gutter-sec-rail" title="Section (notebook) — toggles with Live Analysis">
+      <div class="analysis-section-head">
+        <span class="gutter-sec-title">${escapeHtml(sec.title)}</span>
+        <span class="analysis-section-chev">${gChev}</span>
+      </div>
+    </div>
+    <div class="gutter-code-rail">
+    <div class="gutter-line-buffer gutter-line-buffer--pre" aria-hidden="true"></div>
+    <div class="analysis-section-body gutter-line-stack">`;
+    for (let i = sec.startLine; i < sec.endLine; i++) {
+      const line = lines[i];
+      const c = resolveGutterMeta(line, i);
+      const expanded = STATE.gutterExpanded.has(i);
+      const linkedId = resolvedBlockIdForLine(line, i);
+      const linkBtn = linkedId
+        ? `<button type="button" class="gutter-block-link" data-block-id="${linkedId}" title="Open ${linkedId} in orchestrator">↗</button>`
+        : '';
+      const preview = escapeHtml(line.substring(0, 120)) + (line.length > 120 ? '…' : '');
+      gutterHTML += `
+      <div class="gutter-row ${expanded ? 'expanded' : ''}${linkedId ? ' gutter-row--linked' : ''}" data-line="${i}" title="Line ${i + 1}: click row for line detail">
+        <div class="gutter-row-main">
+          <span class="gutter-sym" style="color:${c.color}">${escapeHtml(c.sym)}</span>
+          <span class="gutter-gate" style="color:${c.color}">${escapeHtml(c.gate)}</span>
+          ${linkBtn}
+        </div>
+        <div class="gutter-row-detail">
+          ${c.fromEngine ? `<span style="font-size:10px;color:var(--freya-cyan);">${escapeHtml(c.rule)}</span> · <span style="font-size:10px;color:var(--text-secondary);">${escapeHtml(c.label)}</span><br>` : ''}
+          <span class="gutter-color-dot" style="background:${c.color}"></span>gate <b style="color:${c.color}">${escapeHtml(c.gate)}</b> · sym ${escapeHtml(c.sym)}<br>
+          ${linkedId ? `<span style="color:#58a6ff;">↗ ${linkedId}</span> — click badge above to focus` : '<span style="opacity:.85;">No block link — add <code>b-N</code> on line or Inspector link</span>'}<br>
+          <span style="opacity:.9;">${preview || ' '}</span>
+        </div>
+      </div>`;
+    }
+    gutterHTML += `</div>
+    <div class="gutter-line-buffer gutter-line-buffer--post" aria-hidden="true"></div>
+    </div></div></div>`;
+  });
+
+  const engineHint = STATE.gutterRuleEngine
+    ? `<br><span style="color:#22d3ee;font-size:11px;">Gutter Rule Engine v4.4 <b>on</b> — ${GUTTER_USER_RULES.length} tokens line-indexed. Lines past that use heuristic classify. <code>Apply</code> reloads default sequence or parses the first <code>{…}</code> block in notes.</span>`
+    : `<br><span style="color:#8b949e;font-size:11px;">Gutter rules: <b>off</b> (heuristic classify). Click <b>Apply gutter rules</b> for the v4.4 sequence.</span>`;
+  let summary = `<div class="analysis-intro"><b>${lines.length} lines • Nuke keying gutter</b><br><span style="color:#8b949e;font-size:11px;">▶R · ■B · ●G · ↓M · ✂K · 0I — <code>##</code> starts a boxed section (gutter + frames + Live Analysis). CLI <b>AI</b> tab streams Grok at the caret. Collapse (▼) to hide detail. Row click expands one line when the section is open.</span>${engineHint}</div>`;
+  sections.forEach(sec => {
+    const collapsed = STATE.sectionCollapsed.has(sec.key);
+    const body = buildAnalysisSectionBody(lines, sec);
+    const chev = collapsed ? '▶' : '▼';
+    summary += `<div class="analysis-section${collapsed ? ' analysis-section--collapsed' : ''}" data-section-key="${sec.key}">
+    <div class="analysis-section-head">
+      <span>${escapeHtml(sec.title)}</span><span class="analysis-section-chev">${chev}</span>
+    </div>
+    <div class="analysis-section-body">${body}</div>
+  </div>`;
+  });
+
+  document.getElementById('gutter').innerHTML = gutterHTML;
+  document.getElementById('analysis').innerHTML = summary;
+  syncOrchestratorCanvasHeight(lines.length);
+  const cube = document.getElementById('cube');
+  const rot = (lines.length * 2.8) % 360;
+  cube.style.transform = `perspective(800px) rotateX(${rot}deg) rotateY(${((text || '').length) % 360}deg)`;
+  requestAnimationFrame(() => {
+    updateGutterScrollTicker();
+    updateSectionChrome();
+  });
+};
+
+function clearGutterCaretRow() {
+  const g = document.getElementById('gutter');
+  if (g) g.querySelectorAll('.gutter-row--caret').forEach(el => el.classList.remove('gutter-row--caret'));
+}
+
+/** Grok-CLI style active row: muted strip + blue left rail (synced to caret line + gutter rail) */
+window.updateEditorLineHighlight = function() {
+  const ed = document.getElementById('editor');
+  const inner = document.getElementById('editor-inner');
+  const hl = document.getElementById('editor-line-highlight');
+  if (!ed || !inner || !hl) return;
+  const sel = window.getSelection();
+  if (!sel.rangeCount) {
+    hl.style.display = 'none';
+    clearGutterCaretRow();
+    return;
+  }
+  const range = sel.getRangeAt(0).cloneRange();
+  if (!ed.contains(range.commonAncestorContainer)) {
+    hl.style.display = 'none';
+    clearGutterCaretRow();
+    return;
+  }
+  range.collapse(true);
+  const rects = range.getClientRects();
+  let r = rects.length ? rects[0] : null;
+  if (!r || (r.height === 0 && r.width === 0)) r = range.getBoundingClientRect();
+  if (!r || (r.height === 0 && r.width === 0)) {
+    hl.style.display = 'none';
+    clearGutterCaretRow();
+    return;
+  }
+  const cs = getComputedStyle(ed);
+  const lh = parseFloat(cs.lineHeight) || 24.75;
+  const h = Math.max(r.height || 0, lh);
+  const innerRect = inner.getBoundingClientRect();
+  const top = r.top - innerRect.top;
+  hl.style.display = 'block';
+  hl.style.top = `${Math.max(0, top)}px`;
+  hl.style.height = `${h}px`;
+  hl.style.width = '100%';
+
+  clearGutterCaretRow();
+  const caretLine = getCaretLineIndex();
+  const grow = document.getElementById('gutter')?.querySelector(`.gutter-row[data-line="${caretLine}"]`);
+  if (grow) grow.classList.add('gutter-row--caret');
+};
+
+window.toggleMode = function() {
+  setMode(currentMode === 'notes' ? 'orchestrator' : 'notes');
+};
+
+window.toggleScale = function() {
+  STATE.tlScale = STATE.tlScale === 'freya' ? 'history' : 'freya';
+  drawTimeline();
+};
+
+window.toggleGridLock = function() {
+  gridLocked = !gridLocked;
+  document.querySelectorAll('#canvas-tools button').forEach(b => {
+    if (b.textContent.includes('grid')) b.style.color = gridLocked ? '#22d3ee' : '';
+  });
+};
+
+window.toggleHeaderNav = function() {
+  const nav = document.getElementById('header-nav');
+  const head = document.getElementById('header-nav-head-trigger');
+  const chev = document.getElementById('header-nav-chev');
+  if (!nav || !head) return;
+  nav.classList.toggle('header-nav--collapsed');
+  const collapsed = nav.classList.contains('header-nav--collapsed');
+  head.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  if (chev) chev.textContent = collapsed ? '▶' : '▼';
+};
+
+window.toggleTimelineCollapse = function() {
+  timelineCollapsed = !timelineCollapsed;
+  const strip = document.getElementById('timeline-strip');
+  const btn = document.getElementById('tl-collapse-btn');
+  strip.classList.toggle('collapsed', timelineCollapsed);
+  btn.textContent = timelineCollapsed ? '▶ timeline' : '▼ timeline';
+  drawTimeline();
+};
+
+window.toggleLiveAnalysis = function() {
+  liveAnalysisCollapsed = !liveAnalysisCollapsed;
+  const panel = document.getElementById('live-analysis-panel');
+  const toggle = document.getElementById('live-analysis-toggle');
+  panel.classList.toggle('collapsed', liveAnalysisCollapsed);
+  toggle.textContent = liveAnalysisCollapsed ? '▶' : '▼';
+};
+
+window.toggleRightDrawer = function() {
+  rightDrawerCollapsed = !rightDrawerCollapsed;
+  const drawer = document.getElementById('right-column-drawer');
+  const btn = document.getElementById('right-drawer-collapse');
+  drawer.classList.toggle('collapsed', rightDrawerCollapsed);
+  btn.textContent = rightDrawerCollapsed ? '‹' : '›';
+  if (!rightDrawerCollapsed) {
+    setTimeout(() => {
+      const body = document.getElementById('right-drawer-body');
+      if (body) body.scrollTop = 0;
+      requestAnimationFrame(updateSectionChrome);
+    }, 10);
+  } else {
+    requestAnimationFrame(updateSectionChrome);
+  }
+};
+
+window.toggleSteno = function() {
+  stenoActive = !stenoActive;
+  document.getElementById('status').textContent = stenoActive ? 'stenoSTRIP on' : 'ready • grok-notes v2.3n • Nuke-style routing + isomorphic notes';
+};
+
+window.runStenoReplace = function() {
+  const ed = document.getElementById('editor');
+  ed.innerText = ed.innerText.replace(/\bthe\b/gi, 'ðə');
+  liveAnalyze(ed.innerText);
+  requestAnimationFrame(() => window.updateEditorLineHighlight());
+};
+
+window.exportQbit = function() {
+  const t = document.getElementById('editor').innerText;
+  const blob = new Blob([t], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'notes.qbit';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+window.tumbleEncryptShare = function() {
+  const t = document.getElementById('editor').innerText.slice(0, 4000);
+  try {
+    prompt('tumble share (base64 preview)', btoa(unescape(encodeURIComponent(t))));
+  } catch (e) {
+    prompt('tumble share (raw slice)', t.slice(0, 200));
+  }
+};
+
+window.kbatchSuggest = function() {
+  const k = document.getElementById('kbatch-panel');
+  const d = document.createElement('div');
+  d.style.cssText = 'padding:8px;margin:4px 0;background:#21262d;border-radius:6px;font-size:12px;color:#8b949e;border-left:3px solid #58a6ff';
+  d.textContent = `kbatch: ${currentContent.split('\n').length} lines • ${currentCliMode} mode hint`;
+  k.appendChild(d);
+  k.scrollTop = k.scrollHeight;
+  const body = document.getElementById('right-drawer-body');
+  if (body) body.scrollTop = body.scrollHeight;
+};
+
+window.startVoiceNotes = function() {
+  voiceActive = !voiceActive;
+  const w = document.getElementById('voice-wave');
+  w.textContent = voiceActive ? 'listening (simulated)…' : 'click button to speak';
+  document.getElementById('status').textContent = voiceActive ? 'jawta-voice active' : 'ready • grok-notes v2.3n • Nuke-style routing + isomorphic notes';
+};
+
+function switchCliMode(btn, mode) {
+  document.querySelectorAll('#cli-mode-tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCliMode = mode;
+  const ph =
+    mode === 'ai'
+      ? 'Grok → streams into notes at caret (needs qbit_xai_api_key)…'
+      : `Ask Grok CLI (${mode} mode)...`;
+  document.getElementById('cli-prompt-input').placeholder = ph;
+}
+
+async function sendCliPrompt() {
+  const input = document.getElementById('cli-prompt-input');
+  const prompt = input.value.trim();
+  if (!prompt) return;
+  const low = prompt.toLowerCase();
+  if (low === '+block' || low === '+node' || low === 'new block') {
+    cliSpawnBlockFromCodeCommand('event');
+    input.value = '';
+    return;
+  }
+  const quick = prompt.match(/^\+(source|event|entity|chapter|relation|analysis)\s*$/i);
+  if (quick) {
+    cliSpawnBlockFromCodeCommand(quick[1].toLowerCase());
+    input.value = '';
+    return;
+  }
+
+  if (currentCliMode === 'ai') {
+    input.value = '';
+    const sendBtn = document.getElementById('cli-send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+    try {
+      await streamGrokIntoNotesAtCaret(prompt);
+    } finally {
+      if (sendBtn) sendBtn.disabled = false;
+    }
+    return;
+  }
+
+  const kbatch = document.getElementById('kbatch-panel');
+  const entry = document.createElement('div');
+  entry.style.cssText = 'margin:8px 0;padding:10px 14px;background:#21262d;border-radius:8px;border-left:4px solid #34d399;';
+  entry.innerHTML = `<div style="color:#34d399;">[${currentCliMode.toUpperCase()}] → ${prompt.replace(/</g, '&lt;')}</div><div style="margin-top:6px;color:#8b949e;">Grok CLI: ${currentCliMode === 'quantum' ? 'Quantum-prefix engaged' : 'Processed via grok.com layer'}</div>`;
+  kbatch.appendChild(entry);
+  kbatch.scrollTop = kbatch.scrollHeight;
+  const body = document.getElementById('right-drawer-body');
+  if (body) body.scrollTop = body.scrollHeight;
+  input.value = '';
+}
+
+window.startVoiceCLI = async function() {
+  const btn = document.getElementById('cli-voice-btn');
+  btn.textContent = '●';
+  setTimeout(() => {
+    document.getElementById('cli-prompt-input').value = 'Voice CLI — quantum analysis requested';
+    sendCliPrompt();
+    btn.textContent = '🎤';
+  }, 900);
+};
+
+function syncTimelineCanvasSize() {
+  const strip = document.getElementById('timeline-strip');
+  const cv = document.getElementById('timeline-canvas');
+  if (!strip || !cv) return;
+  const w = Math.max(280, Math.floor(strip.clientWidth));
+  const h = strip.classList.contains('collapsed') ? 32 : 96;
+  cv.style.width = w + 'px';
+  cv.style.height = h + 'px';
+  cv.width = w;
+  cv.height = h;
+}
+
+function drawTimeline() {
+  syncTimelineCanvasSize();
+  const cv = document.getElementById('timeline-canvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0c12';
+  ctx.fillRect(0, 0, W, H);
+
+  const orders = 61;
+  const markers = [
+    { log: -43, label: 'Planck', color: '#22d3ee' },
+    { log: -21, label: 'CERN', color: '#58a6ff' },
+    { log: 0, label: 'Now', color: '#ff7b72' },
+    { log: 17, label: 'Universe', color: '#3fb950' }
+  ];
+
+  for (let i = 0; i <= orders; i++) {
+    const x = (i / orders) * W;
+    ctx.strokeStyle = i % 10 === 0 ? (STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff') : '#30363d';
+    ctx.lineWidth = i % 10 === 0 ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(x, 20);
+    ctx.lineTo(x, H - 20);
+    ctx.stroke();
+    if (i % 5 === 0) {
+      ctx.fillStyle = STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.fillText(STATE.tlScale === 'freya' ? '10^' + (i - 30) : i + 's', x + 4, 14);
+    }
+  }
+
+  markers.forEach(m => {
+    const x = ((m.log + 44) / orders) * W;
+    ctx.fillStyle = m.color;
+    ctx.beginPath();
+    ctx.arc(x, H / 2, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = m.color;
+    ctx.font = 'bold 9px IBM Plex Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText(m.label, x, H - 6);
+  });
+
+  const fisheye = document.getElementById('tl-fisheye');
+  fisheye.textContent = STATE.tlScale === 'freya' ? '10⁰s • lens focus' : 'history scale';
+  fisheye.style.opacity = timelineCollapsed ? '0.6' : '1';
+
+  ctx.fillStyle = STATE.tlScale === 'freya' ? '#22d3ee' : '#58a6ff';
+  ctx.font = 'bold 10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(STATE.tlScale === 'freya' ? 'FREYA UNITS LOG SCALE' : 'HISTORY TIMELINE SCALE', W / 2, H - 8);
+  ctx.textAlign = 'left';
+}
+
+function createBlock(type, title = '', content = '', opts = {}) {
+  const bt = BLOCK_TYPES[type] || BLOCK_TYPES.event;
+  const id = 'b-' + STATE.nextId++;
+  if (!STATE.versionCounter[type]) STATE.versionCounter[type] = 0;
+  const version = ++STATE.versionCounter[type];
+  let pos;
+  if (opts.x != null && opts.y != null) {
+    pos = { x: snapToGrid(opts.x), y: snapToGrid(opts.y) };
+  } else if (opts.linkedLineIndex != null && opts.linkedLineIndex >= 0) {
+    pos = findCanvasPosForLine(opts.linkedLineIndex);
+  } else {
+    pos = nextLogicalGridSlot();
+  }
+  const block = {
+    id,
+    type,
+    title: title || bt.label,
+    content: content || '',
+    x: pos.x,
+    y: pos.y,
+    version,
+    linkedLineIndex: opts.linkedLineIndex != null && opts.linkedLineIndex >= 0 ? opts.linkedLineIndex : null,
+    headerLabel: opts.headerLabel != null ? opts.headerLabel : null
+  };
+  if (block.linkedLineIndex != null) assignBlockToCodeLine(block, block.linkedLineIndex);
+  STATE.blocks.push(block);
+  renderBlock(block);
+  updateStats();
+  return block;
+}
+
+function renderBlock(block) {
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  const headLabel = block.headerLabel != null && block.headerLabel !== '' ? block.headerLabel : bt.label;
+  const el = document.createElement('div');
+  el.className = 'block';
+  el.id = block.id;
+  el.style.left = block.x + 'px';
+  el.style.top = block.y + 'px';
+  el.style.borderLeft = `4px solid ${bt.color}`;
+  el.innerHTML = `
+    <div class="connector in" data-id="${block.id}"></div>
+    <div class="block-header">
+      <span class="cli-prompt">${bt.cli}</span>
+      <span class="prefix" style="color:${bt.color}">${bt.prefix}</span>
+      <span style="font-weight:600">${headLabel}</span>
+      <span style="flex:1"></span>
+      <span class="block-version" title="Variation for this node type">v${block.version}</span>
+      ${block.linkedLineIndex != null ? `<span class="block-line-pill" title="Isomorphic code line">L${block.linkedLineIndex + 1}</span>` : ''}
+      <span onclick="removeBlock('${block.id}');event.stopImmediatePropagation()" style="cursor:pointer;color:#8b949e">✕</span>
+    </div>
+    <div class="block-body" contenteditable="true" spellcheck="false">${block.title || ''}</div>
+    <div class="connector out" data-id="${block.id}"></div>
+  `;
+  document.getElementById('orchestrator-panel').appendChild(el);
+
+  const body = el.querySelector('.block-body');
+  body.addEventListener('input', () => {
+    block.title = body.innerText;
+    syncNodeToNotes(block);
+    drawConnections();
+  });
+
+  let offsetX, offsetY, isDragging = false;
+  const startDrag = (clientX, clientY) => {
+    isDragging = true;
+    STATE.selectedBlock = block;
+    offsetX = clientX - block.x;
+    offsetY = clientY - block.y;
+    document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  };
+  const moveDrag = (clientX, clientY) => {
+    if (!isDragging || STATE.selectedBlock?.id !== block.id) return;
+    let nx = clientX - offsetX;
+    let ny = clientY - offsetY;
+    if (gridLocked) {
+      nx = snapToGrid(nx);
+      ny = snapToGrid(ny);
+    }
+    block.x = nx;
+    block.y = ny;
+    el.style.left = block.x + 'px';
+    el.style.top = block.y + 'px';
+    drawConnections();
+  };
+
+  el.addEventListener('mousedown', e => {
+    const t = e.target;
+    if (t.closest && (t.closest('span[onclick]') || t.classList.contains('block-version') || t.closest('.block-body'))) return;
+    startDrag(e.clientX, e.clientY);
+  });
+  window.addEventListener('mousemove', e => { moveDrag(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', () => { isDragging = false; STATE.selectedBlock = null; });
+
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: false });
+  window.addEventListener('touchmove', e => { if (isDragging) moveDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  window.addEventListener('touchend', () => { isDragging = false; STATE.selectedBlock = null; });
+
+  el.addEventListener('click', () => { STATE.selectedBlock = block; updateInspector(); });
+}
+
+function removeBlock(id) {
+  pruneGutterEntriesForBlockId(id);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  STATE.blocks = STATE.blocks.filter(b => b.id !== id);
+  STATE.connections = STATE.connections.filter(c => c.from !== id && c.to !== id);
+  drawConnections();
+  updateStats();
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText || '');
+}
+
+function catmullRomSpline(points, tension = catmullTension) {
+  if (points.length < 4) return points;
+  const result = [];
+  for (let i = 1; i < points.length - 2; i++) {
+    const p0 = points[i - 1];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[i + 2];
+    for (let t = 0; t <= 1; t += 0.08) {
+      const t2 = t * t;
+      const t3 = t2 * t;
+      const tt = (1 - tension) * 0.5;
+      const x = tt * ((-p0.x + 3*p1.x - 3*p2.x + p3.x) * t3 + (2*p0.x - 5*p1.x + 4*p2.x - p3.x) * t2 + (-p0.x + p2.x) * t + 2*p1.x);
+      const y = tt * ((-p0.y + 3*p1.y - 3*p2.y + p3.y) * t3 + (2*p0.y - 5*p1.y + 4*p2.y - p3.y) * t2 + (-p0.y + p2.y) * t + 2*p1.y);
+      result.push({x, y});
+    }
+  }
+  return result;
+}
+
+function autoRouteConnection(conn) {
+  const fromEl = document.getElementById(conn.from);
+  const toEl = document.getElementById(conn.to);
+  if (!fromEl || !toEl) return '';
+
+  const panel = document.getElementById('orchestrator-panel').getBoundingClientRect();
+  const f = fromEl.getBoundingClientRect();
+  const t = toEl.getBoundingClientRect();
+  const x1 = f.right - panel.left;
+  const y1 = f.top + f.height / 2 - panel.top;
+  const x2 = t.left - panel.left;
+  const y2 = t.top + t.height / 2 - panel.top;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  let pathD = '';
+
+  if (Math.abs(dx) > Math.abs(dy) * 1.3) {
+    const offset = 80;
+    const elbowY = y1 + dy * 0.35;
+    pathD = `M ${x1} ${y1} L ${x1 + offset} ${y1} L ${x1 + offset} ${elbowY} L ${x2 - offset} ${elbowY} L ${x2 - offset} ${y2} L ${x2} ${y2}`;
+  } else {
+    const points = [
+      {x: x1 - 60, y: y1},
+      {x: x1, y: y1},
+      {x: (x1 + x2) / 2 + (dy > 0 ? 40 : -40), y: (y1 + y2) / 2},
+      {x: x2, y: y2},
+      {x: x2 + 60, y: y2}
+    ];
+    const splinePoints = catmullRomSpline(points, catmullTension);
+    pathD = `M ${x1} ${y1}`;
+    for (let i = 1; i < splinePoints.length; i++) {
+      pathD += ` L ${splinePoints[i].x} ${splinePoints[i].y}`;
+    }
+  }
+  return pathD;
+}
+
+function drawConnections() {
+  const svg = document.getElementById('block-svg');
+  svg.innerHTML = '';
+  STATE.connections.forEach(conn => {
+    const pathD = autoRouteConnection(conn);
+    if (!pathD) return;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('stroke', getWireStroke());
+    path.setAttribute('stroke-width', '2.8');
+    path.setAttribute('fill', 'none');
+    svg.appendChild(path);
+  });
+}
+
+window.autoRouteAll = function() {
+  drawConnections();
+  const st = document.getElementById('status');
+  if (st) st.textContent = 'wires re-drawn • Nuke elbows + Catmull where vertical';
+};
+
+window.setTension = function(t) {
+  catmullTension = t;
+  const st = document.getElementById('status');
+  if (st) st.textContent = `wire tension ${t} • re-draw`;
+  drawConnections();
+};
+
+function updateStats() {
+  const info = document.getElementById('canvas-info');
+  if (info) {
+    const wc = wireColorMode === 'magenta' ? 'magenta' : 'blue';
+    info.textContent = `blocks: ${STATE.blocks.length} | connections: ${STATE.connections.length} | ${GRID_SIZE}px grid ${gridLocked ? 'snap' : 'free'} • tension ${catmullTension} • wires ${wc} • v2.3n`;
+  }
+}
+
+function updateInspector() {
+  const block = STATE.selectedBlock;
+  const insp = document.getElementById('insp-content');
+  if (!block) {
+    insp.innerHTML = '<div style="color:#8b949e;font-size:12px;">select a grok-cli node to inspect</div>';
+    return;
+  }
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  const headLab = block.headerLabel != null && block.headerLabel !== '' ? block.headerLabel : bt.label;
+  insp.innerHTML = `
+    <div style="color:${bt.color};font-weight:600;">${bt.cli} ${bt.prefix} ${headLab} <span class="block-version" style="display:inline-block;margin-left:6px;">v${block.version}</span></div>
+    <div style="margin-top:8px;font-size:13px;color:var(--text);">Title: ${block.title}</div>
+    <div style="margin-top:6px;font-size:12px;color:#8b949e;">Content: ${block.content || '(empty)'}</div>
+    <div style="margin-top:12px;font-size:11px;color:#8b949e;">ID: ${block.id} | x:${Math.round(block.x)} y:${Math.round(block.y)}${block.linkedLineIndex != null ? ` | code L${block.linkedLineIndex + 1} ↔ canvas y≈${canvasYForLineIndex(block.linkedLineIndex)}` : ''}</div>
+    ${block.linkedLineIndex != null ? `<button type="button" onclick="openNotesAtLinkedLine()" style="margin-top:10px;width:100%;">Open notes at line ${block.linkedLineIndex + 1}</button>` : ''}
+    <button type="button" onclick="linkCaretLineToSelectedBlock()" style="margin-top:12px;width:100%;">Link caret line in notes → this block</button>
+    <div style="margin-top:6px;font-size:10px;color:#8b949e;">Snaps node to canvas row y = ${GRID_SIZE}px × line index (matches gutter). Use + below or CLI <code>+block</code>.</div>
+    <button type="button" onclick="removeBlock('${block.id}')" style="margin-top:12px;width:100%;">Delete Node</button>
+  `;
+}
+
+function addBlock(type) { createBlock(type); }
+
+/** Copy orchestrator state (blocks + connections + wire prefs) to clipboard for backup or tooling. */
+window.exportCanvasGraph = function() {
+  const data = {
+    blocks: STATE.blocks.map(b => ({
+      id: b.id,
+      type: b.type,
+      title: b.title,
+      content: b.content || '',
+      x: b.x,
+      y: b.y,
+      version: b.version,
+      linkedLineIndex: b.linkedLineIndex,
+      headerLabel: b.headerLabel != null ? b.headerLabel : null
+    })),
+    connections: STATE.connections.map(c => ({ from: c.from, to: c.to })),
+    wireColorMode,
+    catmullTension,
+    gridLocked
+  };
+  const text = JSON.stringify(data, null, 2);
+  const st = document.getElementById('status');
+  const done = () => { if (st) st.textContent = 'canvas graph JSON copied • paste into a file or importer'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => {
+      window.prompt('Copy this JSON:', text);
+    });
+  } else {
+    window.prompt('Copy this JSON:', text);
+  }
+};
+
+/** Bottom + and CLI: spawn block snapped to canvas row for current code line (notes caret or last memo). */
+window.cliSpawnBlockFromCodeCommand = function(type = 'event') {
+  const t = BLOCK_TYPES[type] ? type : 'event';
+  const line = currentMode === 'notes' ? getCaretLineIndex() : STATE.lastCaretLineIndex;
+  const block = createBlock(t, '', '', { linkedLineIndex: line });
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText);
+  focusBlock(block.id);
+};
+
+function clearBlocks() {
+  STATE.blocks.forEach(b => { const el = document.getElementById(b.id); if (el) el.remove(); });
+  STATE.blocks = [];
+  STATE.connections = [];
+  STATE.versionCounter = {};
+  STATE.gutterLineToBlock = {};
+  drawConnections();
+  updateStats();
+  const ed = document.getElementById('editor');
+  if (ed) liveAnalyze(ed.innerText || '');
+}
+
+/** v4.5 preset — Git branching strategies (loads into notes editor; leaves canvas blocks intact) */
+const GIT_BRANCHING_V45_HTML = `
+<div class="strategy-card">
+  <h2>v4.5 — Git Branching Strategies Explorer</h2>
+  <p><strong>Total iterations to date: 39</strong> — Strategies applied to the qbit-notes / codec line (gutter v4.4 and prior features stay in the unified shell).</p>
+</div>
+
+<div class="strategy-card">
+  <h2>1. GitFlow (classic)</h2>
+  <pre class="branch-diagram">main          ← Production / stable (e.g. v4.5)
+├── develop   ← Integration
+│   ├── feature/grid-v3.9
+│   ├── feature/cards-v3.6
+│   ├── feature/auto-routing-v3.4
+│   └── feature/version-control-v4.3
+├── release/v4.5
+└── hotfix/v4.2-reconciliation</pre>
+  <p><strong>Best for:</strong> Long-lived projects with clear release cycles.</p>
+</div>
+
+<div class="strategy-card">
+  <h2>2. GitHub Flow (simple)</h2>
+  <pre class="branch-diagram">main          ← Always deployable
+├── feature/enhanced-cards
+├── feature/advanced-grid
+├── feature/gutter-rules-v4.4
+└── feature/branching-explorer-v4.5   ← current doc</pre>
+  <p><strong>Best for:</strong> Fast-moving solo or small teams.</p>
+</div>
+
+<div class="strategy-card">
+  <h2>3. Trunk-based (high velocity)</h2>
+  <pre class="branch-diagram">main          ← Single long-lived branch
+├── short-lived feature (1–2 days max)
+└── PR → main (CI required)</pre>
+  <p><strong>Best for:</strong> Frequent releases and strong automation.</p>
+</div>
+
+<div class="strategy-card">
+  <h2>4. Hybrid (recommended sketch for this repo)</h2>
+  <pre class="branch-diagram"># Workflow sketch
+git checkout main &amp;&amp; git pull
+git checkout -b feature/gutter-rules-v4.4
+# … work …
+git commit -m "feat: gutter rule engine"
+git push -u origin feature/gutter-rules-v4.4
+# after review
+git checkout main
+git merge feature/gutter-rules-v4.4 --no-ff
+git tag -a v4.4 -m "Gutter Rule Engine"</pre>
+  <pre class="branch-diagram">Live branch diagram (illustrative)
+
+main ──────────────────────────────── v4.5 (HEAD)
+├── feature/grid-v3.9
+├── feature/cards-v3.6
+├── feature/auto-routing-v3.4
+├── feature/version-control-v4.3
+├── feature/gutter-rules-v4.4
+└── feature/branching-explorer-v4.5   ← you are here</pre>
+</div>
+
+<table class="git-explorer-table">
+  <thead><tr><th>Strategy</th><th>When it shines</th></tr></thead>
+  <tbody>
+    <tr><td>GitFlow</td><td>Multiple environments, release trains</td></tr>
+    <tr><td>GitHub Flow</td><td>Ship from main; minimal branching</td></tr>
+    <tr><td>Trunk-based</td><td>Continuous integration, tiny branches</td></tr>
+  </tbody>
+</table>
+
+<pre class="branch-diagram"># Next feature branch (example)
+git checkout -b feature/master-merge-v4.6
+git add .
+git commit -m "feat: consolidate best of 39 iterations"
+git push -u origin feature/master-merge-v4.6</pre>
+
+<p style="margin-top:14px;font-size:13px;color:var(--text-secondary);">Next steps (pick one): live interactive branch visualizer · single consolidated master HTML · v4.6 feature work.</p>
+`;
+
+/** v4.6–v4.7 — RAG / LLM orchestration + screenshot-match copy (default notes seed + Codec v4.6+ preset) */
+const CODEC_V46_V47_NOTES_HTML = `
+<div class="notes-section-md">## Main notes
+
+Place the caret in the editor. CLI bar → AI tab → type a prompt → Enter: text streams inline at the caret (set localStorage key qbit_xai_api_key for live Grok).
+
+Lines starting with ## split the gutter, Live Analysis, and the section frames behind the editor.
+
+## Reference (cards below)</div>
+
+<div class="rag-section">
+  <div class="rag-header">v4.6 — RAG LLM Orchestration Template (analysis-linked)</div>
+  <p><strong>Total iterations: 40</strong> — Analysis-style staging, linked to canvas blocks via <code>b-N</code> references. Gutter rules (v4.4) and Nuke-style wires (v3.x) stay active in this unified shell.</p>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">1. Ingestion stage</div>
+  <div class="template-block">Corpus → Chunking → Embedding
+
+Ingestion pipeline
+Document loader: PDF / Markdown / Web scrape → raw text
+Chunk strategy: fixed 512 tokens or semantic split
+Embedding model: text-embedding-3-large / voyage-2</div>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">2. Retrieval stage</div>
+  <div class="template-block">Query → Embed → Vector search → Rerank
+
+Retrieval pipeline
+Vector store: Pinecone / Weaviate / Chroma (metadata filtering)
+Retriever: hybrid (dense + sparse) + MMR reranking
+Context window: top-K = 8 → compressed to fit LLM context</div>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">3. Generation stage (LLM orchestration)</div>
+  <div class="template-block">Retrieved context + system prompt → Grok / Claude / Llama-3
+
+System prompt template: “You are a helpful research assistant. Use only the provided context.”
+LLM call: Grok-4 · temperature 0.7 · max_tokens 2048
+Post-processing: citation injection + hallucination guard</div>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">4. Evaluation &amp; feedback loop</div>
+  <div class="template-block">Answer quality → rerank / fine-tune → loop
+
+Metrics: faithfulness, answer relevancy, context precision
+Human-in-the-loop: thumbs up/down → training pairs
+Continuous improvement: retrain embeddings or prompt every N cycles</div>
+</div>
+
+<table class="git-explorer-table">
+  <thead><tr><th>Canvas block</th><th>Maps to</th></tr></thead>
+  <tbody>
+    <tr><td>b-1</td><td>Ingestion stage (source block)</td></tr>
+    <tr><td>b-2</td><td>Retrieval stage (entity block)</td></tr>
+    <tr><td>b-3</td><td>Generation stage (analysis block)</td></tr>
+    <tr><td>b-4</td><td>Evaluation loop (chapter block)</td></tr>
+  </tbody>
+</table>
+
+<p style="font-size:13px;color:var(--text-secondary);margin:12px 0;">Copy any template block above into the main flow, or use the cards below to push a matching graph to the orchestrator (switches to canvas).</p>
+
+<div class="template-staging">
+  <div class="template-card" onclick="loadPreset('rag-llm-orchestration'); setMode('orchestrator');" title="Load RAG → router → LLM chain">
+    <strong>RAG pipeline</strong>
+    Document corpus → embedding → retriever → orchestration router → LLM
+  </div>
+  <div class="template-card" onclick="loadPreset('llm'); setMode('orchestrator');" title="Load LLM inference chain">
+    <strong>LLM inference</strong>
+    Prompt → KV cache → model → output
+  </div>
+  <div class="template-card" onclick="loadPreset('cdn'); setMode('orchestrator');" title="Load governance-style chain">
+    <strong>Orchestration tree</strong>
+    Source → edge → cache → governance (policy)
+  </div>
+  <div class="template-card" onclick="loadPreset('ibm-rag');" title="IBM Think GenAI RAG — ingest + query paths">
+    <strong>IBM GenAI RAG</strong>
+    Document store → preprocess → embed → vector DB ∥ query → retriever → augment → LLM → answer
+  </div>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">v4.6 — Node template preset (orchestrator)</div>
+  <p>Preset <strong>RAG+LLM orch</strong> in the toolbar builds: Document Corpus → Embedding Layer → Retriever → Orchestration Router → LLM Generator, with Nuke-style wires. Use <strong>notes ↔ orchestrator</strong> to toggle views.</p>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">v4.7 — RAG / LLM / orchestration flow (screenshot match)</div>
+  <p>Standalone codec sketch: ~25 blocks, magenta connections, named nodes (e.g. Voynich Manuscript, Planck Epoch, CERN Proton Cage, versioned grid test), version badges, grid snap. This file keeps the <strong>accent</strong> wire color for routing; recreate magenta in a fork by changing <code>path.setAttribute('stroke', …)</code> in <code>drawConnections</code> if you want a pixel match.</p>
+  <p style="margin-bottom:0;">Next options from the thread: live RAG simulator on canvas · single master HTML merge · v4.8 refinements.</p>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">v4.7 — IBM GenAI RAG node graph (Think architecture pattern)</div>
+  <p>Reference: <a href="https://www.ibm.com/think/architectures/patterns/genai-rag" style="color:var(--accent);">ibm.com/think/architectures/patterns/genai-rag</a> — RAG combines <strong>build-time</strong> embedding of client data with <strong>runtime</strong> retrieval and generation.</p>
+  <p><strong>Build time (ingest):</strong> client data → preprocessing / chunking → embedding model → vector database.</p>
+  <p><strong>Runtime (query):</strong> user query → search vector DB (top-K) → augment prompt with passages → LLM → answer for the user.</p>
+  <p>Use preset <strong>IBM RAG</strong> in the toolbar (or the card above) to lay out the orchestrator graph: two columns (ingest vs query), with <code>vector DB → retriever</code>, <code>query → retriever</code>, <code>query + retriever → augmentation → LLM</code>. Wires use the same Nuke elbows + Catmull routing as the rest of v2.3n.</p>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">v4.8 — IBM watsonx vs LangChain (2026 sketch)</div>
+  <p><strong>Summary:</strong> watsonx is an enterprise AI platform (governance, watsonx.ai, data products). LangChain is open orchestration (Python/JS) with LangGraph for agents. Hybrid <strong>LangChain + watsonx</strong> is common via official integrations.</p>
+  <table class="comparison-table">
+    <thead><tr><th>Category</th><th class="ibm-cell">IBM watsonx</th><th class="langchain-cell">LangChain</th></tr></thead>
+    <tbody>
+      <tr><td>Type</td><td class="ibm-cell">Enterprise platform (watsonx.ai + data + orchestrate)</td><td class="langchain-cell">Open-source framework (+ LangGraph)</td></tr>
+      <tr><td>Primary strength</td><td class="ibm-cell">Governance, compliance, IBM ecosystem</td><td class="langchain-cell">Flexibility, agents, rapid prototyping</td></tr>
+      <tr><td>RAG</td><td class="ibm-cell">Native with watsonx.data, vector integrations</td><td class="langchain-cell">Rich retrievers; pair with watsonx via langchain-ibm</td></tr>
+      <tr><td>Governance</td><td class="ibm-cell">Strong policy / explainability positioning</td><td class="langchain-cell">Bring your own (e.g. LangSmith)</td></tr>
+      <tr><td>Best for</td><td class="ibm-cell">Regulated production, IBM Cloud / on-prem paths</td><td class="langchain-cell">Custom agents, many model backends</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">v4.9 — watsonx vs LangChain vs LlamaIndex</div>
+  <p><strong>Verdict sketch:</strong> <span class="ibm-cell">watsonx</span> — enterprise + governance; <span class="langchain-cell">LangChain</span> — agents &amp; orchestration; <span class="llamaindex-cell">LlamaIndex</span> — data-centric RAG and indexing. Many deployments mix <strong>LlamaIndex</strong> retrieval + <strong>LangChain</strong> agents + <strong>watsonx</strong> models.</p>
+  <table class="comparison-table">
+    <thead><tr><th>Category</th><th class="ibm-cell">IBM watsonx</th><th class="langchain-cell">LangChain</th><th class="llamaindex-cell">LlamaIndex</th></tr></thead>
+    <tbody>
+      <tr><td>Core focus</td><td class="ibm-cell">Platform: models + data + governance</td><td class="langchain-cell">Orchestration &amp; agents</td><td class="llamaindex-cell">Indexing, query engines, RAG</td></tr>
+      <tr><td>RAG strength</td><td class="ibm-cell">Enterprise retrieval + data products</td><td class="langchain-cell">Flexible retriever ecosystem</td><td class="llamaindex-cell">Often strongest for document-heavy RAG</td></tr>
+      <tr><td>Agents</td><td class="ibm-cell">Orchestrate &amp; tooling</td><td class="langchain-cell">LangGraph, tool use</td><td class="llamaindex-cell">Workflows + agents</td></tr>
+      <tr><td>Governance</td><td class="ibm-cell">Strongest default story</td><td class="langchain-cell">External tools</td><td class="llamaindex-cell">External tools</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="rag-section">
+  <div class="rag-header">v2.3n unified shell (reminder)</div>
+  <p style="margin:0;">20px grid snap; row-major placement; line ↔ node linking (owner-first + optional <code>b-N</code>). Presets: <strong>Git v4.5</strong> (branching notes), <strong>Codec v4.6+</strong> (reload this doc), <strong>IBM RAG</strong> / <strong>RAG+LLM orch</strong> (canvas), <strong>Apply gutter rules</strong> / <strong>Heuristic gutter</strong>.</p>
+</div>
+`;
+
+function loadPreset(name) {
+  if (name === 'git-v4.5') {
+    setMode('notes');
+    const ed = document.getElementById('editor');
+    if (ed) {
+      ed.innerHTML = GIT_BRANCHING_V45_HTML;
+      liveAnalyze(ed.innerText || '');
+      requestAnimationFrame(() => {
+        updateGutterScrollTicker();
+        updateSectionChrome();
+        window.updateEditorLineHighlight();
+      });
+      ed.focus();
+      console.log('%cGit Branching Strategies Explorer v4.5 • preset loaded', 'color:#58a6ff;font-family:monospace');
+    }
+    return;
+  }
+  if (name === 'codec-notes-v46') {
+    setMode('notes');
+    const ed = document.getElementById('editor');
+    if (ed) {
+      ed.innerHTML = CODEC_V46_V47_NOTES_HTML;
+      liveAnalyze(ed.innerText || '');
+      requestAnimationFrame(() => {
+        updateGutterScrollTicker();
+        updateSectionChrome();
+        window.updateEditorLineHighlight();
+      });
+      ed.focus();
+      console.log('%cCodec v4.6+ staging notes • preset loaded', 'color:#58a6ff;font-family:monospace');
+    }
+    return;
+  }
+  clearBlocks();
+  if (name === 'rag') {
+    const source = createBlock('source', 'Document Corpus', 'RAG data lake');
+    const embed = createBlock('entity', 'Embedding Layer', 'Vector store');
+    const retriever = createBlock('relation', 'Retriever', 'Semantic search');
+    const llm = createBlock('analysis', 'LLM Generator', 'Grok response');
+    STATE.connections.push({ from: source.id, to: embed.id });
+    STATE.connections.push({ from: embed.id, to: retriever.id });
+    STATE.connections.push({ from: retriever.id, to: llm.id });
+  } else if (name === 'rag-llm-orchestration') {
+    const corpus = createBlock('source', 'Document Corpus', 'Raw data lake');
+    const embed = createBlock('entity', 'Embedding Layer', 'Vector store');
+    const retriever = createBlock('relation', 'Retriever', 'Semantic search');
+    const router = createBlock('analysis', 'Orchestration Router', 'Agent selector');
+    const llm = createBlock('analysis', 'LLM Generator', 'Grok inference');
+    STATE.connections.push({ from: corpus.id, to: embed.id });
+    STATE.connections.push({ from: embed.id, to: retriever.id });
+    STATE.connections.push({ from: retriever.id, to: router.id });
+    STATE.connections.push({ from: router.id, to: llm.id });
+    setMode('orchestrator');
+  } else if (name === 'llm') {
+    const input = createBlock('source', 'User Query', 'Prompt');
+    const cache = createBlock('entity', 'KV Cache', 'Context window');
+    const model = createBlock('analysis', 'LLM Core', 'Inference');
+    const output = createBlock('event', 'Response', 'Stream');
+    STATE.connections.push({ from: input.id, to: cache.id });
+    STATE.connections.push({ from: cache.id, to: model.id });
+    STATE.connections.push({ from: model.id, to: output.id });
+  } else if (name === 'cdn') {
+    const origin = createBlock('source', 'Origin Server', 'Edge origin');
+    const edge = createBlock('entity', 'Edge Node', 'PoP');
+    const cache = createBlock('relation', 'Cache Layer', 'CDN cache');
+    const governance = createBlock('chapter', 'Governance Tree', 'Policy enforcement');
+    STATE.connections.push({ from: origin.id, to: edge.id });
+    STATE.connections.push({ from: edge.id, to: cache.id });
+    STATE.connections.push({ from: cache.id, to: governance.id });
+  } else if (name === 'nuke-keying') {
+    const plate = createBlock('source', 'Plate Read', 'Green screen input', { x: 300, y: 120 });
+    const clean = createBlock('entity', 'Screen Clean', 'Denoise + uneven fix', { x: 300, y: 300 });
+    const ibk = createBlock('analysis', 'IBK Stacked', 'Core key + edge', { x: 300, y: 480 });
+    const despill = createBlock('entity', 'Despill Mix', 'Edge integration', { x: 100, y: 480 });
+    const merge = createBlock('event', 'Merge (B-spine)', 'Composite over BG', { x: 300, y: 660 });
+    const output = createBlock('source', 'Viewer / Write', 'Final comp', { x: 300, y: 840 });
+    STATE.connections.push({ from: plate.id, to: clean.id });
+    STATE.connections.push({ from: clean.id, to: ibk.id });
+    STATE.connections.push({ from: ibk.id, to: merge.id });
+    STATE.connections.push({ from: despill.id, to: merge.id });
+    STATE.connections.push({ from: merge.id, to: output.id });
+  } else if (name === 'ibm-rag') {
+    /** IBM Think “Retrieval Augmented Generation” pattern — build-time ingest + runtime query (see ibm.com/think/architectures/patterns/genai-rag) */
+    const doc = createBlock('source', 'Client data lake / manuals / tickets', '', { x: 200, y: 120, headerLabel: 'Document store' });
+    const chunk = createBlock('entity', 'Chunk + enrich for retrieval', '', { x: 200, y: 300, headerLabel: 'Data preprocessing' });
+    const embed = createBlock('relation', 'Vectors for passages', '', { x: 200, y: 480, headerLabel: 'Embedding model' });
+    const vec = createBlock('chapter', 'Milvus / FAISS / Chroma / watsonx.data…', '', { x: 200, y: 660, headerLabel: 'Vector database' });
+    const query = createBlock('event', 'End-user prompt', '', { x: 600, y: 120, headerLabel: 'User query' });
+    const retr = createBlock('analysis', 'Top-K passages by similarity', '', { x: 600, y: 300, headerLabel: 'Retriever' });
+    const aug = createBlock('entity', 'Query + passages + app prompt', '', { x: 600, y: 480, headerLabel: 'Augmentation' });
+    const llm = createBlock('analysis', 'Grok / Granite / watsonx.ai', '', { x: 600, y: 660, headerLabel: 'LLM' });
+    const answer = createBlock('event', 'Grounded response to user', '', { x: 600, y: 840, headerLabel: 'Answer' });
+    STATE.connections.push({ from: doc.id, to: chunk.id });
+    STATE.connections.push({ from: chunk.id, to: embed.id });
+    STATE.connections.push({ from: embed.id, to: vec.id });
+    STATE.connections.push({ from: query.id, to: retr.id });
+    STATE.connections.push({ from: vec.id, to: retr.id });
+    STATE.connections.push({ from: retr.id, to: aug.id });
+    STATE.connections.push({ from: query.id, to: aug.id });
+    STATE.connections.push({ from: aug.id, to: llm.id });
+    STATE.connections.push({ from: llm.id, to: answer.id });
+    setMode('orchestrator');
+  } else if (name === 'dense-25') {
+    /** Busy 5×5 grid (~25 blocks) + lattice wiring — matches “screenshot” demos; magenta wires + non-zero connection count */
+    wireColorMode = 'magenta';
+    try { localStorage.setItem('qbit-notes-wire', wireColorMode); } catch (e) {}
+    updateWireColorButton();
+    const COLS = 5;
+    const DX = 200;
+    const DY = 130;
+    const ox = 40;
+    const oy = 60;
+    const named = [
+      ['source', 'Voynich Manuscript'],
+      ['event', 'Planck Epoch'],
+      ['entity', 'CERN Proton Cage'],
+      ['chapter', 'Versioned grid test']
+    ];
+    const out = [];
+    for (let i = 0; i < 25; i++) {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      const x = ox + col * DX;
+      const y = oy + row * DY;
+      if (i < 4) {
+        out.push(createBlock(named[i][0], named[i][1], '', { x, y }));
+      } else {
+        const ty = ['source', 'event', 'entity', 'chapter'][(i - 4) % 4];
+        const body = ty === 'source' ? 'SOURCE' : ty === 'event' ? 'EVENT' : ty === 'entity' ? 'ENTITY' : 'CHAPTER';
+        out.push(createBlock(ty, body, '', { x, y }));
+      }
+    }
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 4; col++) {
+        const i = row * COLS + col;
+        STATE.connections.push({ from: out[i].id, to: out[i + 1].id });
+      }
+    }
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 5; col++) {
+        const i = row * COLS + col;
+        STATE.connections.push({ from: out[i].id, to: out[i + 5].id });
+      }
+    }
+    setMode('orchestrator');
+  }
+  bumpOrchestratorHeightForBlocks();
+  drawTimeline();
+  autoRouteAll();
+  updateStats();
+}
+
+setTimeout(() => {
+  const editor = document.getElementById('editor');
+  if (editor) {
+    editor.innerHTML = CODEC_V46_V47_NOTES_HTML;
+  }
+  createBlock('source', 'Voynich Manuscript', 'Beinecke MS 408');
+  createBlock('event', 'Planck Epoch', 'Freya Unit start');
+  createBlock('entity', 'CERN Proton Cage', '70 proton polarity inversion');
+  createBlock('chapter', 'Versioned grid test', 'Auto-placed row-major');
+  document.querySelectorAll('#canvas-tools button').forEach(b => {
+    if (b.textContent.includes('grid')) b.style.color = gridLocked ? '#22d3ee' : '';
+  });
+  drawTimeline();
+  drawConnections();
+  updateWireColorButton();
+  updateStats();
+  const wrap = document.getElementById('editor-wrap');
+  function touchCaretMemo() {
+    if (document.activeElement === editor) STATE.lastCaretLineIndex = getCaretLineIndex();
+  }
+  editor.addEventListener('input', function() {
+    liveAnalyze(this.innerText);
+    touchCaretMemo();
+    window.updateEditorLineHighlight();
+  });
+  ['keyup', 'mouseup'].forEach(ev => editor.addEventListener(ev, () => requestAnimationFrame(() => {
+    touchCaretMemo();
+    window.updateEditorLineHighlight();
+  })));
+  if (wrap) {
+    wrap.addEventListener('scroll', () => {
+      updateGutterScrollTicker();
+      updateSectionChrome();
+      window.updateEditorLineHighlight();
+    }, { passive: true });
+  }
+  document.addEventListener('selectionchange', () => {
+    if (document.activeElement === editor) requestAnimationFrame(() => {
+      touchCaretMemo();
+      window.updateEditorLineHighlight();
+    });
+  });
+  editor.focus();
+  touchCaretMemo();
+  initGutterClickDelegation();
+  initGutterScrollTickerClick();
+  initAnalysisSectionDelegation();
+  initXaiApiPanel();
+  liveAnalyze(editor.innerText || '');
+  requestAnimationFrame(() => {
+    updateGutterScrollTicker();
+    updateSectionChrome();
+    window.updateEditorLineHighlight();
+  });
+  let tlResizePending = false;
+  function onViewportResize() {
+    if (tlResizePending) return;
+    tlResizePending = true;
+    requestAnimationFrame(() => {
+      tlResizePending = false;
+      drawTimeline();
+      updateGutterScrollTicker();
+      updateSectionChrome();
+    });
+  }
+  window.addEventListener('resize', onViewportResize, { passive: true });
+  window.addEventListener('orientationchange', onViewportResize, { passive: true });
+  initBidirectionalSync();
+}, 80);
+</script>
+</body>
+</html>

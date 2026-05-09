@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-grok-console="v9">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GROK › TEAM CONSOLE v9 • ISOMORPHIC ORCHESTRATION</title>
+<style>
+:root {
+  --bg: #000000; --panel: #0a0a0a; --border: #1a1a1a;
+  --accent: #00ff9f; --accent2: #00eaff; --text: #00ddaa; --muted: #444;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+body { margin:0; background:var(--bg); color:var(--text); font-family:var(--mono); font-size:13px; overflow:hidden; }
+header { background:#050505; border-bottom:2px solid var(--accent); padding:8px 16px; display:flex; justify-content:space-between; position:sticky; top:0; z-index:100; }
+header h1 { margin:0; color:var(--accent); letter-spacing:3px; font-size:16px; }
+
+.git-traffic { background:#050505; border-bottom:2px solid #00ff9f; padding:10px 16px; overflow-x:auto; }
+.git-graph { height:118px; width:100%; min-width:1300px; }
+
+.panel { background:var(--panel); border:1px solid var(--border); border-radius:6px; margin:10px; padding:14px; }
+h2 { color:var(--accent2); margin:0 0 10px; font-size:13px; letter-spacing:1px; }
+
+.controls button, .btn {
+  background:#111; color:var(--accent); border:1px solid var(--accent); padding:6px 12px; font-family:var(--mono); font-size:11px; margin:2px; cursor:pointer; border-radius:3px;
+}
+.btn:hover, .controls button:hover { background:var(--accent); color:#000; }
+.btn-danger { border-color:#ff3366; color:#ff6699; }
+
+.steno-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; background:#111; border-radius:6px; overflow:hidden; }
+.steno-pane { background:#000; padding:12px; }
+.steno-ta { width:100%; height:180px; background:#000; border:1px solid #222; color:#00ffcc; font-family:var(--mono); font-size:12px; padding:10px; resize:none; }
+
+.console-log {
+  background:#000; border:1px solid #222; padding:12px; height:240px; overflow-y:auto; color:#00ff9f; font-size:12px; white-space:pre-wrap; line-height:1.35;
+}
+.steno-line { display:flex; gap:8px; font-size:11px; margin:1px 0; }
+.steno-sym { width:28px; color:#ff00cc; }
+.steno-gate { width:48px; color:#00eaff; }
+.steno-depth { width:24px; color:#ffff00; }
+
+#boids-canvas { background:#000; border:1px solid #222; width:100%; height:260px; }
+#justification-mount { border:1px solid #222; padding:12px; background:#050505; }
+
+.transcript-line {
+  background:#111; padding:6px 10px; margin:4px 0; border-left:3px solid #00ff9f; font-size:12px; color:#ccc;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GROK › TEAM CONSOLE v9</h1>
+  <div style="color:#00ff9f;font-size:12px">ISOMORPHIC ORCHESTRATION • MAIN CHAIN INTEGRITY 100% • <span id="live-count">7</span> ENTITIES IN FLOW</div>
+</header>
+
+<!-- GIT GRAPH TRAFFIC CONTROL -->
+<div class="git-traffic">
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:#00ff9f;margin-bottom:6px">
+    <strong>MAIN PRODUCTION CHAIN — Persistent Isomorphic Loop</strong>
+    <span>ON/OFF RAMPS ENABLED — MULTI-USER HACKATHON/OFFICE MODE</span>
+  </div>
+  <svg id="git-graph" viewBox="0 0 1350 118"></svg>
+  
+  <div class="controls" style="margin-top:8px">
+    <button onclick="joinRamp('triage')">Join Triage Ramp</button>
+    <button onclick="joinRamp('analysis')">Join Analysis Ramp</button>
+    <button onclick="joinRamp('synthesis')">Join Synthesis Ramp</button>
+    <button onclick="hopOff()" class="btn-danger">Hop Off Chain</button>
+    <button onclick="togglePause()" id="pause-btn">PAUSE MAIN CHAIN</button>
+    <button onclick="forceMerge()">FORCE MERGE</button>
+    <button onclick="advanceAll()">ADVANCE ALL</button>
+    <span style="margin-left:20px;color:#666">Concurrency</span>
+    <input type="range" id="concurrency-slider" min="1" max="16" value="6" oninput="updateConcurrency(this.value)">
+    <span id="concurrency-val" style="color:var(--accent);width:60px">6</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:280px 1fr 420px;gap:8px;height:calc(100vh - 168px);padding:8px">
+
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="panel">
+      <h2>ISOMORPHIC PROTOCOL v9</h2>
+      <div style="font-size:11px;margin-bottom:8px" id="protocol-readout">DEPTH: 4 • TEMP: 0.82 • COHERENCE: 94% • CYCLE: 17</div>
+      
+      <div class="controls">
+        <button onclick="setDepth(2)">Depth 2</button>
+        <button onclick="setDepth(4)">Depth 4</button>
+        <button onclick="setDepth(7)">Depth 7</button>
+      </div>
+      <div style="margin:12px 0 6px">Coherence <progress id="coherence-bar" value="94" max="100" style="width:100%"></progress></div>
+      <button onclick="triggerPhase()" class="btn" style="width:100%">MANUAL PHASE ADVANCE</button>
+    </div>
+
+    <div class="panel">
+      <h2>ACTIVE TASKS</h2>
+      <table id="task-table" style="width:100%;font-size:11px"></table>
+    </div>
+
+    <div class="panel">
+      <h2>PRESENCE • IN FLOW (WebSocket Sim)</h2>
+      <div id="presence"></div>
+    </div>
+  </div>
+
+  <!-- CENTER COLUMN -->
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <!-- Dual Steno Channel -->
+    <div class="panel" style="flex:2">
+      <h2>CHANNEL A ↔ B • REAL-TIME STENO LOGGING</h2>
+      <div class="steno-grid">
+        <div class="steno-pane">
+          <div style="color:#00eaff">INPUT + LIVE TRANSCRIPT</div>
+          <textarea id="channel-a" class="steno-ta" placeholder="Live transcripts appear here..."></textarea>
+        </div>
+        <div class="steno-pane">
+          <div style="color:#00ff9f">SYNTHESIS • ITERATED OUTPUT</div>
+          <div id="channel-b" style="height:180px;overflow:auto;background:#000;padding:10px;font-size:12px;color:#aaffcc;white-space:pre-wrap"></div>
+        </div>
+      </div>
+      <button onclick="sendToOrchestration()" style="margin-top:8px;width:100%" class="btn">SEND TO ISOMORPHIC ORCHESTRATION</button>
+    </div>
+
+    <!-- Sophisticated Boid Flock -->
+    <div class="panel" style="flex:1">
+      <h2>LIVE BOID FLOCK • AGENT SWARM (45 entities)</h2>
+      <canvas id="boids-canvas" width="680" height="260"></canvas>
+      <div style="font-size:10px;color:#555;margin-top:4px">Mouse = attraction point • Team agents (Oppie/Leo/Enrico/Hans) colored</div>
+    </div>
+
+    <!-- Pretext Justification Widget -->
+    <div class="panel">
+      <h2>PRETEXT JUSTIFICATION WIDGET • Live Comparison</h2>
+      <div style="margin-bottom:8px">
+        <label>Narrow → Wide <input type="range" id="justify-slider" min="180" max="520" value="280" style="width:280px"></label>
+        <span id="justify-val" style="margin-left:12px;color:var(--accent)">280px</span>
+      </div>
+      <div id="justification-mount" style="height:160px;overflow:hidden;background:#000;position:relative"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <!-- Live Terminal -->
+    <div class="panel" style="flex:2">
+      <h2>LIVE TERMINAL • STENO-STYLE LOG</h2>
+      <pre id="console-log" class="console-log"></pre>
+    </div>
+
+    <!-- Live Speech-to-Text Sources -->
+    <div class="panel">
+      <h2>LIVE TRANSCRIPT SOURCES</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="startTranscript('bloomberg')" class="btn">Bloomberg Live</button>
+        <button onclick="startTranscript('xai')" class="btn">xAI Livestream</button>
+        <button onclick="startTranscript('youtube')" class="btn">YouTube Stream</button>
+        <button onclick="stopAllTranscripts()" class="btn-danger">Stop All</button>
+      </div>
+      <div id="live-transcripts" style="margin-top:12px;max-height:180px;overflow:auto"></div>
+    </div>
+
+    <!-- Orchestration Graph -->
+    <div class="panel">
+      <h2>ORCHESTRATION GRAPH (Animated)</h2>
+      <svg id="orch-svg" width="100%" height="140" viewBox="0 0 720 140"></svg>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== BOIDS (Sophisticated Flock) ======================
+class Boid {
+  constructor(x,y,color,name) {
+    this.pos = {x,y}; this.vel = {x:Math.random()*4-2, y:Math.random()*4-2};
+    this.color = color; this.name = name; this.size = 5;
+  }
+  update(boids, mouse) {
+    let sep = this.separate(boids);
+    let ali = this.align(boids);
+    let coh = this.cohesion(boids);
+    let mou = this.seek(mouse);
+    
+    this.vel.x += sep.x*1.4 + ali.x*1.0 + coh.x*1.1 + mou.x*0.6;
+    this.vel.y += sep.y*1.4 + ali.y*1.0 + coh.y*1.1 + mou.y*0.6;
+    
+    const speed = Math.hypot(this.vel.x, this.vel.y);
+    if (speed > 5) { this.vel.x = this.vel.x/speed*5; this.vel.y = this.vel.y/speed*5; }
+    
+    this.pos.x += this.vel.x; this.pos.y += this.vel.y;
+    
+    if (this.pos.x < 0 || this.pos.x > 680) this.vel.x *= -1;
+    if (this.pos.y < 0 || this.pos.y > 260) this.vel.y *= -1;
+  }
+  separate(boids) { let steer = {x:0,y:0}, count=0;
+    for (let b of boids) {
+      let d = Math.hypot(this.pos.x-b.pos.x, this.pos.y-b.pos.y);
+      if (d>0 && d<45) { steer.x += (this.pos.x-b.pos.x)/d; steer.y += (this.pos.y-b.pos.y)/d; count++; }
+    }
+    if (count>0) { steer.x /= count; steer.y /= count; }
+    return steer;
+  }
+  align(boids) { let sum={x:0,y:0}, count=0;
+    for (let b of boids) {
+      let d = Math.hypot(this.pos.x-b.pos.x, this.pos.y-b.pos.y);
+      if (d>0 && d<65) { sum.x += b.vel.x; sum.y += b.vel.y; count++; }
+    }
+    if (count>0) { sum.x /= count; sum.y /= count; }
+    return sum;
+  }
+  cohesion(boids) { let sum={x:0,y:0}, count=0;
+    for (let b of boids) {
+      let d = Math.hypot(this.pos.x-b.pos.x, this.pos.y-b.pos.y);
+      if (d>0 && d<75) { sum.x += b.pos.x; sum.y += b.pos.y; count++; }
+    }
+    if (count>0) { sum.x = (sum.x/count - this.pos.x)*0.05; sum.y = (sum.y/count - this.pos.y)*0.05; }
+    return sum;
+  }
+  seek(target) {
+    return { x: (target.x - this.pos.x)*0.008, y: (target.y - this.pos.y)*0.008 };
+  }
+  draw(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.pos.x, this.pos.y, this.size, this.size);
+    ctx.fillStyle = "#fff";
+    ctx.font = "9px monospace";
+    ctx.fillText(this.name[0], this.pos.x+6, this.pos.y+4);
+  }
+}
+
+let boids = [];
+let mouse = {x:340, y:130};
+function initBoids() {
+  boids = [];
+  const colors = ["#00ff9f","#00eaff","#ff00cc","#ccff00"];
+  const names = ["Oppie","Leo","Enrico","Hans"];
+  for (let i=0; i<45; i++) {
+    let c = colors[i%4];
+    let n = names[i%4];
+    boids.push(new Boid(Math.random()*680, Math.random()*260, c, n));
+  }
+}
+function animateBoids() {
+  const canvas = document.getElementById("boids-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#000000";
+  function loop() {
+    ctx.fillRect(0,0,680,260);
+    for (let b of boids) {
+      b.update(boids, mouse);
+      b.draw(ctx);
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+canvas = document.getElementById("boids-canvas");
+canvas.addEventListener("mousemove", e => {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = e.clientX - rect.left;
+  mouse.y = e.clientY - rect.top;
+});
+
+// ====================== PRETEXT JUSTIFICATION WIDGET (Full original style) ======================
+function initJustification() {
+  const mount = document.getElementById("justification-mount");
+  const slider = document.getElementById("justify-slider");
+  const val = document.getElementById("justify-val");
+  
+  const text = "The isomorphic orchestration layer allows multiple users to join and leave the main production chain via on/off ramps without disruption, while maintaining coherence across search, analysis, conversion, collaboration, iteration, and loop phases.";
+  
+  function renderJustify(w) {
+    val.textContent = w + "px";
+    mount.innerHTML = `
+      <div style="display:flex;height:100%;font-size:11.5px;line-height:1.35;background:#111;color:#ddd">
+        <div style="width:${w}px;border-right:2px solid #00ff9f;padding:8px;overflow:hidden">${text}</div>
+        <div style="width:${w}px;border-right:2px solid #00eaff;padding:8px;overflow:hidden;text-align:justify">${text}</div>
+        <div style="flex:1;padding:8px;overflow:hidden;text-align:right">${text}</div>
+      </div>
+      <div style="position:absolute;bottom:4px;right:12px;font-size:9px;color:#00ff9f">stenoSTRIP • utilization 87% • waste 9%</div>
+    `;
+  }
+  slider.oninput = () => renderJustify(slider.value);
+  renderJustify(280);
+}
+
+// ====================== GIT GRAPH + ANIMATION ======================
+function renderGitGraph() {
+  const svg = document.getElementById("git-graph");
+  svg.innerHTML = `
+    <path d="M 60 58 L 1290 58" stroke="#00ff9f" stroke-width="7" fill="none"/>
+    <text x="20" y="65" fill="#00ff9f" font-size="14" font-family="monospace">MAIN</text>
+    
+    <path d="M 240 58 Q 310 12 390 12" stroke="#00eaff" stroke-width="4" fill="none" stroke-dasharray="3,3"/>
+    <text x="290" y="26" fill="#00eaff" font-size="11">TRIAGE</text>
+    
+    <path d="M 580 58 Q 650 12 740 12" stroke="#ff00cc" stroke-width="4" fill="none" stroke-dasharray="3,3"/>
+    <text x="640" y="26" fill="#ff00cc" font-size="11">ANALYSIS</text>
+    
+    <path d="M 920 58 Q 990 104 1080 104" stroke="#ccff00" stroke-width="4" fill="none" stroke-dasharray="3,3"/>
+    <text x="970" y="118" fill="#ccff00" font-size="11">SYNTHESIS</text>
+    
+    <circle cx="180" cy="58" r="9" fill="#111" stroke="#00ff9f"/>
+    <circle cx="520" cy="12" r="7" fill="#111" stroke="#00eaff"/>
+    <circle cx="810" cy="58" r="7" fill="#111" stroke="#ff00cc"/>
+    <circle cx="1150" cy="104" r="7" fill="#111" stroke="#ccff00"/>
+  `;
+}
+
+// ====================== WEB SOCKET SIMULATION ======================
+let simulatedUsers = ["Sarah Chen", "Marcus Rivera", "Priya Patel", "Jamal Wright"];
+function simulateWebSocket() {
+  setInterval(() => {
+    if (Math.random() > 0.7) {
+      const user = simulatedUsers[Math.floor(Math.random()*simulatedUsers.length)];
+      log(`[WS] ${user} joined via synthesis ramp`);
+      renderPresence();
+    }
+  }, 6500);
+}
+
+// ====================== STENO-STYLE LOGGING ======================
+function log(msg) {
+  const el = document.getElementById("console-log");
+  const ts = new Date().toLocaleTimeString('en-US',{hour12:false});
+  el.textContent += `${ts} ${msg}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// ====================== LIVE TRANSCRIPT SIMULATION ======================
+let transcriptInterval = null;
+window.startTranscript = function(source) {
+  const container = document.getElementById("live-transcripts");
+  const sources = {
+    bloomberg: "Bloomberg",
+    xai: "xAI Livestream",
+    youtube: "YouTube"
+  };
+  const phrases = [
+    "We are seeing strong coordination signals in multi-agent systems...",
+    "The isomorphic pattern maintains chain integrity even with transient users.",
+    "Real-time speech-to-text latency now under 180ms on the new cluster.",
+    "xAI researchers just published new results on bounded concurrency.",
+    "The main production chain absorbed three new contributors without disruption."
+  ];
+  
+  let i = 0;
+  if (transcriptInterval) clearInterval(transcriptInterval);
+  
+  transcriptInterval = setInterval(() => {
+    const line = document.createElement("div");
+    line.className = "transcript-line";
+    line.textContent = `[${sources[source]}] ${phrases[i%phrases.length]}`;
+    container.appendChild(line);
+    container.scrollTop = container.scrollHeight;
+    
+    // Auto-feed some transcripts into Channel A
+    if (Math.random() > 0.6) {
+      document.getElementById("channel-a").value += "\n" + phrases[i%phrases.length];
+    }
+    i++;
+  }, 1700);
+  
+  log(`[TRANSCRIPT] Connected to ${sources[source]} live feed`);
+};
+
+window.stopAllTranscripts = function() {
+  if (transcriptInterval) clearInterval(transcriptInterval);
+  log("[TRANSCRIPT] All live feeds disconnected");
+};
+
+// ====================== REMAINING FUNCTIONS (Tasks, Protocol, etc.) ======================
+let tasks = [];
+const stages = ["POLL","ANALYSIS","CONVERT","COLLAB","ITERATE","LOOP"];
+let isPaused = false;
+let depth = 4;
+
+function createTask(text) {
+  const id = "T" + (10000 + Math.floor(Math.random()*90000));
+  const task = {id, title:text.substring(0,38)+"…", stage:stages[0], status:"RUNNING", participants:["Oppie","Leo"]};
+  tasks.unshift(task);
+  renderTasks();
+  
+  let step = 0;
+  const int = setInterval(() => {
+    if (isPaused) return;
+    step++;
+    if (step < stages.length) {
+      task.stage = stages[step];
+      renderTasks();
+    } else {
+      task.status = "MERGED";
+      renderTasks();
+      clearInterval(int);
+    }
+  }, 1300);
+}
+
+function renderTasks() {
+  let html = `<tr style="color:#555"><th>ID</th><th>TITLE</th><th>STAGE</th><th>STATUS</th></tr>`;
+  tasks.forEach(t => {
+    html += `<tr><td style="color:#00ff9f">${t.id}</td><td>${t.title}</td><td>${t.stage}</td><td style="color:#00ffaa">${t.status}</td></tr>`;
+  });
+  document.getElementById("task-table").innerHTML = html;
+}
+
+window.sendToOrchestration = function() {
+  const val = document.getElementById("channel-a").value.trim();
+  if (!val) return;
+  document.getElementById("channel-b").textContent += `\n→ ${val}\n`;
+  createTask(val);
+  log("[ORCH] Task enqueued on main chain");
+  document.getElementById("channel-a").value = "";
+};
+
+window.joinRamp = function(type) { 
+  log(`[USER] New participant joined ${type.toUpperCase()} ramp`);
+  renderPresence();
+};
+
+window.hopOff = function() {
+  log("[USER] Participant cleanly hopped off main chain — integrity preserved");
+  renderPresence();
+};
+
+function renderPresence() {
+  const names = ["Oppie","Leo","Enrico","Hans","Sarah","Marcus","Priya"];
+  let html = "";
+  names.forEach(n => {
+    html += `<div style="display:inline-block;background:#111;padding:4px 10px;margin:2px;border-radius:4px;color:#00ff9f">${n}</div>`;
+  });
+  document.getElementById("presence").innerHTML = html;
+  document.getElementById("live-count").textContent = names.length;
+};
+
+window.togglePause = function() {
+  isPaused = !isPaused;
+  document.getElementById("pause-btn").textContent = isPaused ? "RESUME MAIN CHAIN" : "PAUSE MAIN CHAIN";
+  log(isPaused ? "[SYSTEM] MAIN CHAIN PAUSED" : "[SYSTEM] MAIN CHAIN RESUMED");
+};
+
+window.forceMerge = function() { log("[HITL] Force merge executed"); tasks.forEach(t=>t.status="MERGED"); renderTasks(); };
+window.advanceAll = function() { log("[ORCH] Advancing all tasks"); renderTasks(); };
+window.setDepth = function(d) { depth = d; document.getElementById("protocol-readout").textContent = `DEPTH: ${d} • TEMP: 0.82 • COHERENCE: 94% • CYCLE: 17`; log(`[PROTOCOL] Depth changed to ${d}`); };
+window.triggerPhase = function() { log("[PROTOCOL] Manual phase advance triggered"); };
+
+// ====================== BOOT ======================
+renderGitGraph();
+initBoids();
+animateBoids();
+initJustification();
+renderPresence();
+simulateWebSocket();
+
+log("[SYSTEM] Grok Team Console v9 • Dark Terminal-First Mode");
+log("[INFO] Sophisticated boid flock, pretext justification, WebSocket simulation, live steno logging, deep protocol controls, and live transcript sources initialized.");
+
+setTimeout(() => { createTask("Comparative analysis of isomorphic multi-agent orchestration frameworks with live transcript integration"); }, 800);
+setTimeout(() => { startTranscript("xai"); }, 1600);
+</script>
+</body>
+</html>

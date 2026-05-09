@@ -1,0 +1,39 @@
+grok-railway-iterations/
+├── README.md
+├── v11/
+│   ├── railway-v11.html
+│   ├── server.js
+│   └── README_v11.md
+├── v12/
+│   ├── railway-v12.html
+│   ├── server.py
+│   ├── server.rs (stub)
+│   ├── Makefile
+│   └── README_v12.md
+├── v13/
+│   ├── railway-v13.html
+│   ├── server.py (PyTorch)
+│   ├── server.rs
+│   ├── Cargo.toml
+│   ├── Makefile
+│   └── README_v13.md
+├── v14/
+│   ├── railway-v14.html (dashboard)
+│   ├── server.py (trained PyTorch)
+│   ├── server.rs (full)
+│   ├── Cargo.toml
+│   ├── Makefile
+│   ├── Taskfile.yml
+│   ├── flake.nix
+│   └── README_v14.md
+├── v15-final/
+│   ├── railway-v15.html (final dashboard + IronRaw)
+│   ├── server.rs (complete with IronRaw integration)
+│   ├── Cargo.toml
+│   ├── Makefile
+│   ├── Taskfile.yml
+│   ├── flake.nix
+│   ├── run-all.sh
+│   └── README.md
+├── zip-all-versions.sh
+└── run-all.sh

@@ -1,0 +1,261 @@
+<!-- Extracted from qbit/v01 (Grok codec canvas bundle). Do not edit v01 by hand for single-file fixes — edit this file. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • grok.com waypoint v3.8 codec • CSS Grid Layout Techniques</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c12">
+<style>
+  :root {
+    /* ====================== CORE THEME ====================== */
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --surface-2: #21262d;
+    --gutter: #0d1117;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --accent-hover: #79b8ff;
+    --border: #30363d;
+    --card-bg: #1f252e;
+    --card-border: #3a424f;
+    --card-accent: #58a6ff;
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    --grid-size: 20px;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  body {
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; min-height:100dvh; height:100vh;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+
+  header {
+    background:var(--surface); padding:12px 16px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px; font-size:13px; flex-wrap:wrap;
+  }
+  .logo { font-weight:500; color:var(--accent); }
+
+  /* ====================== CSS GRID LAYOUT TECHNIQUES DEMO ====================== */
+  .demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--grid-size);
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 20px;
+  }
+
+  .demo-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.25s ease;
+  }
+  .demo-card:hover {
+    border-left-color: var(--accent-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(88,166,255,0.3);
+  }
+
+  /* Explicit Grid Areas Example */
+  .explicit-grid {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "sidebar main"
+      "footer footer";
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    min-height: 420px;
+  }
+  .grid-header { grid-area: header; background:var(--surface); padding:12px; border-radius:6px; }
+  .grid-sidebar { grid-area: sidebar; background:var(--card-bg); padding:16px; border-radius:8px; border-left:5px solid #3fb950; }
+  .grid-main { grid-area: main; background:var(--card-bg); padding:16px; border-radius:8px; }
+  .grid-footer { grid-area: footer; background:var(--surface); padding:12px; border-radius:6px; text-align:center; }
+
+  /* Nuke-style Node Grid Overlay */
+  .node-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--grid-size);
+    padding: 20px;
+    background: rgba(10,12,18,0.6);
+    border: 1px dashed #58a6ff;
+  }
+
+  .editor {
+    flex:1; padding:20px; overflow:auto; background:var(--bg); font-size:15px; line-height:1.65;
+    white-space:pre-wrap; caret-color:var(--accent);
+  }
+
+  .gutter {
+    width:72px; background:var(--gutter); border-right:1px solid var(--border);
+    padding:16px 4px; color:var(--text-secondary); font-size:15px;
+  }
+
+  button {
+    background:var(--surface-2); color:var(--accent); border:1px solid var(--border);
+    padding:8px 14px; border-radius:6px; cursor:pointer; font-family:inherit;
+  }
+  button:hover { background:#21262d; border-color:var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">qbit-notes • codec v3.8 • CSS Grid Layout Techniques</div>
+  <button onclick="toggleMode()">Switch to Node Grid</button>
+  <button onclick="demoAutoLayout()">Auto-Fill Grid Demo</button>
+  <button onclick="resetAll()">Reset All</button>
+</header>
+
+<div style="flex:1;display:flex;overflow:hidden;">
+  <!-- Notes Panel with Grid Examples -->
+  <div id="notes-panel" style="flex:1;display:flex;flex-direction:column;">
+    <div style="display:flex;">
+      <div class="gutter" id="gutter">GRID</div>
+      <div class="editor" id="editor" contenteditable="true" spellcheck="false">
+# v3.8 — CSS Grid Layout Techniques
+
+CSS Grid is the modern way to create complex, responsive layouts. Here are the key techniques used in qbit-notes:
+
+## 1. Auto-fit Responsive Grid
+```css
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--grid-size);
+}
+→ Perfect for card galleries and responsive panels.
+
+  Plate Read
+Input layer
+  Screen Clean
+Denoise pass
+  IBK Stacked
+Core keying
+
+2. Explicit Named Grid Areas (Nuke-style Layout)
+CSS.explicit-grid {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 240px 1fr;
+}
+→ Ideal for complex orchestrator panels with fixed sidebar + flexible main area.
+
+  Nuke B-Spine Header
+  
+    Keying Tools
+
+    • IBK
+
+    • Keylight
+
+    • Despill
+  
+  
+    Main compositing canvas area with 20px grid snapping.
+  
+  Output • Render Queue
+
+3. 20px Grid Snapping (Node Graph Foundation)
+CSS.node-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--grid-size);
+}
+→ Used for precise block placement in the orchestrator canvas.
+
+  Read
+  Clean
+  Key
+  Merge
+
+4. Combining Grid + Flex
+The main layout uses display:flex for the overall page while inner sections use Grid for precise control.
+Pro Tips:
+
+Use var(--grid-size) for consistent spacing
+auto-fit makes layouts responsive
+Named areas make complex UIs readable and maintainable
+Grid works perfectly with absolute positioned blocks (our node graph)
+
+Copy any example above and paste into the editor to see live updates.
+      
+    
+  
+  
+  
+    
+      
+      
+        Plate Input
+Green screen source
+      
+      
+        Screen Clean
+      
+      
+        IBK Key
+      
+      
+        Merge over B-spine
+      
+    
+    
+      This panel uses CSS Grid with 20px gaps. Blocks snap to grid in full implementation.
+    
+  
+
+
+  <button onclick="toggleMode()">Toggle Node Grid View</button>
+  <button onclick="demoAutoLayout()">Add More Grid Cards</button>
+  <button onclick="resetAll()">Reset Demo</button>
+
+<script>
+let currentMode = 'notes';
+
+function toggleMode() {
+currentMode = currentMode === 'notes' ? 'orchestrator' : 'notes';
+document.getElementById('notes-panel').style.display = currentMode === 'notes' ? 'flex' : 'none';
+document.getElementById('orchestrator-panel').style.display = currentMode === 'orchestrator' ? 'flex' : 'none';
+}
+
+function demoAutoLayout() {
+const grid = document.querySelector('.node-grid');
+if (grid) {
+const newCard = document.createElement('div');
+newCard.style.cssText = 'background:var(--surface-2);padding:16px;border:1px solid var(--accent);border-radius:6px;';
+newCard.innerHTML = `<strong>New Node</strong><br>Added via JS`;
+grid.appendChild(newCard);
+}
+}
+
+function resetAll() {
+alert('Demo reset. All grid examples restored to initial state.');
+location.reload();
+}
+
+// Boot
+setTimeout(() => {
+document.getElementById('editor').focus();
+}, 120);
+</script>
+</body>
+</html>

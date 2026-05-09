@@ -1,0 +1,19 @@
+import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
+    plugins: [react()],
+    server: {
+      port: 5178,
+    },
+    // simple-peer / randombytes expect Node's `global` in the browser bundle
+    define: {
+      global: 'globalThis',
+      'process.env.VITE_UVSPEED_WEB_BASE': JSON.stringify(env.VITE_UVSPEED_WEB_BASE ?? ''),
+      'process.env.VITE_BACKEND_URL': JSON.stringify(env.VITE_BACKEND_URL ?? ''),
+    },
+  }
+})

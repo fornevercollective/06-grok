@@ -1,0 +1,213 @@
+{
+  "version": "1.0",
+  "generated": "2026-02-15T02:01:53.527Z",
+  "apps": [
+    {
+      "name": "archflow",
+      "category": "visualizer",
+      "dark": "archflow-dark.png",
+      "light": "archflow-light.png",
+      "split": "archflow-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "blackwell",
+      "category": "dashboard",
+      "dark": "blackwell-dark.png",
+      "light": "blackwell-light.png",
+      "split": "blackwell-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "brothernumsy",
+      "category": "game",
+      "dark": "brothernumsy-dark.png",
+      "light": "brothernumsy-light.png",
+      "split": "brothernumsy-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "feed",
+      "category": "media",
+      "dark": "feed-dark.png",
+      "light": "feed-light.png",
+      "split": "feed-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "freya",
+      "category": "tools",
+      "dark": "freya-dark.png",
+      "light": "freya-light.png",
+      "split": "freya-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "freya-landing",
+      "category": "showcase",
+      "dark": "freya-landing-dark.png",
+      "light": "freya-landing-light.png",
+      "split": "freya-landing-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "github-dashboard",
+      "category": "dashboard",
+      "dark": "github-dashboard-dark.png",
+      "light": "github-dashboard-light.png",
+      "split": "github-dashboard-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "grid",
+      "category": "media",
+      "dark": "grid-dark.png",
+      "light": "grid-light.png",
+      "split": "grid-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "hexbench",
+      "category": "analyzer",
+      "dark": "hexbench-dark.png",
+      "light": "hexbench-light.png",
+      "split": "hexbench-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "hexcast",
+      "category": "media",
+      "dark": "hexcast-dark.png",
+      "light": "hexcast-light.png",
+      "split": "hexcast-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "hexcast-send",
+      "category": "media",
+      "dark": "hexcast-send-dark.png",
+      "light": "hexcast-send-light.png",
+      "split": "hexcast-send-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "history",
+      "category": "knowledge",
+      "dark": "history-dark.png",
+      "light": "history-light.png",
+      "split": "history-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "jawta-audio",
+      "category": "media",
+      "dark": "jawta-audio-dark.png",
+      "light": "jawta-audio-light.png",
+      "split": "jawta-audio-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "kbatch",
+      "category": "analyzer",
+      "dark": "kbatch-dark.png",
+      "light": "kbatch-light.png",
+      "split": "kbatch-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "launcher",
+      "category": "launcher",
+      "dark": "launcher-dark.png",
+      "light": "launcher-light.png",
+      "split": "launcher-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "numsy",
+      "category": "visual",
+      "dark": "numsy-dark.png",
+      "light": "numsy-light.png",
+      "split": "numsy-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "quantum-gutter",
+      "category": "showcase",
+      "dark": "quantum-gutter-dark.png",
+      "light": "quantum-gutter-light.png",
+      "split": "quantum-gutter-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "quantum-notepad",
+      "category": "editor",
+      "dark": "quantum-notepad-dark.png",
+      "light": "quantum-notepad-light.png",
+      "split": "quantum-notepad-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "questcast",
+      "category": "media",
+      "dark": "questcast-dark.png",
+      "light": "questcast-light.png",
+      "split": "questcast-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "research-lab",
+      "category": "editor",
+      "dark": "research-lab-dark.png",
+      "light": "research-lab-light.png",
+      "split": "research-lab-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "search",
+      "category": "knowledge",
+      "dark": "search-dark.png",
+      "light": "search-light.png",
+      "split": "search-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "sponsor",
+      "category": "showcase",
+      "dark": "sponsor-dark.png",
+      "light": "sponsor-light.png",
+      "split": "sponsor-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    },
+    {
+      "name": "terminal",
+      "category": "terminal",
+      "dark": "terminal-dark.png",
+      "light": "terminal-light.png",
+      "split": "terminal-split.png",
+      "hasLightMode": true,
+      "viewport": "1280x800"
+    }
+  ]
+}

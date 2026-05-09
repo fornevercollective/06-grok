@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["jest", "node", "@testing-library/jest-dom", "vite/client"],
+    "verbatimModuleSyntax": false,
+    "allowImportingTsExtensions": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src", "src/vite-env.d.ts"]
+}

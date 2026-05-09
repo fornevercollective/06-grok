@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<!-- Grok Railway console — layout aligned with compression-staging-lab / console.x shell -->
+<html lang="en" data-theme="light" data-railway-console="1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f7f8">
+<title>Grok Railway · Console</title>
+<style>
+:root {
+  color-scheme: light;
+  --lab-page: #f7f7f8;
+  --lab-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --lab-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Consolas", monospace;
+  --lab-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --qp-bg: #ffffff;
+  --qp-bg-secondary: #f6f8fa;
+  --qp-border: #d0d7de;
+  --qp-text: #1f2328;
+  --qp-text-secondary: #57606a;
+  --qp-text-muted: #656d76;
+  --qp-accent: #0969da;
+  --qp-accent-subtle: rgba(9, 105, 218, 0.08);
+  /* Soft grey content well (settings / research panel style) */
+  --rail-content-surface: #eef0f4;
+  --nav-w-expanded: 220px;
+  --nav-w-collapsed: 56px;
+  --insp-w-expanded: 300px;
+  --insp-w-collapsed: 0px;
+  --nav-w: var(--nav-w-expanded);
+  --insp-w: var(--insp-w-expanded);
+}
+
+html[data-railway-console="1"] {
+  height: 100%;
+  background: var(--lab-page);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--lab-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--qp-text);
+  background: var(--lab-page);
+}
+
+body.nav-collapsed { --nav-w: var(--nav-w-collapsed); }
+body.inspector-collapsed { --insp-w: var(--insp-w-collapsed); }
+
+/* nav | inspector (hugs nav) | main workspace */
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--nav-w) var(--insp-w) minmax(0, 1fr);
+  height: 100%;
+  /* No transition on grid — avoids collapse/expand jank with 0-width column */
+}
+
+/* —— Left rail —— */
+.nav-rail {
+  display: flex;
+  flex-direction: column;
+  background: var(--qp-bg);
+  border-right: 1px solid var(--qp-border);
+  min-height: 0;
+  transition: width 0.2s ease;
+}
+
+.nav-rail-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.nav-toggle {
+  align-self: flex-end;
+  margin: 8px 8px 4px;
+  width: 36px;
+  height: 32px;
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  background: var(--qp-bg-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--qp-text-muted);
+}
+.nav-toggle:hover { background: #eaeef2; color: var(--qp-text); }
+
+.nav-brand {
+  padding: 4px 14px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--qp-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.nav-collapsed .nav-brand { opacity: 0; height: 0; padding: 0; }
+
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--qp-text);
+  cursor: pointer;
+}
+.nav-item:hover { background: var(--qp-bg-secondary); }
+.nav-item.active {
+  background: var(--qp-accent-subtle);
+  color: var(--qp-accent);
+  font-weight: 500;
+}
+.nav-item .ni-icon {
+  width: 1.25rem;
+  text-align: center;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+body.nav-collapsed .nav-item { justify-content: center; padding: 10px; }
+body.nav-collapsed .nav-label { display: none; }
+
+.nav-footer {
+  padding: 12px;
+  font-size: 12px;
+  border-top: 1px solid var(--qp-border);
+}
+.nav-footer a { color: var(--qp-accent); text-decoration: none; }
+.nav-footer a:hover { text-decoration: underline; }
+
+/* —— Main column —— */
+.main-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-left: 1px solid var(--qp-border);
+  background: var(--lab-page);
+}
+
+/* Merge graph below top bar (full width of main column) */
+.graph-ribbon {
+  flex: 0 0 auto;
+  padding: 8px 16px 0;
+  background: var(--lab-page);
+}
+
+/* Tall enough for SVG + bench + ticket strip + merge log without clipping */
+.graph-ribbon .panel-card {
+  max-height: min(52vh, 520px);
+}
+
+.graph-ribbon .pc-body {
+  padding: 10px 14px;
+}
+.graph-card > .pc-body.graph-body-split {
+  background: var(--rail-content-surface);
+  border-radius: 0 0 11px 11px;
+}
+
+.topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: var(--qp-bg);
+  border-bottom: 1px solid var(--qp-border);
+}
+
+.topbar-title {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.topbar-hint {
+  font-size: 11px;
+  color: var(--qp-text-muted);
+  max-width: 42ch;
+}
+.topbar-hint code { font-family: var(--lab-mono); font-size: 10px; }
+
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-primary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+/* Legend + bench moved here on Tickets view; full merge graph ribbon hidden */
+#topbar-merge-row {
+  display: none;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 16px;
+  width: 100%;
+  padding: 10px 0 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--qp-border);
+}
+body[data-view="tickets"] #topbar-merge-row {
+  display: flex;
+}
+body[data-view="tickets"] .graph-ribbon {
+  display: none !important;
+}
+.topbar-merge-legend {
+  flex: 1 1 200px;
+  min-width: min(100%, 200px);
+}
+.merge-bench-panel--topbar {
+  flex: 2 1 320px;
+  min-width: min(100%, 280px);
+  padding: 8px 10px;
+}
+
+#server-url {
+  width: 220px;
+  padding: 6px 10px;
+  font-family: var(--lab-mono);
+  font-size: 12px;
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  background: var(--qp-bg-secondary);
+}
+
+.btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  background: var(--qp-bg);
+  cursor: pointer;
+  color: var(--qp-text);
+}
+.btn:hover { background: var(--qp-bg-secondary); }
+.btn-primary {
+  background: var(--qp-accent);
+  border-color: var(--qp-accent);
+  color: #fff;
+}
+.btn-primary:hover { filter: brightness(0.95); }
+
+.ws-live { color: #1a7f37; font-weight: 500; }
+.ws-warn { color: #9a6700; }
+.ws-off { color: var(--qp-text-muted); }
+
+.workspace-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workspace {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  padding: 12px 16px;
+  overflow: hidden;
+  flex: 1;
+}
+/* When data panel is hidden, #insp-edge-tab (~30px) sits on this column’s left edge — inset content so cards don’t sit under it */
+body.inspector-collapsed .graph-ribbon {
+  padding: 8px 16px 0 40px;
+}
+body.inspector-collapsed .workspace {
+  padding: 12px 16px 12px 40px;
+}
+
+/* Original-style cohesive grid: terminal + staging side by side */
+.cohesive-grid {
+  display: grid;
+  /* Cap terminal column so staging gets more width; edge tab stays clear of nav */
+  grid-template-columns: minmax(260px, min(460px, 100%)) minmax(240px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  min-height: 0;
+  flex: 1;
+}
+@media (max-width: 900px) {
+  .cohesive-grid { grid-template-columns: 1fr; }
+}
+.cohesive-grid .panel-card { min-height: 200px; }
+.cohesive-grid .terminal { min-height: 140px; }
+
+.view {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.view.active { display: flex; }
+
+.panel-card {
+  background: var(--qp-bg);
+  border: 1px solid var(--qp-border);
+  border-radius: 12px;
+  box-shadow: var(--lab-card-shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel-card > .pc-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--qp-border);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--qp-text-muted);
+  flex-shrink: 0;
+}
+
+.panel-card > .pc-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 14px;
+}
+
+/* Git / rail graph — left cell; right = bench flow (compression-staging-lab style) */
+.graph-body-split {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(240px, 400px);
+  gap: 12px;
+  align-items: start;
+  min-height: 0;
+}
+@media (max-width: 960px) {
+  .graph-body-split { grid-template-columns: 1fr; }
+}
+.graph-chart-cell {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.graph-merge-rail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+/* Live bench–style panel (from lab “Live bench · flow”) */
+.merge-bench-panel {
+  flex-shrink: 0;
+  padding: 10px 12px;
+  background: var(--qp-bg);
+  border-radius: 10px;
+  border: 1px solid var(--qp-border);
+  box-shadow: var(--lab-card-shadow);
+}
+.merge-bench-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-bottom: 8px;
+  font-family: var(--lab-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--qp-text);
+}
+.merge-k {
+  color: var(--qp-text-muted);
+  font-weight: 500;
+  text-transform: lowercase;
+}
+.merge-session-id {
+  text-decoration: underline;
+  text-decoration-color: rgba(9, 105, 218, 0.35);
+  text-underline-offset: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.merge-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #0a5c52;
+  background: rgba(13, 148, 136, 0.12);
+  border: 1px solid rgba(13, 148, 136, 0.28);
+  border-radius: 4px;
+}
+.merge-tape-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 2px;
+  font-family: var(--lab-sans);
+  font-size: 11px;
+  color: var(--qp-text-secondary);
+  margin-bottom: 6px;
+}
+.merge-col { display: inline-flex; align-items: center; }
+.merge-sep {
+  color: var(--qp-border);
+  margin: 0 2px;
+  user-select: none;
+}
+.merge-seg-name {
+  color: var(--qp-text-muted);
+  font-size: 10px;
+  text-transform: lowercase;
+  margin-right: 4px;
+}
+.merge-seg.merge-on .merge-seg-name { color: #0d9488; font-weight: 600; }
+.merge-seg.merge-on .merge-dot { color: #0d9488; }
+.merge-dot { font-size: 10px; color: var(--qp-text-muted); }
+.merge-toptrack {
+  position: relative;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--qp-border);
+  overflow: hidden;
+}
+.merge-toptrack > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 1px;
+  background: #0d9488;
+  transition: width 0.35s ease;
+}
+.merge-ticket-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 2rem;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+.merge-ticket-card {
+  font-family: var(--lab-mono);
+  font-size: 10px;
+  padding: 6px 8px;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  border-left: 3px solid #0969da;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
+}
+.merge-ticket-card.merge-merged { border-left-color: #1a7f37; }
+.merge-ticket-empty span {
+  font-size: 11px;
+  color: var(--qp-text-secondary);
+}
+.merge-ticket-stage {
+  font-size: 9px;
+  color: var(--qp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rail-graph-svg {
+  width: 100%;
+  min-height: 128px;
+  max-height: min(28vh, 240px);
+  background: var(--qp-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--qp-border);
+}
+.rail-graph-svg svg { display: block; width: 100%; height: auto; }
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--qp-text-muted);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  justify-content: flex-end;
+}
+.graph-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.graph-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Legend sits on the right side of the merge-graph panel title */
+.graph-card > .pc-head.graph-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.graph-card .graph-head-title {
+  flex: 1 1 auto;
+  min-width: 12ch;
+}
+.graph-card > .pc-head .graph-legend {
+  margin-top: 0;
+  flex: 0 1 auto;
+  max-width: min(100%, 52ch);
+}
+
+/* Tickets table */
+.ticket-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.ticket-table th {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--qp-border);
+  color: var(--qp-text-muted);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ticket-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--qp-border);
+  font-family: var(--lab-mono);
+  font-size: 12px;
+}
+.ticket-table tr:hover td { background: var(--qp-bg-secondary); }
+.ticket-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--qp-text-muted);
+  font-size: 13px;
+}
+
+/* Tickets view: grey body well */
+#view-tickets .panel-card > .pc-body {
+  background: var(--rail-content-surface);
+  border-radius: 0 0 11px 11px;
+}
+
+.terminal {
+  margin: 0;
+  padding: 12px;
+  font-family: var(--lab-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  background: var(--qp-bg-secondary);
+  border: 1px solid var(--qp-border);
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+  min-height: 120px;
+  overflow: auto;
+}
+
+.activity-log {
+  margin-top: 10px;
+  max-height: 100px;
+  overflow: auto;
+  padding: 8px 10px;
+  font-family: var(--lab-mono);
+  font-size: 11px;
+  color: var(--qp-text-muted);
+  background: var(--qp-bg-secondary);
+  border: 1px solid var(--qp-border);
+  border-radius: 8px;
+}
+.activity-log.graph-merge-log {
+  margin-top: 0;
+  max-height: 160px;
+  flex: 0 0 auto;
+  min-height: 88px;
+  overflow-y: auto;
+  color: var(--qp-text-secondary);
+}
+
+.mic-row { margin-top: 10px; flex-shrink: 0; }
+.mic-row .btn { width: 100%; padding: 10px; }
+.mic-btn.recording {
+  border-color: #8c959f;
+  background: #eaeef2;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.88; } }
+
+/* Staging view */
+.staging-mount,
+#staging-area {
+  flex: 1 1 auto;
+  min-height: 100px;
+  padding: 10px;
+  background: var(--qp-bg-secondary);
+  border: 1px solid var(--qp-border);
+  border-radius: 8px;
+  font-size: 13px;
+  overflow: auto;
+}
+.staging-item {
+  margin: 6px 0;
+  padding: 8px 10px;
+  background: var(--qp-bg);
+  border: 1px solid var(--qp-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* —— Inspector (left of main — hugs nav) —— white panel like main chat column */
+.inspector {
+  border-right: 1px solid var(--qp-border);
+  background: var(--qp-bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+/* Collapsed: column width is 0 via --insp-w */
+body.inspector-collapsed .inspector {
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+/* Reopen control lives inside .main-stack (always clickable when panel hidden) */
+.insp-edge-tab {
+  display: none;
+  position: absolute;
+  /* Flush with main column so panels and tab share one left edge */
+  left: 0;
+  top: min(45%, 320px);
+  z-index: 40;
+  width: 30px;
+  min-height: 88px;
+  padding: 4px 0;
+  border: 1px solid var(--qp-border);
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+  background: var(--qp-bg);
+  color: var(--qp-accent);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 2px 0 8px rgba(31, 35, 40, 0.08);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+}
+.insp-edge-tab .insp-edge-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: var(--qp-text-muted);
+}
+body.inspector-collapsed .insp-edge-tab {
+  display: flex !important;
+}
+
+.insp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--qp-border);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--qp-text-muted);
+  background: var(--qp-bg);
+}
+.insp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  font-size: 13px;
+  background: var(--qp-bg);
+}
+.insp-section {
+  margin-bottom: 16px;
+}
+.insp-section h3 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--qp-text-muted);
+}
+.agent-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 4px 0;
+  background: var(--qp-bg-secondary);
+  border: 1px solid var(--qp-border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.agent-toggle.on { border-color: #0969da; background: var(--qp-accent-subtle); }
+.agent-dot { font-size: 10px; color: var(--qp-text-muted); }
+.agent-toggle.on .agent-dot { color: #1a7f37; }
+
+.client {
+  padding: 6px 8px;
+  margin: 4px 0;
+  font-family: var(--lab-mono);
+  font-size: 11px;
+  background: var(--qp-bg-secondary);
+  border-radius: 6px;
+  word-break: break-all;
+}
+
+.insp-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+#last-intent {
+  font-family: var(--lab-mono);
+  font-size: 12px;
+  padding: 10px;
+  background: var(--qp-bg-secondary);
+  border: 1px solid var(--qp-border);
+  border-radius: 8px;
+  min-height: 44px;
+  color: var(--qp-text);
+}
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="nav-rail" id="nav-rail" aria-label="Primary">
+    <div class="nav-rail-inner">
+      <button type="button" class="nav-toggle" id="nav-toggle" onclick="toggleNav()" title="Collapse menu">«</button>
+      <div class="nav-brand">Grok Railway</div>
+      <nav class="nav-items" id="nav-items">
+        <button type="button" class="nav-item active" data-view="overview" onclick="setView('overview')">
+          <span class="ni-icon">◇</span><span class="nav-label">Overview</span>
+        </button>
+        <button type="button" class="nav-item" onclick="scrollToGraph()">
+          <span class="ni-icon">⤉</span><span class="nav-label">Merge graph</span>
+        </button>
+        <button type="button" class="nav-item" data-view="tickets" onclick="setView('tickets')">
+          <span class="ni-icon">☰</span><span class="nav-label">Tickets</span>
+        </button>
+        <button type="button" class="nav-item" data-view="terminal" onclick="setView('terminal')">
+          <span class="ni-icon">&gt;_</span><span class="nav-label">Terminal</span>
+        </button>
+        <button type="button" class="nav-item" data-view="staging" onclick="setView('staging')">
+          <span class="ni-icon">▤</span><span class="nav-label">Staging</span>
+        </button>
+      </nav>
+      <div class="nav-footer">
+        <a href="http://127.0.0.1:8080/help" target="_blank" rel="noopener">Help</a>
+      </div>
+    </div>
+  </aside>
+
+  <aside class="inspector" id="inspector" aria-label="Railway data" role="complementary">
+    <div class="insp-head">
+      <span>Data</span>
+      <button type="button" class="btn insp-close" onclick="toggleInspector(false)" title="Hide data panel" aria-label="Hide data panel">»</button>
+    </div>
+    <div class="insp-body">
+      <div class="insp-section">
+        <h3>Railway status</h3>
+        <div id="railway-status"></div>
+      </div>
+      <div class="insp-section">
+        <h3>Railway agents</h3>
+        <div id="agent-list"></div>
+      </div>
+      <div class="insp-section">
+        <h3>Connected clients</h3>
+        <div id="client-list"></div>
+      </div>
+      <div class="insp-section">
+        <h3>Last voice intent</h3>
+        <div id="last-intent">—</div>
+      </div>
+      <div class="insp-section">
+        <h3>Quick actions</h3>
+        <div class="insp-actions">
+          <button type="button" class="btn" onclick="exportRailway('steno')">Export .steno</button>
+          <button type="button" class="btn" onclick="exportRailway('json')">Export JSON</button>
+          <button type="button" class="btn" onclick="forceMerge()">Force merge</button>
+          <button type="button" class="btn" onclick="togglePause()" id="pause-btn">Pause railway</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-stack">
+    <button
+      type="button"
+      class="insp-edge-tab"
+      id="insp-edge-tab"
+      onclick="toggleInspector(true)"
+      title="Show data panel"
+      aria-label="Show data panel"
+      aria-controls="inspector"
+      hidden
+    >
+      <span aria-hidden="true">⟩</span>
+      <span class="insp-edge-label">Data</span>
+    </button>
+
+    <header class="topbar">
+      <div class="topbar-primary">
+        <div>
+          <div class="topbar-title">Grok Railway · v15</div>
+          <div class="topbar-hint">Serve at <code>http://127.0.0.1:8080/railway-v15.html</code> — avoid <code>file://</code> for WebSockets.</div>
+        </div>
+        <div class="topbar-actions">
+          <input id="server-url" type="text" value="ws://127.0.0.1:8080/ws" spellcheck="false" autocomplete="off" />
+          <button type="button" class="btn btn-primary" onclick="connectWebSocket()">Connect</button>
+          <span id="ws-status" class="ws-off">● Off</span>
+          <span id="client-count" style="font-size:12px;color:var(--qp-text-muted)">Clients —</span>
+          <button type="button" class="btn" onclick="toggleInspector()" id="insp-btn" title="Show or hide data panel" aria-expanded="true" aria-controls="inspector">Hide data panel</button>
+        </div>
+      </div>
+      <div id="topbar-merge-row" class="topbar-merge-row" aria-label="Agents and bench (tickets view)">
+        <div class="graph-legend topbar-merge-legend" id="graph-legend-tb" aria-label="Agent legend"></div>
+        <div class="merge-bench-panel merge-bench-panel--topbar" aria-label="Live bench flow">
+          <div class="merge-bench-row merge-agent-row">
+            <span class="merge-k">session</span>
+            <span class="merge-session-id" id="merge-session-label-tb">—</span>
+            <span class="merge-tag" id="merge-depth-tag-tb">depth —</span>
+          </div>
+          <div class="merge-tape-row" id="merge-tape-row-tb" aria-label="Pipeline stages">
+            <div class="merge-col merge-seg" data-stage="poll"><span class="merge-seg-name">poll</span><span class="merge-dot">●</span></div>
+            <span class="merge-sep" aria-hidden="true">|</span>
+            <div class="merge-col merge-seg" data-stage="analyze"><span class="merge-seg-name">analyze</span><span class="merge-dot">●</span></div>
+            <span class="merge-sep">|</span>
+            <div class="merge-col merge-seg" data-stage="hitl"><span class="merge-seg-name">hitl</span><span class="merge-dot">●</span></div>
+            <span class="merge-sep">|</span>
+            <div class="merge-col merge-seg" data-stage="merge"><span class="merge-seg-name">merge</span><span class="merge-dot">●</span></div>
+            <span class="merge-sep">|</span>
+            <div class="merge-col merge-seg" data-stage="export"><span class="merge-seg-name">export</span><span class="merge-dot">●</span></div>
+          </div>
+          <div class="merge-toptrack" aria-hidden="true"><span id="merge-toptrack-fill-tb"></span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="graph-ribbon" id="graph-ribbon">
+      <div class="panel-card graph-card">
+        <div class="pc-head graph-head-row">
+          <span class="graph-head-title">Merge graph · agents &amp; track</span>
+          <div class="graph-legend" id="graph-legend" aria-label="Agent legend"></div>
+        </div>
+        <div class="pc-body graph-body-split">
+          <div class="graph-chart-cell">
+            <div id="rail-graph-host" class="rail-graph-svg" aria-label="Merge lines"></div>
+          </div>
+          <div class="graph-merge-rail">
+            <div class="merge-bench-panel" aria-label="Live bench flow">
+              <div class="merge-bench-row merge-agent-row">
+                <span class="merge-k">session</span>
+                <span class="merge-session-id" id="merge-session-label">—</span>
+                <span class="merge-tag" id="merge-depth-tag">depth —</span>
+              </div>
+              <div class="merge-tape-row" id="merge-tape-row" aria-label="Pipeline stages">
+                <div class="merge-col merge-seg" data-stage="poll"><span class="merge-seg-name">poll</span><span class="merge-dot" id="merge-dot-poll">●</span></div>
+                <span class="merge-sep" aria-hidden="true">|</span>
+                <div class="merge-col merge-seg" data-stage="analyze"><span class="merge-seg-name">analyze</span><span class="merge-dot" id="merge-dot-analyze">●</span></div>
+                <span class="merge-sep">|</span>
+                <div class="merge-col merge-seg" data-stage="hitl"><span class="merge-seg-name">hitl</span><span class="merge-dot" id="merge-dot-hitl">●</span></div>
+                <span class="merge-sep">|</span>
+                <div class="merge-col merge-seg" data-stage="merge"><span class="merge-seg-name">merge</span><span class="merge-dot" id="merge-dot-merge">●</span></div>
+                <span class="merge-sep">|</span>
+                <div class="merge-col merge-seg" data-stage="export"><span class="merge-seg-name">export</span><span class="merge-dot" id="merge-dot-export">●</span></div>
+              </div>
+              <div class="merge-toptrack" aria-hidden="true"><span id="merge-toptrack-fill"></span></div>
+            </div>
+            <div class="merge-ticket-strip" id="merge-ticket-strip" aria-label="Tickets on rail"></div>
+            <div class="activity-log graph-merge-log merge-log-mirror" id="graph-merge-log" aria-label="Merge output"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="workspace-main">
+      <main class="workspace">
+        <!-- Overview: original-style cohesive cards -->
+        <section id="view-overview" class="view active" aria-label="Overview">
+          <div class="cohesive-grid">
+            <div class="panel-card" style="min-height:0">
+              <div class="pc-head">IronRaw terminal</div>
+              <div class="pc-body" style="display:flex;flex-direction:column;min-height:0">
+                <pre class="terminal ir-text" data-ir-mirror="1">Waiting for WebSocket…</pre>
+                <div class="activity-log ir-log-mirror" data-ir-log-mirror="1"></div>
+                <div class="mic-row">
+                  <button type="button" class="btn mic-btn" id="mic-btn" onclick="toggleVoice()">Voice commands (browser speech API)</button>
+                </div>
+              </div>
+            </div>
+            <div class="panel-card" style="min-height:0">
+              <div class="pc-head">Staging · highlight text</div>
+              <div class="pc-body" style="display:flex;flex-direction:column;min-height:0">
+                <div class="staging-mount" data-staging-mirror="1">— Nothing staged —</div>
+                <button type="button" class="btn" style="margin-top:10px;width:100%" onclick="clearStaging()">Clear staging</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-tickets" class="view" aria-label="Tickets">
+          <div class="panel-card" style="flex:1">
+            <div class="pc-head">Tickets · poll / merge</div>
+            <div class="pc-body" style="padding:0">
+              <div id="tickets-mount" style="padding:12px 14px"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-terminal" class="view" aria-label="Terminal">
+          <div class="panel-card" style="flex:1">
+            <div class="pc-head">IronRaw terminal</div>
+            <div class="pc-body" style="display:flex;flex-direction:column;min-height:0">
+              <pre class="terminal ir-text" data-ir-mirror="1">Waiting for WebSocket…</pre>
+              <div class="activity-log ir-log-mirror" data-ir-log-mirror="1"></div>
+              <div class="mic-row">
+                <button type="button" class="btn mic-btn" onclick="toggleVoice()">Voice commands (browser speech API)</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-staging" class="view" aria-label="Staging">
+          <div class="panel-card" style="flex:1">
+            <div class="pc-head">Staging · highlight text</div>
+            <div class="pc-body">
+              <div class="staging-mount" data-staging-mirror="1">— Nothing staged —</div>
+              <button type="button" class="btn" style="margin-top:10px;width:100%" onclick="clearStaging()">Clear staging</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script>
+let ws = null;
+let myId = "Dashboard-" + Math.floor(Math.random() * 9999);
+let myClientId = null;
+let depth = 4;
+let activeAgents = { Oppie: true, Leo: true, Enrico: true, Hans: true };
+let lastIntent = "—";
+let isPaused = false;
+let stagingBuffer = [];
+let tasks = [];
+
+function log(msg) {
+  const ts = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const line = ts + " " + msg + "\n";
+  document.querySelectorAll(".ir-log-mirror, .merge-log-mirror").forEach((el) => {
+    el.textContent += line;
+    el.scrollTop = el.scrollHeight;
+  });
+}
+
+function scrollToGraph() {
+  if (document.body.dataset.view === "tickets") {
+    setView("overview");
+  }
+  const g = document.getElementById("graph-ribbon");
+  if (g) g.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function setView(name) {
+  document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+  const el = document.getElementById("view-" + name);
+  if (el) el.classList.add("active");
+  document.querySelectorAll(".nav-item[data-view]").forEach((b) => {
+    b.classList.toggle("active", b.getAttribute("data-view") === name);
+  });
+  document.body.dataset.view = name;
+}
+
+function toggleNav() {
+  document.body.classList.toggle("nav-collapsed");
+  const t = document.getElementById("nav-toggle");
+  t.textContent = document.body.classList.contains("nav-collapsed") ? "»" : "«";
+  t.title = document.body.classList.contains("nav-collapsed") ? "Expand menu" : "Collapse menu";
+}
+
+/** @param {boolean | undefined} show - if true, expand; if false, collapse; if undefined, toggle */
+function toggleInspector(show) {
+  const collapsed = document.body.classList.contains("inspector-collapsed");
+  let next;
+  if (show === true) next = false;
+  else if (show === false) next = true;
+  else next = !collapsed;
+
+  const insp = document.getElementById("inspector");
+  const edge = document.getElementById("insp-edge-tab");
+  const topBtn = document.getElementById("insp-btn");
+
+  // Do not combine aria-hidden with focused descendants; blur before hiding
+  if (next && insp && insp.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
+  if (!next && edge && document.activeElement === edge) {
+    edge.blur();
+  }
+
+  document.body.classList.toggle("inspector-collapsed", next);
+
+  if (insp) {
+    if (next) {
+      insp.setAttribute("inert", "");
+    } else {
+      insp.removeAttribute("inert");
+    }
+  }
+  if (edge) {
+    if (next) {
+      edge.removeAttribute("hidden");
+    } else {
+      edge.setAttribute("hidden", "");
+    }
+  }
+  if (topBtn) {
+    topBtn.textContent = next ? "Show data panel" : "Hide data panel";
+    topBtn.setAttribute("aria-expanded", next ? "false" : "true");
+  }
+}
+
+function connectWebSocket() {
+  const url = document.getElementById("server-url").value;
+  if (ws && ws.readyState === WebSocket.OPEN) ws.close();
+  ws = new WebSocket(url);
+
+  ws.onopen = () => {
+    document.getElementById("ws-status").innerHTML = '<span class="ws-live">● Live</span>';
+    log("Connected to server");
+    ws.send(JSON.stringify({ type: "join", client: myId, role: "dashboard" }));
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === "state") {
+        if (msg.clientId) myClientId = msg.clientId;
+        if (msg.state) {
+          if (msg.state.activeAgents) activeAgents = msg.state.activeAgents;
+          if (msg.state.lastIntent != null) lastIntent = msg.state.lastIntent;
+          isPaused = !!msg.state.isPaused;
+          if (msg.state.depth != null) depth = msg.state.depth;
+          if (Array.isArray(msg.state.tasks)) tasks = msg.state.tasks;
+        }
+        const byId =
+          myClientId && msg.terminalByClient ? msg.terminalByClient[myClientId] : undefined;
+        const term =
+          byId !== undefined && byId !== "" ? byId : (msg.terminalText || "");
+        if (term) {
+          document.querySelectorAll(".ir-text").forEach((te) => {
+            te.textContent = term;
+          });
+        }
+        if (msg.clients) updateClientList(msg.clients);
+        const li = document.getElementById("last-intent");
+        if (li) li.textContent = lastIntent || "—";
+        syncPauseButton();
+        updateDashboard();
+        renderRailGraph();
+        renderTicketsTable();
+      } else if (msg.type === "log") {
+        log(msg.text);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  ws.onerror = () => {
+    log("WebSocket error — is the server running?");
+    document.getElementById("ws-status").innerHTML = '<span class="ws-warn">● Error</span>';
+  };
+
+  ws.onclose = () => {
+    document.getElementById("ws-status").innerHTML = '<span class="ws-off">● Off</span>';
+    setTimeout(connectWebSocket, 4000);
+  };
+}
+
+function syncPauseButton() {
+  const btn = document.getElementById("pause-btn");
+  if (btn) btn.textContent = isPaused ? "Resume railway" : "Pause railway";
+}
+
+function updateDashboard() {
+  let html = "<strong>Depth:</strong> " + depth + "<br>";
+  html += "<strong>Paused:</strong> " + (isPaused ? "Yes" : "No") + "<br>";
+  html += "<strong>Last intent:</strong> " + lastIntent + "<br><br>";
+  html += "<strong>Agents</strong><br>";
+  Object.keys(activeAgents).forEach((a) => {
+    html += "• " + a + ": " + (activeAgents[a] ? "on rail" : "siding") + "<br>";
+  });
+  const rs = document.getElementById("railway-status");
+  if (rs) rs.innerHTML = html;
+  renderAgents();
+}
+
+function renderAgents() {
+  const container = document.getElementById("agent-list");
+  if (!container) return;
+  let html = "";
+  Object.keys(activeAgents).forEach((name) => {
+    const on = activeAgents[name];
+    html +=
+      '<div onclick="toggleAgent(\'' +
+      name +
+      '\')" class="agent-toggle ' +
+      (on ? "on" : "") +
+      '"><span class="agent-dot">●</span> ' +
+      name +
+      '<span style="margin-left:auto;font-size:11px;color:var(--qp-text-muted)">' +
+      (on ? "on rail" : "siding") +
+      "</span></div>";
+  });
+  container.innerHTML = html;
+}
+
+function renderTicketsTable() {
+  const mount = document.getElementById("tickets-mount");
+  if (!mount) return;
+  if (!tasks.length) {
+    mount.innerHTML =
+      '<div class="ticket-empty">No tickets yet. Create one via voice or API when wired.</div>';
+    return;
+  }
+  let html =
+    "<table class='ticket-table'><thead><tr><th>ID</th><th>Title</th><th>Stage</th><th>Status</th></tr></thead><tbody>";
+  tasks.forEach((t) => {
+    html +=
+      "<tr><td>" +
+      escapeHtml(t.id) +
+      "</td><td>" +
+      escapeHtml(t.title) +
+      "</td><td>" +
+      escapeHtml(t.stage) +
+      "</td><td>" +
+      escapeHtml(t.status) +
+      "</td></tr>";
+  });
+  html += "</tbody></table>";
+  mount.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+const AGENT_COLORS = ["#0969da", "#1a7f37", "#9a6700", "#8250df"];
+
+function syncBenchLine(id, text) {
+  const a = document.getElementById(id);
+  const b = document.getElementById(id + "-tb");
+  if (a) a.textContent = text;
+  if (b) b.textContent = text;
+}
+
+function syncToptrackWidth(pct) {
+  ["merge-toptrack-fill", "merge-toptrack-fill-tb"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = pct + "%";
+  });
+}
+
+/** Right column: session / depth, tape stages, tickets, progress (bench-flow style). */
+function renderMergeBenchUI() {
+  const strip = document.getElementById("merge-ticket-strip");
+  syncBenchLine("merge-session-label", myClientId || myId || "—");
+  syncBenchLine("merge-depth-tag", "depth " + depth);
+
+  const intent = String(lastIntent || "");
+  const tapeOn = {
+    poll: !isPaused,
+    analyze: tasks.length > 0,
+    hitl:
+      tasks.some((t) => /hitl|review|human/i.test(String(t.stage || ""))) ||
+      /hitl|review/i.test(intent),
+    merge: tasks.some((t) =>
+      /MERGED|merged|merge/i.test(String(t.status || "") + String(t.stage || ""))
+    ),
+    export: /export|steno/i.test(intent) || tasks.some((t) => /export/i.test(String(t.stage || ""))),
+  };
+  document.querySelectorAll(".merge-seg[data-stage]").forEach((el) => {
+    const st = el.getAttribute("data-stage");
+    el.classList.toggle("merge-on", st && tapeOn[st]);
+  });
+
+  const merged = tasks.filter((t) => /MERGED|merged|done/i.test(String(t.status || ""))).length;
+  let pct = 0;
+  if (tasks.length) pct = Math.min(100, Math.round((merged / tasks.length) * 100));
+  else {
+    const keys = Object.keys(activeAgents);
+    const on = keys.filter((a) => activeAgents[a]).length;
+    pct = keys.length ? Math.min(100, Math.round((on / keys.length) * 35)) : 0;
+  }
+  syncToptrackWidth(pct);
+
+  if (strip) {
+    if (!tasks.length) {
+      strip.innerHTML =
+        '<div class="merge-ticket-card merge-ticket-empty" style="border-left-color:#8b949e;grid-template-columns:1fr"><span>No tickets on rail</span></div>';
+    } else {
+      strip.innerHTML = tasks
+        .map((t) => {
+          const done = /MERGED|merged|done/i.test(String(t.status || ""));
+          return (
+            '<div class="merge-ticket-card' +
+            (done ? " merge-merged" : "") +
+            '"><span class="merge-ticket-stage">' +
+            escapeHtml(t.stage || "—") +
+            '</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' +
+            escapeHtml(t.title || "") +
+            '">' +
+            escapeHtml(t.id) +
+            " · " +
+            escapeHtml(t.title || "") +
+            '</span><span style="color:' +
+            (done ? "#1a7f37" : "#656d76") +
+            '">' +
+            escapeHtml(t.status || "") +
+            "</span></div>"
+          );
+        })
+        .join("");
+    }
+  }
+}
+
+function renderRailGraph() {
+  const host = document.getElementById("rail-graph-host");
+  const legend = document.getElementById("graph-legend");
+  if (!host || !legend) return;
+
+  const agents = Object.keys(activeAgents);
+  const W = 800;
+  const H = 220;
+  const pad = 48;
+  const trackGap = 36;
+
+  const y0 = pad;
+  let paths = "";
+  let nodes = "";
+
+  // main spine
+  const spineX = 120;
+  paths +=
+    '<path d="M ' +
+    spineX +
+    " " +
+    (y0 - 20) +
+    " L " +
+    spineX +
+    " " +
+    (H - pad) +
+    '" stroke="#d0d7de" fill="none" stroke-width="2"/>';
+
+  // branch lanes per agent (names live in legend + merge bench row)
+  agents.forEach((name, i) => {
+    const y = y0 + i * trackGap;
+    const col = AGENT_COLORS[i % AGENT_COLORS.length];
+    const active = activeAgents[name];
+    paths +=
+      '<path d="M ' +
+      spineX +
+      " " +
+      y +
+      " L " +
+      (W - pad) +
+      " " +
+      y +
+      '" stroke="' +
+      col +
+      '" stroke-opacity="' +
+      (active ? "0.85" : "0.25") +
+      '" stroke-width="2" fill="none"/>';
+    nodes +=
+      '<circle cx="' +
+      spineX +
+      '" cy="' +
+      y +
+      '" r="5" fill="' +
+      col +
+      '" stroke="#fff" stroke-width="1.5"><title>' +
+      escapeHtml(name) +
+      "</title></circle>";
+  });
+
+  // merge junction
+  const mergeY = H - pad - 24;
+  nodes +=
+    '<circle cx="' +
+    spineX +
+    '" cy="' +
+    mergeY +
+    '" r="7" fill="#cf222e" stroke="#fff" stroke-width="1.5"><title>merge / HITL</title></circle>';
+
+  tasks.slice(0, 5).forEach((t, i) => {
+    const ty = pad + 28 + i * 28;
+    nodes +=
+      '<circle cx="' +
+      spineX +
+      '" cy="' +
+      ty +
+      '" r="4" fill="#57606a" stroke="#fff" stroke-width="1"><title>' +
+      escapeHtml(t.id) +
+      "</title></circle>";
+  });
+
+  host.innerHTML =
+    '<svg viewBox="0 0 ' +
+    W +
+    " " +
+    H +
+    '" xmlns="http://www.w3.org/2000/svg" aria-label="Rail merge graph">' +
+    paths +
+    nodes +
+    "</svg>";
+
+  const legendHtml = agents
+    .map(
+      (name, i) =>
+        '<span><span class="graph-dot" style="background:' +
+        AGENT_COLORS[i % AGENT_COLORS.length] +
+        '"></span> ' +
+        escapeHtml(name) +
+        " · " +
+        (activeAgents[name] ? "active" : "idle") +
+        "</span>"
+    )
+    .join("");
+  legend.innerHTML = legendHtml;
+  const legendTb = document.getElementById("graph-legend-tb");
+  if (legendTb) legendTb.innerHTML = legendHtml;
+
+  renderMergeBenchUI();
+}
+
+function updateClientList(clients) {
+  const el = document.getElementById("client-list");
+  if (!el) return;
+  let html = "";
+  clients.forEach((c) => {
+    const mark = myClientId && c === myClientId ? " (this session)" : "";
+    html += '<div class="client">● ' + escapeHtml(c) + mark + "</div>";
+  });
+  el.innerHTML = html || '<div style="color:var(--qp-text-muted);font-size:12px">No clients</div>';
+  const cc = document.getElementById("client-count");
+  if (cc) cc.textContent = "Clients: " + clients.length;
+}
+
+window.toggleAgent = function (name) {
+  activeAgents[name] = !activeAgents[name];
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "toggleAgent", name, value: activeAgents[name] }));
+  }
+  updateDashboard();
+  renderRailGraph();
+};
+
+window.toggleVoice = function () {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return log("Speech recognition not supported in this browser");
+
+  const rec = new SpeechRecognition();
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.onresult = (e) => {
+    let transcript = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      transcript += e.results[i][0].transcript;
+    }
+    log("Heard: " + transcript);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "voice_command", text: transcript }));
+    }
+  };
+  rec.start();
+  document.querySelectorAll(".mic-btn").forEach((mb) => mb.classList.add("recording"));
+  log("Listening…");
+};
+
+document.addEventListener("mouseup", () => {
+  const sel = window.getSelection().toString().trim();
+  if (sel.length > 8) {
+    stagingBuffer.unshift(sel);
+    if (stagingBuffer.length > 8) stagingBuffer.pop();
+    renderStaging();
+    log("Staging: " + sel.length + " chars");
+  }
+});
+
+function renderStaging() {
+  const html =
+    stagingBuffer
+      .map(
+        (t, i) =>
+          '<div class="staging-item" onclick="stageToChannel(' +
+          i +
+          ')">' +
+          escapeHtml(t) +
+          "</div>"
+      )
+      .join("") || "— Nothing staged —";
+  document.querySelectorAll(".staging-mount").forEach((el) => {
+    el.innerHTML = html;
+  });
+}
+
+window.stageToChannel = function (i) {
+  log("[staged] " + stagingBuffer[i].slice(0, 120) + "…");
+  stagingBuffer.splice(i, 1);
+  renderStaging();
+};
+
+window.clearStaging = function () {
+  stagingBuffer = [];
+  renderStaging();
+};
+
+window.exportRailway = function (fmt) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "export", format: fmt }));
+  }
+  log("Export: " + fmt);
+};
+
+window.forceMerge = function () {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "forceMerge" }));
+  }
+  log("Force merge requested");
+};
+
+window.togglePause = function () {
+  const t = isPaused ? "resume" : "pause";
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: t }));
+  }
+  log(t === "pause" ? "Pause requested" : "Resume requested");
+};
+
+log("Console ready");
+connectWebSocket();
+renderAgents();
+updateDashboard();
+renderStaging();
+renderRailGraph();
+renderTicketsTable();
+setView("overview");
+</script>
+</body>
+</html>

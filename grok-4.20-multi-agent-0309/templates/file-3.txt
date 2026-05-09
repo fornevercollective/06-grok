@@ -1,0 +1,13 @@
+grok-railway/
+├── railway-v14.html          # Frontend Dashboard
+├── Makefile
+├── run-all.sh
+├── rust/
+│   ├── Cargo.toml
+│   └── src/main.rs
+├── python/
+│   ├── pyproject.toml
+│   └── server.py
+└── node/
+    ├── server.js
+    └── package.json

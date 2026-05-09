@@ -1,0 +1,9 @@
+<hr class="lab-steno-sep" />
+<h2>Column width · line stats</h2>
+<div class="slider-row">
+  <label for="colw">Narrow → wide</label>
+  <input type="range" id="colw" min="180" max="420" value="240">
+  <span id="colw-val">240px</span>
+</div>
+<p class="note" style="margin-top:0">Three-way justification comparison; <strong>stenoSTRIP</strong> live — slate–violet river strips on wide spaces + tiered stats below each column. Justification widget is bundled with this lab (same module the mount loads).</p>
+<div id="pj-justify-mount"></div>

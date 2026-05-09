@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>qbit-notes • grok.com waypoint v1.6 codec • freya+history blocks</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #0a0c12;
+    --surface: #161b22;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --border: #30363d;
+    --gutter: #0d1117;
+    --voice: #ff7b72;
+    --freya-cyan: #22d3ee;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+  body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace; height: 100vh; display: flex;
+    flex-direction: column; overflow: hidden;
+  }
+  header {
+    background: var(--surface); padding: 10px 16px; display: flex; align-items: center;
+    gap: 12px; border-bottom: 1px solid var(--border); font-size: 14px; flex-wrap: wrap;
+  }
+  .logo { font-weight: 500; letter-spacing: 0.5px; color: var(--accent); }
+  .gutter {
+    width: 54px; background: var(--gutter); padding: 8px 4px;
+    text-align: center; font-size: 13px; line-height: 1.5; overflow-y: auto;
+    border-right: 1px solid var(--border); user-select: none; color: var(--text-secondary);
+  }
+  .editor {
+    flex: 1; padding: 20px; outline: none; font-size: 15px; line-height: 1.65;
+    white-space: pre-wrap; overflow: auto; background: var(--bg);
+    caret-color: var(--accent); color: var(--text);
+  }
+  .sidebar {
+    width: 320px; background: var(--surface); border-left: 1px solid var(--border);
+    padding: 12px; display: flex; flex-direction: column; gap: 12px;
+    font-size: 13px; overflow: auto;
+  }
+  button {
+    background: var(--surface); color: var(--accent); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+  }
+  button:hover { background: #21262d; border-color: var(--accent); }
+  button.voice { color: var(--voice); border-color: var(--voice); }
+  .status {
+    font-size: 12px; opacity: 0.85; padding: 6px 12px;
+    background: #21262d; border-radius: 6px; border: 1px solid var(--border);
+  }
+  .cube {
+    width: 100%; height: 140px; background: var(--surface);
+    border: 1px solid var(--accent); border-radius: 8px;
+    position: relative; overflow: hidden;
+  }
+  .cube::after {
+    content: '◼︎'; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotate(45deg); font-size: 68px;
+    color: var(--accent); opacity: 0.15;
+  }
+  .voice-wave {
+    height: 60px; background: var(--surface); border: 1px solid var(--voice);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--voice);
+  }
+  .panel-title { font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  .accreditation {
+    font-size: 11px; color: var(--text-secondary); line-height: 1.4;
+    border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;
+  }
+
+  /* HISTORY BLOCKED CARD SYSTEM + FREYA LOG SCALE */
+  #timeline-strip {
+    height: 96px; flex-shrink: 0; background: var(--surface);
+    border-bottom: 1px solid var(--border); position: relative; overflow: hidden;
+  }
+  #block-canvas { position: absolute; inset: 0; background: var(--bg); }
+  .block {
+    position: absolute; min-width: 160px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; cursor: grab;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3); z-index: 10; user-select: none;
+  }
+  .block:hover { box-shadow: 0 4px 20px rgba(124,58,237,.4); }
+  .block.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,.3); }
+  .block-header {
+    display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+    border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: .625rem;
+  }
+  .block-header .prefix { font-weight: 800; }
+  .block-body { padding: 8px 10px; font-size: .6875rem; color: var(--text-secondary); max-height: 110px; overflow: hidden; }
+  .connector {
+    width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border);
+    background: var(--bg); position: absolute; cursor: crosshair; z-index: 20;
+  }
+  .connector.in { left: -6px; top: 50%; transform: translateY(-50%); }
+  .connector.out { right: -6px; top: 50%; transform: translateY(-50%); }
+  #block-svg { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">qbit-notes • grok.com</div>
+  <span style="flex:1"></span>
+  <button onclick="toggleSteno()">stenoSTRIP</button>
+  <button onclick="runStenoReplace()">stenoReplace</button>
+  <button onclick="exportQbit()">export .qbit</button>
+  <button onclick="tumbleEncryptShare()">tumble share</button>
+  <button onclick="kbatchSuggest()">kbatch</button>
+  <button class="voice" onclick="startVoiceNotes()">jawta-voice • x.ai</button>
+  <button onclick="toggleFreyaMode()">freya-units log</button>
+</header>
+
+<!-- FREYA + HISTORY TIMELINE STRIP (updated scroll assess top) -->
+<div id="timeline-strip">
+  <canvas id="timeline-canvas" width="1200" height="96"></canvas>
+  <div id="tl-info" style="position:absolute;top:6px;left:12px;font-size:11px;font-family:IBM Plex Mono;color:#8b949e;pointer-events:none;">ZPF ← 61 orders • Freya Units Logarithmic Scale → Observable</div>
+  <div id="tl-freya" style="position:absolute;top:6px;right:12px;font-size:11px;color:#22d3ee;font-family:IBM Plex Mono;">freya-log</div>
+</div>
+
+<div style="display:flex;flex:1;overflow:hidden">
+  <!-- Quantum Gutter -->
+  <div class="gutter" id="gutter"></div>
+
+  <!-- Main Canvas + Blocked Card System (full history integration) -->
+  <div id="canvas-panel" style="flex:1;position:relative;background:var(--bg);">
+    <canvas id="block-canvas" width="1400" height="800"></canvas>
+    <svg id="block-svg" width="1400" height="800" style="position:absolute;inset:0;pointer-events:none;"></svg>
+    
+    <div id="canvas-tools" style="position:absolute;top:12px;left:12px;display:flex;gap:4px;z-index:30;">
+      <button onclick="addBlock('source')">+ Source</button>
+      <button onclick="addBlock('event')">+ Event</button>
+      <button onclick="addBlock('entity')">+ Entity</button>
+      <button onclick="addBlock('chapter')">+ Chapter</button>
+      <button onclick="clearBlocks()">Clear</button>
+    </div>
+    
+    <div id="canvas-info" style="position:absolute;bottom:8px;left:12px;font-size:11px;color:#8b949e;font-family:IBM Plex Mono;pointer-events:none;">blocks: 0 | connections: 0 | drag to connect • freya-log active</div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="panel-title">Live Analysis</div>
+    <div id="analysis" style="background:var(--surface);padding:12px;border:1px solid var(--border);min-height:140px;font-size:13px;line-height:1.6"></div>
+
+    <div class="panel-title">Cube Preview</div>
+    <div id="cube" class="cube"></div>
+
+    <div class="panel-title">Inspector • Blocked Card</div>
+    <div id="insp-content" style="flex:1;background:var(--surface);padding:12px;border:1px solid var(--border);overflow:auto;font-size:12.5px;">
+      <!-- Dynamic inspector populated by JS -->
+    </div>
+
+    <div class="panel-title">jawta-voice • x.ai realtime</div>
+    <div id="voice-wave" class="voice-wave">click button to speak</div>
+
+    <div id="kbatch-panel" style="flex:1;background:var(--surface);padding:12px;border:1px solid var(--border);font-size:12.5px;overflow:auto"></div>
+
+    <div class="accreditation">
+      Built by Grok (xAI)<br>
+      qbitOS research surface • codec v1.6<br>
+      quantum-prefixes.js + qbit-steno + DAC + Freya Units Log + blocked card system<br>
+      grok.com visual language • 2026-04-18
+    </div>
+
+    <div class="status" id="status">ready • grok.com • freya-log + blocked cards active</div>
+  </div>
+</div>
+
+<script>
+// ====================== QBITOS v1.6 GROK.COM + FREYA + BLOCKED CARD SYSTEM ======================
+let stenoActive = false;
+let currentContent = '';
+let voiceActive = false;
+let mediaRecorder = null;
+
+// STATE for blocked card system (full history integration)
+let STATE = {
+  blocks: [],
+  connections: [],
+  selectedBlock: null,
+  nextId: 1,
+  freyaMode: true,
+  tlCenter: 0,
+  tlZoom: 1
+};
+
+// BLOCK TYPES with quantum prefixes
+const BLOCK_TYPES = {
+  source:  { prefix: 'n:',   color: '#ef4444', label: 'SOURCE' },
+  chapter: { prefix: '+1:',  color: '#3fb950', label: 'CHAPTER' },
+  entity:  { prefix: '+0:',  color: '#f0883e', label: 'ENTITY' },
+  event:   { prefix: '0:',   color: '#58a6ff', label: 'EVENT' },
+  relation:{ prefix: '+n:',  color: '#d2a8ff', label: 'RELATION' },
+  analysis:{ prefix: '1:',   color: '#79c0ff', label: 'ANALYSIS' }
+};
+
+function classifyLine(line) {
+  if (!line || !line.trim()) return {sym:'0', gate:'I', color:'#8b949e'};
+  const l = line.toLowerCase().trim();
+  if (l.includes('import') || l.includes('script')) return {sym:'-n', gate:'M', color:'#58a6ff'};
+  if (l.includes('function') || l.includes('=>')) return {sym:'+1', gate:'H', color:'#58a6ff'};
+  if (l.includes('grok') || l.includes('canvas') || l.includes('block')) return {sym:'★', gate:'Q', color:'#ff7b72'};
+  if (l.includes('freya') || l.includes('log') || l.includes('unit')) return {sym:'⚛', gate:'F', color:'#22d3ee'};
+  return {sym:'0', gate:'I', color:'#8b949e'};
+}
+
+window.liveAnalyze = function(text) {
+  currentContent = text;
+  const lines = text.split('\n');
+  let gutterHTML = '';
+  let summary = `<b>${lines.length} lines • Quantum Gutter + Freya</b><br>`;
+
+  lines.forEach((line, i) => {
+    const c = classifyLine(line);
+    gutterHTML += `<div style="color:${c.color}">${c.sym} ${c.gate}</div>`;
+    if (i < 12) summary += `<span style="color:${c.color}">${c.sym}</span> ${line.substring(0,42)}${line.length>42?'…':''}<br>`;
+  });
+
+  document.getElementById('gutter').innerHTML = gutterHTML;
+  document.getElementById('analysis').innerHTML = summary;
+
+  const cube = document.getElementById('cube');
+  const rot = (lines.length * 2.8) % 360;
+  cube.style.transform = `perspective(800px) rotateX(${rot}deg) rotateY(${text.length % 360}deg)`;
+};
+
+// BLOCKED CARD SYSTEM (history.html integration)
+function createBlock(type, title = '', content = '') {
+  const bt = BLOCK_TYPES[type] || BLOCK_TYPES.event;
+  const id = 'b-' + STATE.nextId++;
+  const block = {
+    id, type, title: title || bt.label,
+    content: content || '',
+    x: 120 + Math.random() * 600,
+    y: 80 + Math.random() * 400
+  };
+  STATE.blocks.push(block);
+  renderBlock(block);
+  updateStats();
+  return block;
+}
+
+function renderBlock(block) {
+  const bt = BLOCK_TYPES[block.type] || BLOCK_TYPES.event;
+  const el = document.createElement('div');
+  el.className = 'block';
+  el.id = block.id;
+  el.style.left = block.x + 'px';
+  el.style.top = block.y + 'px';
+  el.style.borderLeft = `4px solid ${bt.color}`;
+  el.innerHTML = `
+    <div class="connector in" data-id="${block.id}"></div>
+    <div class="block-header">
+      <span class="prefix" style="color:${bt.color}">${bt.prefix}</span>
+      <span style="font-weight:600">${bt.label}</span>
+      <span style="flex:1"></span>
+      <span onclick="removeBlock('${block.id}');event.stopImmediatePropagation()" style="cursor:pointer;color:#8b949e">✕</span>
+    </div>
+    <div class="block-body">${block.title || ''}</div>
+    <div class="connector out" data-id="${block.id}"></div>
+  `;
+  document.getElementById('canvas-panel').appendChild(el);
+
+  // Drag logic
+  let offsetX, offsetY;
+  el.addEventListener('mousedown', e => {
+    if (e.target.tagName === 'SPAN') return;
+    STATE.selectedBlock = block;
+    offsetX = e.clientX - block.x;
+    offsetY = e.clientY - block.y;
+    document.querySelectorAll('.block').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!STATE.selectedBlock || STATE.selectedBlock.id !== block.id) return;
+    block.x = e.clientX - offsetX;
+    block.y = e.clientY - offsetY;
+    el.style.left = block.x + 'px';
+    el.style.top = block.y + 'px';
+    drawConnections();
+  });
+
+  window.addEventListener('mouseup', () => { STATE.selectedBlock = null; });
+}
+
+function removeBlock(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  STATE.blocks = STATE.blocks.filter(b => b.id !== id);
+  STATE.connections = STATE.connections.filter(c => c.from !== id && c.to !== id);
+  drawConnections();
+  updateStats();
+}
+
+function addConnection(from, to) {
+  if (STATE.connections.find(c => c.from === from && c.to === to)) return;
+  STATE.connections.push({ from, to });
+  drawConnections();
+}
+
+function drawConnections() {
+  const svg = document.getElementById('block-svg');
+  svg.innerHTML = '';
+  STATE.connections.forEach(conn => {
+    const fromEl = document.getElementById(conn.from);
+    const toEl = document.getElementById(conn.to);
+    if (!fromEl || !toEl) return;
+    const fRect = fromEl.getBoundingClientRect();
+    const tRect = toEl.getBoundingClientRect();
+    const panelRect = document.getElementById('canvas-panel').getBoundingClientRect();
+    const x1 = fRect.right - panelRect.left;
+    const y1 = fRect.top + fRect.height / 2 - panelRect.top;
+    const x2 = tRect.left - panelRect.left;
+    const y2 = tRect.top + tRect.height / 2 - panelRect.top;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${x1+60} ${y1} ${x2-60} ${y2} ${x2} ${y2}`);
+    path.setAttribute('stroke', '#58a6ff');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-dasharray', '3,2');
+    svg.appendChild(path);
+  });
+}
+
+function updateStats() {
+  document.getElementById('canvas-info').textContent = `blocks: ${STATE.blocks.length} | connections: ${STATE.connections.length} | freya-log active`;
+}
+
+// FREYA UNITS LOGARITHMIC SCALE (built-in from freya.qbitos.ai)
+let freyaScale = true;
+function toggleFreyaMode() {
+  freyaScale = !freyaScale;
+  document.getElementById('tl-freya').textContent = freyaScale ? 'freya-log ✓' : 'linear';
+  drawTimeline();
+}
+
+// Timeline with Freya Log Scale
+function drawTimeline() {
+  const cv = document.getElementById('timeline-canvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0c12'; ctx.fillRect(0, 0, W, H);
+
+  // Freya Logarithmic scale (61 orders + Freya units)
+  const orders = 61;
+  for (let i = 0; i <= orders; i++) {
+    const x = (i / orders) * W;
+    ctx.strokeStyle = i % 10 === 0 ? '#22d3ee' : '#30363d';
+    ctx.lineWidth = i % 10 === 0 ? 2 : 1;
+    ctx.beginPath();
+    ctx.moveTo(x, 20);
+    ctx.lineTo(x, H - 20);
+    ctx.stroke();
+    if (i % 5 === 0) {
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = '9px IBM Plex Mono';
+      ctx.fillText('10^' + (i - 30), x + 4, 14);
+    }
+  }
+  // Freya label
+  ctx.fillStyle = '#22d3ee';
+  ctx.font = 'bold 10px IBM Plex Mono';
+  ctx.fillText('FREYA UNITS LOG SCALE', W/2 - 80, H - 8);
+}
+
+function addBlock(type) {
+  createBlock(type);
+}
+
+// Boot everything
+setTimeout(() => {
+  // Seed demo blocks
+  createBlock('source', 'Voynich Manuscript', 'Beinecke MS 408 • carbon dated 1404–1438');
+  createBlock('event', 'Planck Epoch', 'Freya Unit start of observable universe');
+  createBlock('entity', 'CERN Proton Cage', '70 proton polarity inversion');
+  drawTimeline();
+  drawConnections();
+  document.getElementById('editor').focus();
+  liveAnalyze(document.getElementById('editor').innerText);
+}, 120);
+</script>
+</body>
+</html>
