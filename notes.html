@@ -2021,6 +2021,7 @@ html.nt-draw-open #main.nt-draw-active .nt-draw-canvas-wrap{cursor:crosshair}
 
 <script src="quantum-prefixes.js"></script>
 <script src="notes-surface.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js" crossorigin="anonymous"></script>
 <script>
 // Grok Notes - Advanced Terminal Integration Loaded
 
@@ -2319,11 +2320,16 @@ class MLEngine {
   }
 }
 
-// Initialize advanced components
+// Initialize advanced components (GraphicsEngine needs THREE — missing library must not abort UI wiring)
 const perfMonitor = new PerformanceMonitor();
 const errorBoundary = new ErrorBoundary(document.body);
 const grokState = new GrokState();
-const graphicsEngine = new GraphicsEngine();
+let graphicsEngine = null;
+try {
+  if (typeof THREE !== 'undefined') graphicsEngine = new GraphicsEngine();
+} catch (e) {
+  console.warn('GraphicsEngine init skipped:', e);
+}
 const mlEngine = new MLEngine();
 
 // Add to global tools
