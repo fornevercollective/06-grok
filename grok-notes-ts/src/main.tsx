@@ -15,8 +15,8 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-// Service worker only in production — dev caching can serve stale HTML for `/`
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+// Service worker only at site root — public/sw.js caches `/` paths and breaks GitHub Pages project URLs (e.g. /grok-cli/).
+if (import.meta.env.PROD && import.meta.env.BASE_URL === '/' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const swUrl = `${import.meta.env.BASE_URL}sw.js`
     navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL })
