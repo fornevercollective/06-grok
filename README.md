@@ -1,3 +1,5 @@
+<img width="1323" height="794" alt="Screenshot 2026-05-09 at 2 26 13 PM" src="https://github.com/user-attachments/assets/64a094c1-4e3c-4ad8-bd36-9fd1d2ab762a" />
+
 # Grok Notes
 
 Grok Notes is an advanced, AI-powered notebook application built with React, TypeScript, and Node.js. It provides a collaborative, offline-capable environment for coding, data analysis, and machine learning, integrated with Grok AI for assistance.
