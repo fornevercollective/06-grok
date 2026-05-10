@@ -18,7 +18,8 @@ createRoot(document.getElementById('root')!).render(
 // Service worker only in production — dev caching can serve stale HTML for `/`
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    const swUrl = `${import.meta.env.BASE_URL}sw.js`
+    navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL })
       .then((registration) => {
         console.log('SW registered: ', registration);
       })
